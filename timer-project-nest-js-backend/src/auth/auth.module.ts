@@ -6,6 +6,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './auth.gaurd';
+import { LocalStrategy } from './passport/local.strategy';
 
 @Module({
   imports: [
@@ -25,7 +26,8 @@ import { AuthGuard } from './auth.gaurd';
     {
       provide: APP_GUARD,
       useClass: AuthGuard
-    }
+    }, 
+    LocalStrategy
   ]
 })
 export class AuthModule {}

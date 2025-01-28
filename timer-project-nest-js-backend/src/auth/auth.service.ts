@@ -22,15 +22,8 @@ export class AuthService {
   }
 
   async signin(createUserSignInDto: CreateUserSignInDto): Promise<{ access_token: string}> {
-    const user: User = await this.usersService.retreiveUser(createUserSignInDto.email);
-    //user does not exist - exit.
+    const user: User = await this.validateUser(createUserSignInDto.email, createUserSignInDto.password);
     if(!user) {
-      return;
-    }
-    //validate input user credentials are valid.
-    const isMatching: boolean = await bcrypt.compare(createUserSignInDto.password, user.password);
-    //input user credentials are invalid.
-    if(!isMatching) {
       return;
     }
     //input user credentials are valid - generate JWT.
@@ -38,5 +31,20 @@ export class AuthService {
     return {
       access_token: await this.jwtService.signAsync(payload),
     };
+  }
+
+  async validateUser(email: string, password: string): Promise<User> {
+    const user: User = await this.usersService.retreiveUser(email);
+    //user does not exist - exit.
+    if(!user) {
+      return;
+    }
+    //validate input user credentials are valid.
+    const isMatching: boolean = await bcrypt.compare(password, user.password);
+    //input user credentials are invalid.
+    if(!isMatching) {
+      return;
+    }
+    return user;
   }
 }
