@@ -18,16 +18,22 @@ export class AuthService {
     const salt: string = await bcrypt.genSalt(10);
     const hashedPassword: string = await bcrypt.hash(createUserSignUpDto.password, salt);
     const user: User = await this.usersService.createUser({ ...createUserSignUpDto, password: hashedPassword });
-    return user;
-  }
-
-  async signin(createUserSignInDto: CreateUserSignInDto): Promise<{ access_token: string}> {
-    const user: User = await this.validateUser(createUserSignInDto.email, createUserSignInDto.password);
     if(!user) {
       return;
     }
+    let signInCred: CreateUserSignInDto = new CreateUserSignInDto();
+    signInCred.email = user.email;
+    signInCred.password = user.password;
+    const tokenPlaceHolderObject: { access_token: string} = await this.signin(user.id, signInCred);
+    if(!tokenPlaceHolderObject) {
+      return;
+    }
+    return user;
+  }
+
+  async signin(userId: string, createUserSignInDto: CreateUserSignInDto): Promise<{ access_token: string}> {
     //input user credentials are valid - generate JWT.
-    const payload = { sub: user.id, username: user.email };
+    const payload = { sub: userId, username: createUserSignInDto.email };
     return {
       access_token: await this.jwtService.signAsync(payload),
     };

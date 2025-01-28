@@ -1,6 +1,7 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Request } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Public } from './auth.decorator.factory';
+import { LocalAuthGuard } from './passport/local-auth.guard';
 import { CreateUserSignUpDto } from '../users/dto/create-user-sign-up.dto';
 import { CreateUserSignInDto } from '../users/dto/create-user-sign-in.dto';
 
@@ -16,8 +17,14 @@ export class AuthController {
   }
 
   @Public()
+  @UseGuards(LocalAuthGuard)
   @Post('signin')
-  signin(@Body() createUserSignInDto: CreateUserSignInDto) {
-    return this.authService.signin(createUserSignInDto);
+  signin(@Request() request) {
+    //retreive and store user object in request once validated via LocalStrategy.
+    //create CreateUserSignInDto via this request user object.
+    let signInCred: CreateUserSignInDto = new CreateUserSignInDto();
+    signInCred.email = request.user.email;
+    signInCred.password = request.user.password;
+    return this.authService.signin(request.user.id, signInCred);
   }
 }
