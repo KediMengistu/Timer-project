@@ -1,10 +1,12 @@
-import { Module } from '@nestjs/common';
+import { Module, ValidationPipe } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { TimersModule } from './timers/timers.module';
 import { User } from './users/entities/user.entity';
 import { AuthModule } from './auth/auth.module';
+import { APP_PIPE, APP_FILTER } from '@nestjs/core';
+import { CatchEverythingFilter } from './exception/catch-everything-exception.filter';
 
 @Module({
   imports: 
@@ -25,6 +27,16 @@ import { AuthModule } from './auth/auth.module';
       }),
       UsersModule, 
       TimersModule, AuthModule
+    ],
+    providers: [
+      {
+        provide: APP_PIPE,
+        useClass: ValidationPipe
+      },
+      {
+        provide: APP_FILTER,
+        useClass: CatchEverythingFilter,
+      }
     ]
 })
 export class AppModule {}

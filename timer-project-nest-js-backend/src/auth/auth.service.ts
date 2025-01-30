@@ -1,9 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/entities/user.entity';
 import { CreateUserSignUpDto } from '../users/dto/create-user-sign-up.dto';
-import { CreateUserSignInDto } from '../users/dto/create-user-sign-in.dto';
 import * as bcrypt from 'bcrypt';
 
 
@@ -14,26 +13,17 @@ export class AuthService {
     private jwtService: JwtService
   ) {}
 
-  async signup(createUserSignUpDto: CreateUserSignUpDto): Promise<User> {
+  async signup(createUserSignUpDto: CreateUserSignUpDto): Promise<{ user: User, access_token_obj: { access_token: string} }> {
     const salt: string = await bcrypt.genSalt(10);
     const hashedPassword: string = await bcrypt.hash(createUserSignUpDto.password, salt);
     const user: User = await this.usersService.createUser({ ...createUserSignUpDto, password: hashedPassword });
-    if(!user) {
-      return;
-    }
-    let signInCred: CreateUserSignInDto = new CreateUserSignInDto();
-    signInCred.email = user.email;
-    signInCred.password = user.password;
-    const tokenPlaceHolderObject: { access_token: string} = await this.signin(user.id, signInCred);
-    if(!tokenPlaceHolderObject) {
-      return;
-    }
-    return user;
+    const tokenPlaceHolderObject: { access_token: string } = await this.signin(user.id, user.email);
+    return { user: user, access_token_obj: tokenPlaceHolderObject };
   }
 
-  async signin(userId: string, createUserSignInDto: CreateUserSignInDto): Promise<{ access_token: string}> {
+  async signin(userId: string, email: string): Promise<{ access_token: string}> {
     //input user credentials are valid - generate JWT.
-    const payload = { sub: userId, username: createUserSignInDto.email };
+    const payload = { sub: userId, username: email };
     return {
       access_token: await this.jwtService.signAsync(payload),
     };
@@ -43,13 +33,13 @@ export class AuthService {
     const user: User = await this.usersService.retreiveUser(email);
     //user does not exist - exit.
     if(!user) {
-      return;
+      throw new HttpException('Provided email is not associated to any user account.', HttpStatus.UNAUTHORIZED);
     }
     //validate input user credentials are valid.
     const isMatching: boolean = await bcrypt.compare(password, user.password);
     //input user credentials are invalid.
     if(!isMatching) {
-      return;
+      throw new HttpException('Provided password is incorrect.', HttpStatus.UNAUTHORIZED);
     }
     return user;
   }
