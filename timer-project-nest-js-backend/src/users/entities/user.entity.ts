@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn, Unique, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, Unique, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+import { Timer } from '../../timers/entities/timer.entity';
 
 @Entity({ name: 'users' })
 @Unique(["email"])
@@ -18,10 +19,13 @@ export class User {
   @Column()
   lastName: string;
 
+  @OneToMany(() => Timer, (timer) => timer.user)
+  timers: Timer[]
+
   @CreateDateColumn(
     {
       name: 'created_at',
-      type: 'timestamptz',
+      type: 'timestamp',
       default: () => 'CURRENT_TIMESTAMP(6)'
     }
   )
@@ -30,7 +34,7 @@ export class User {
   @UpdateDateColumn(
     { 
       name: 'updated_at',
-      type: 'timestamptz',
+      type: 'timestamp',
       default: () => 'CURRENT_TIMESTAMP(6)',
       onUpdate: 'CURRENT_TIMESTAMP(6)',
     }
