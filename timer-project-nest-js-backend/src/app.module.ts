@@ -1,15 +1,15 @@
 import { Module, ValidationPipe } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { UsersModule } from './users/users.module';
-import { TimersModule } from './timers/timers.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './users/entities/user.entity';
 import { Timer } from './timers/entities/timer.entity'
 import { Break } from './breaks/entity/break.entity';;
+import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { TimersModule } from './timers/timers.module';
+import { BreaksModule } from './breaks/breaks.module';
 import { APP_PIPE, APP_FILTER } from '@nestjs/core';
 import { CatchEverythingFilter } from './exception/catch-everything-exception.filter';
-import { BreaksModule } from './breaks/breaks.module';
 
 @Module({
   imports: 
@@ -29,8 +29,8 @@ import { BreaksModule } from './breaks/breaks.module';
         })
       }),
       UsersModule, 
+      AuthModule,
       TimersModule, 
-      AuthModule, 
       BreaksModule
     ],
     providers: [

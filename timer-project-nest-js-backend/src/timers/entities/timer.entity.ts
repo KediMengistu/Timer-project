@@ -1,7 +1,7 @@
-import { Entity, Column, PrimaryGeneratedColumn, Unique, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, Check } from 'typeorm';
+import { Entity, Unique, Check, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
-import { Break } from '../../breaks/entity/break.entity';
 import { BreakDurationSpans } from '../../breaks/enums/break-duration.enum';
+import { Break } from '../../breaks/entity/break.entity';
 
 @Entity({ name: 'timers' })
 @Unique(['title'])
