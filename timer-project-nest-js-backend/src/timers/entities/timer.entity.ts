@@ -1,9 +1,10 @@
-import { Entity, Column, PrimaryGeneratedColumn, Unique, CreateDateColumn, UpdateDateColumn, ManyToOne, Check } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, Unique, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, Check } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
-import { BreakDurationSpans } from './break-duration.enum';
+import { Break } from '../../breaks/entity/break.entity';
+import { BreakDurationSpans } from '../../breaks/enums/break-duration.enum';
 
 @Entity({ name: 'timers' })
-@Unique(["title"])
+@Unique(['title'])
 @Check(`"durationHours" >= 1 AND "durationHours" < 25`)
 @Check(`"durationMinutes" > 0 AND "durationMinutes" < 60`)
 @Check(`"durationSeconds" > 0 AND "durationSeconds" < 60`)
@@ -25,10 +26,11 @@ export class Timer {
   )
   startTime: Date;
 
-  @CreateDateColumn(
+  @Column(
     {
       type: 'timestamp',
-      nullable: true
+      nullable: true,
+      default: null
     }
   )
   endTime: Date;
@@ -58,6 +60,9 @@ export class Timer {
     }
   )
   numberOfBreaks: number;
+
+  @OneToMany(() => Break, (breakEntity) => breakEntity.timer)
+  breaks: Break[];
 
   @CreateDateColumn(
     {

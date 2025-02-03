@@ -1,5 +1,5 @@
 import { IsString, IsNotEmpty, IsInt, IsEnum } from "class-validator";
-import { BreakDurationSpans } from "../entities/break-duration.enum";
+import { BreakDurationSpans } from "../../breaks/enums/break-duration.enum";
 
 export class CreateTimerDTO {
   @IsString()
@@ -8,7 +8,7 @@ export class CreateTimerDTO {
 
   @IsInt()
   @IsNotEmpty()
-  durationHour: number;
+  durationHours: number;
 
   @IsInt()
   @IsNotEmpty()

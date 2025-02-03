@@ -2,7 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn, Unique, CreateDateColumn, Updat
 import { Timer } from '../../timers/entities/timer.entity';
 
 @Entity({ name: 'users' })
-@Unique(["email"])
+@Unique(['email'])
 export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -20,7 +20,7 @@ export class User {
   lastName: string;
 
   @OneToMany(() => Timer, (timer) => timer.user)
-  timers: Timer[]
+  timers: Timer[];
 
   @CreateDateColumn(
     {
