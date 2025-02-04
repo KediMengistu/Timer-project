@@ -64,6 +64,24 @@ export class Timer {
   @OneToMany(() => Break, (breakEntity) => breakEntity.timer)
   breaks: Break[];
 
+  @Column(
+    {
+      type: 'timestamp',
+      nullable: true,
+      default: null
+    }
+  )
+  pauseTime: Date;
+
+  @Column(
+    {
+      type: 'timestamp',
+      nullable: true,
+      default: null
+    }
+  )
+  unpausedTime: Date;
+
   @CreateDateColumn(
     {
       name: 'created_at',

@@ -5,6 +5,7 @@ import { UsersModule } from '../users/users.module';
 import { BreaksModule } from '../breaks/breaks.module';
 import { TimersController } from './timers.controller';
 import { TimersService } from './timers.service';
+import { TimersUtility } from './timers.utility';
 
 @Module({
   imports: [
@@ -13,6 +14,6 @@ import { TimersService } from './timers.service';
     BreaksModule
   ],
   controllers: [TimersController],
-  providers: [TimersService]
+  providers: [TimersService, TimersUtility]
 })
 export class TimersModule {}
