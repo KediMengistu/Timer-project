@@ -15,7 +15,9 @@ export class Timer {
   @Column()
   title: string;
 
-  @ManyToOne(() => User, (user) => user.timers)
+  @ManyToOne(() => User, (user) => user.timers, {
+    onDelete: 'CASCADE'
+  })
   user: User;
 
   @CreateDateColumn(
@@ -35,6 +37,15 @@ export class Timer {
   )
   endTime: Date;
 
+  @Column(
+    {
+      type: 'timestamp',
+      nullable: true,
+      default: null
+    }
+  )
+  delayedEndTime: Date;
+
   @Column({ type: 'int' })
   durationHours: number;
 
@@ -43,6 +54,9 @@ export class Timer {
 
   @Column({ type: 'int' })
   durationSeconds: number;
+
+  @Column({ type: 'bigint', default: 0 })
+  pausedDurationInMs: number;
 
   @Column(
     { 
@@ -56,7 +70,8 @@ export class Timer {
   @Column(
     { 
       type: 'int',
-      nullable: true
+      nullable: true,
+      default: null
     }
   )
   numberOfBreaks: number;

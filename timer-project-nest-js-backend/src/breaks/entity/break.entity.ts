@@ -10,7 +10,9 @@ export class Break {
   @Column({ type: 'int' })
   breakNumber: number;
 
-  @ManyToOne(() => Timer, (timer) => timer.breaks)
+  @ManyToOne(() => Timer, (timer) => timer.breaks, {
+    onDelete: 'CASCADE',
+  })
   timer: Timer;
 
   @Column(

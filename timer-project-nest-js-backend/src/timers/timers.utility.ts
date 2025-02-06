@@ -47,7 +47,7 @@ export class TimersUtility {
     return { end, numberOfBreaks };
   }
 
-  completeCreateTimerBreakIHelper(startTimeForBreakI: Date, endTimeForBreakI: Date, i: number, timer: Timer): Break {
+  private completeCreateTimerBreakIHelper(startTimeForBreakI: Date, endTimeForBreakI: Date, i: number, timer: Timer): Break {
     let breakObjectI = new Break();
     breakObjectI.breakNumber = i;
     breakObjectI.timer = timer;
@@ -55,5 +55,19 @@ export class TimersUtility {
     breakObjectI.startTime = startTimeForBreakI;
     breakObjectI.endTime = endTimeForBreakI;
     return breakObjectI;
+  }
+
+  pausePlayTimerSettingsConfiguration(timer: Timer):
+    { 
+      delayedEndTime: Date, 
+      pausedDurationInMs: number
+    }{
+    const totalMs = timer.unpausedTime.getTime() - timer.pauseTime.getTime();
+    const newPausedDurationInMs = Number(timer.pausedDurationInMs) + totalMs;
+    const delayedEndTime = new Date(timer.endTime.getTime() + totalMs);
+    return {
+      delayedEndTime,
+      pausedDurationInMs: newPausedDurationInMs
+    }
   }
 }
