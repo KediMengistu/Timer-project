@@ -7,6 +7,8 @@ import { CreateTimerDTO } from './dto/create-timer.dto';
 import { User } from '../users/entities/user.entity';
 import { TimersUtility } from './timers.utility';
 import { NotFoundException } from '../exception/not-found.exception';
+import { GuestTimer } from './objects/guest-timer';
+import { GuestTimerDTO } from './dto/guest-timer.dto';
 
 @Injectable()
 export class TimersService {
@@ -25,6 +27,10 @@ export class TimersService {
     await this.timersRepository.update({ id: savedTimer.id }, { endTime: completedTimerStats.end, numberOfBreaks: completedTimerStats.numberOfBreaks });
     const completeTimer: Timer = await this.retreiveTimer(savedTimer.id);
     return completeTimer;
+  }
+
+  createGuestTimer(createTimerDTO: CreateTimerDTO): GuestTimer {
+    return this.timerUtility.guestCompleteCreateTimer(createTimerDTO);
   }
 
   async retreiveTimer(id: string): Promise<Timer> {
@@ -49,6 +55,13 @@ export class TimersService {
     return updatedTimer;
   }
 
+  guestPauseTimer(guestTimerDTO: GuestTimerDTO): GuestTimer {
+    const now: Date = new Date();
+    let guestTimer: GuestTimer = GuestTimer.fromGuestTimerDTO(guestTimerDTO);
+    guestTimer.setPauseTime(now);
+    return guestTimer;
+  }
+
   async playTimer(id: string): Promise<Timer> {
     const now: Date = new Date();
     await this.timersRepository.update({ id }, { unpausedTime: now });
@@ -62,6 +75,18 @@ export class TimersService {
     });
     const updatedTimer: Timer = await this.retreiveTimer(id);
     return updatedTimer;
+  }
+
+  guestPlayTimer(guestTimerDTO: GuestTimerDTO): GuestTimer {
+    const now: Date = new Date();
+    let guestTimer: GuestTimer = GuestTimer.fromGuestTimerDTO(guestTimerDTO);
+    guestTimer.setUnpausedTime(now);
+    const guestPausePlayTimerStats: { delayedEndTime: Date, pausedDurationInMs: number } = this.timerUtility.guestPausePlayTimerSettingsConfiguration(guestTimer);
+    guestTimer.setPauseTime(null);
+    guestTimer.setUnpausedTime(null);
+    guestTimer.setDelayedEndTime(guestPausePlayTimerStats.delayedEndTime);
+    guestTimer.setPausedDurationInMs(guestPausePlayTimerStats.pausedDurationInMs)
+    return guestTimer;
   }
 
   async removeTimer(id: string):Promise<void> {

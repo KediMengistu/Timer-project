@@ -36,7 +36,7 @@ import { CatchEverythingFilter } from './exception/catch-everything-exception.fi
     providers: [
       {
         provide: APP_PIPE,
-        useClass: ValidationPipe
+        useValue: new ValidationPipe({ transform: true })
       },
       {
         provide: APP_FILTER,
