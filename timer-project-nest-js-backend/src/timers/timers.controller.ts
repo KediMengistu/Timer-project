@@ -2,7 +2,6 @@ import { Controller, Post, Req, Body, Get, Patch, Param, Delete } from '@nestjs/
 import { TimersService } from './timers.service';
 import { CreateTimerDTO } from './dto/create-timer.dto';
 import { Public } from 'src/auth/auth.decorator.factory';
-import { GuestTimer } from './objects/guest-timer';
 import { GuestTimerDTO } from './dto/guest-timer.dto';
 
 @Controller('timers')
@@ -53,7 +52,7 @@ export class TimersController {
   }
 
   @Delete('delete-timer/:id')
-  deleteTimer(@Param() params: any) {
-    return this.timerService.removeTimer(params.id);
+  deleteTimer(@Req() request, @Param() params: any) {
+    return this.timerService.removeTimer(request.user.username, params.id);
   }
 }

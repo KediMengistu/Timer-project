@@ -10,6 +10,7 @@ import { TimersModule } from './timers/timers.module';
 import { BreaksModule } from './breaks/breaks.module';
 import { APP_PIPE, APP_FILTER } from '@nestjs/core';
 import { CatchEverythingFilter } from './exception/catch-everything-exception.filter';
+import { EmailsModule } from './emails/emails.module';
 
 @Module({
   imports: 
@@ -31,7 +32,7 @@ import { CatchEverythingFilter } from './exception/catch-everything-exception.fi
       UsersModule, 
       AuthModule,
       TimersModule, 
-      BreaksModule
+      BreaksModule, EmailsModule
     ],
     providers: [
       {

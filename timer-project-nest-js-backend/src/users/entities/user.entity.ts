@@ -1,5 +1,6 @@
 import { Entity, Unique, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { Timer } from '../../timers/entities/timer.entity';
+import { UserVerificationStatus } from '../enums/user-verification-status.enum';
 
 @Entity({ name: 'users' })
 @Unique(['email'])
@@ -21,6 +22,35 @@ export class User {
 
   @OneToMany(() => Timer, (timer) => timer.user)
   timers: Timer[];
+
+  @Column(
+    {
+      type: 'int',
+      default: 0 
+    }
+  )
+  numberOfTimers: number;
+
+  @Column({
+    nullable: true,
+    default: null
+  })
+  verificationCode: string;
+
+  @Column({
+    nullable: true,
+    default: null
+  })
+  verificationCodeExpireTime: Date;
+
+  @Column(
+    { 
+      type: 'enum',
+      enum: UserVerificationStatus,
+      default: UserVerificationStatus.NOT_VERIFIED
+    }
+  )
+  isVerified: string;
 
   @CreateDateColumn(
     {
