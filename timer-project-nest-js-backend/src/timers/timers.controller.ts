@@ -1,7 +1,7 @@
 import { Controller, Post, Req, Body, Get, Patch, Param, Delete } from '@nestjs/common';
 import { TimersService } from './timers.service';
 import { CreateTimerDTO } from './dto/create-timer.dto';
-import { Public } from 'src/auth/auth.decorator.factory';
+import { Public } from '../auth/auth.decorator.factory';
 import { GuestTimerDTO } from './dto/guest-timer.dto';
 
 @Controller('timers')
@@ -10,7 +10,7 @@ export class TimersController {
 
   @Post('create-timer')
   createTimer(@Req() request, @Body() createTimerDTO: CreateTimerDTO) {
-    return this.timerService.createTimer(request.user.username, createTimerDTO);
+    return this.timerService.createTimer(request.user.userId, createTimerDTO);
   }
 
   @Public()
@@ -21,12 +21,12 @@ export class TimersController {
 
   @Get('get-timer/:id')
   getTimer(@Param() params: any) {
-    return this.timerService.retreiveTimer(params.id);
+    return this.timerService.retrieveTimer(params.id);
   }
 
   @Get('get-all-timers')
   getAllTimers(@Req() request) {
-    return this.timerService.retreiveAllTimers(request.user.userId);
+    return this.timerService.retrieveAllTimers(request.user.userId);
   }
 
   @Patch('pause-timer/:id')
@@ -53,6 +53,6 @@ export class TimersController {
 
   @Delete('delete-timer/:id')
   deleteTimer(@Req() request, @Param() params: any) {
-    return this.timerService.removeTimer(request.user.username, params.id);
+    return this.timerService.removeTimer(request.user.userId, params.id);
   }
 }

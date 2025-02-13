@@ -11,6 +11,7 @@ import { BreaksModule } from './breaks/breaks.module';
 import { APP_PIPE, APP_FILTER } from '@nestjs/core';
 import { CatchEverythingFilter } from './exception/catch-everything-exception.filter';
 import { EmailsModule } from './emails/emails.module';
+import { VerificationModule } from './verification/verification.module';
 
 @Module({
   imports: 
@@ -32,7 +33,9 @@ import { EmailsModule } from './emails/emails.module';
       UsersModule, 
       AuthModule,
       TimersModule, 
-      BreaksModule, EmailsModule
+      BreaksModule, 
+      EmailsModule, 
+      VerificationModule
     ],
     providers: [
       {

@@ -20,8 +20,8 @@ export class TimersService {
     private timerUtility: TimersUtility
   ) {}
 
-  async createTimer(email: string, createTimerDTO: CreateTimerDTO): Promise<Timer> {
-    const user: User = await this.usersService.retreiveUser(email);
+  async createTimer(userId: string, createTimerDTO: CreateTimerDTO): Promise<Timer> {
+    const user: User = await this.usersService.retrieveUserViaId(userId);
     if(user.numberOfTimers === 3) {
       throw new BadRequestException('Cannot create more than 3 timers.');
     }
@@ -29,8 +29,8 @@ export class TimersService {
     const savedTimer: Timer = await this.timersRepository.save(timer);
     const completedTimerStats: { end: Date, numberOfBreaks: number } = await this.timerUtility.completeCreateTimer(savedTimer);
     await this.timersRepository.update({ id: savedTimer.id }, { endTime: completedTimerStats.end, numberOfBreaks: completedTimerStats.numberOfBreaks });
-    const completeTimer: Timer = await this.retreiveTimer(savedTimer.id);
-    this.usersService.updateUserTimerCount(user.email, true, user.numberOfTimers);
+    const completeTimer: Timer = await this.retrieveTimer(savedTimer.id);
+    this.usersService.updateUserTimerCount(userId, true, user.numberOfTimers);
     return completeTimer;
   }
 
@@ -38,25 +38,25 @@ export class TimersService {
     return this.timerUtility.guestCompleteCreateTimer(createTimerDTO);
   }
 
-  async retreiveTimer(id: string): Promise<Timer> {
-    const timer: Timer = await this.timersRepository.findOneBy({ id });
+  async retrieveTimer(timerId: string): Promise<Timer> {
+    const timer: Timer = await this.timersRepository.findOneBy({ id: timerId });
     if(!timer) {
       throw new NotFoundException('Timer not found.');
     }
     return timer;
   }
 
-  async retreiveAllTimers(userId: string): Promise<Timer[]> {
+  async retrieveAllTimers(userId: string): Promise<Timer[]> {
     const listOfTimers: Timer[] = await this.timersRepository.find({
       where: { user: { id: userId } },
     });
     return listOfTimers;
   }
 
-  async pauseTimer(id: string): Promise<Timer> {
+  async pauseTimer(timerId: string): Promise<Timer> {
     const now: Date = new Date();
-    await this.timersRepository.update({ id }, { pauseTime: now });
-    const updatedTimer: Timer = await this.retreiveTimer(id);
+    await this.timersRepository.update({ id: timerId }, { pauseTime: now });
+    const updatedTimer: Timer = await this.retrieveTimer(timerId);
     return updatedTimer;
   }
 
@@ -67,18 +67,18 @@ export class TimersService {
     return guestTimer;
   }
 
-  async playTimer(id: string): Promise<Timer> {
+  async playTimer(timerId: string): Promise<Timer> {
     const now: Date = new Date();
-    await this.timersRepository.update({ id }, { unpausedTime: now });
-    const timer: Timer = await this.retreiveTimer(id);
+    await this.timersRepository.update({ id: timerId }, { unpausedTime: now });
+    const timer: Timer = await this.retrieveTimer(timerId);
     const pausePlayTimerStats: { delayedEndTime: Date, pausedDurationInMs: number } = this.timerUtility.pausePlayTimerSettingsConfiguration(timer);
-    await this.timersRepository.update({ id }, {
+    await this.timersRepository.update({ id: timerId }, {
       pauseTime: null,
       unpausedTime: null,
       delayedEndTime: pausePlayTimerStats.delayedEndTime,
       pausedDurationInMs: pausePlayTimerStats.pausedDurationInMs
     });
-    const updatedTimer: Timer = await this.retreiveTimer(id);
+    const updatedTimer: Timer = await this.retrieveTimer(timerId);
     return updatedTimer;
   }
 
@@ -94,13 +94,13 @@ export class TimersService {
     return guestTimer;
   }
 
-  async removeTimer(email: string, id: string) {
-    const user: User = await this.usersService.retreiveUser(email);
+  async removeTimer(userId: string, timerId: string) {
+    const user: User = await this.usersService.retrieveUserViaId(userId);
     if(user.numberOfTimers === 0) {
       throw new BadRequestException('No timers to delete.');
     }
-    const timer: Timer = await this.retreiveTimer(id);
+    const timer: Timer = await this.retrieveTimer(timerId);
     await this.timersRepository.remove(timer);
-    this.usersService.updateUserTimerCount(user.email, false, user.numberOfTimers);
+    this.usersService.updateUserTimerCount(userId, false, user.numberOfTimers);
   }
 }

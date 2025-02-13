@@ -7,9 +7,5 @@ export class VerifyUserSignUpDTO {
 
   @IsString()
   @IsNotEmpty()
-  email: string;
-
-  @IsString()
-  @IsNotEmpty()
   inputVerificationCode: string;
 }
