@@ -13,7 +13,7 @@ export class AuthController {
   @Public()
   @Post('signup')
   async signup(@Body() createUserSignUpDto: CreateUserSignUpDto) {
-    const userDetails: { id: string } = await this.authService.signup(createUserSignUpDto);
+    const userDetails: { userId: string } = await this.authService.signup(createUserSignUpDto);
     return userDetails;
   }
 
@@ -51,15 +51,15 @@ export class AuthController {
   }
 
   @Public()
-  @Patch('forgot-password/:email')
+  @Patch('forgot-password-request/:email')
   async forgotPasswordRequest(@Param() params: any) {
-    this.authService.forgotPasswordRequest(params.email);
+    await this.authService.forgotPasswordRequest(params.email);
   }
 
   @Public()
   @Patch('forgot-password-confirm')
   async forgotPasswordConfirm(@Body() verifyUserForgotPasswordDTO: VerifyUserForgotPasswordDTO) {
-    this.authService.forgotPasswordConfirm(verifyUserForgotPasswordDTO);
+    await this.authService.forgotPasswordConfirm(verifyUserForgotPasswordDTO);
   }
 
   @Post('signout')

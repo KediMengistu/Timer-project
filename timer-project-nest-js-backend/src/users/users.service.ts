@@ -21,16 +21,32 @@ export class UsersService {
     return savedUser;
   }
 
-  retrieveUserViaId(userId: string): Promise<User> {
-    return this.usersRepository.findOneBy({ id: userId });
+  async retrieveUserViaId(userId: string): Promise<User> {
+    const user: User = await this.usersRepository.findOneBy({ id: userId });
+    return user;
   }
 
-  retrieveUserViaEmail(email: string): Promise<User> {
-    return this.usersRepository.findOneBy({ email });
+  async retrieveUserViaEmail(email: string): Promise<User> {
+    const user: User = await this.usersRepository.findOneBy({ email });
+    return user;
+  }
+
+  retrieveAllUsers(): Repository<User> {
+    const users: Repository<User> = this.usersRepository;
+    return users;
   }
 
   async updateUserVerficationProps(userId: string, verificationCode: string, verificationCodeExpireTime: Date, isVerified: string) {
     await this.usersRepository.update({ id: userId }, { verificationCode, verificationCodeExpireTime, isVerified });
+  }
+
+  async updateSignInAndExpirationTime(userId: string) {
+    const previousSigninTime: Date = new Date();
+    const userAccountExpirationTime: Date = new Date(Date.now() + 15 * 24 * 60 * 60 * 1000);
+    await this.usersRepository.update({ id: userId }, { 
+      previousSigninTime,
+      userAccountExpirationTime
+    });
   }
 
   async updateUserTimerCount(userId: string, increaseIsTrueOrDecreaseIsFalse: boolean, currentCount: number) {

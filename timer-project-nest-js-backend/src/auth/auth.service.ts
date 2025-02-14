@@ -21,7 +21,7 @@ export class AuthService {
     private jwtService: JwtService
   ) {}
 
-  async signup(createUserSignUpDto: CreateUserSignUpDto): Promise<{ id: string }> {
+  async signup(createUserSignUpDto: CreateUserSignUpDto): Promise<{ userId: string }> {
     try {
       const user: User = await this.usersService.retrieveUserViaEmail(createUserSignUpDto.email);
       if(!user){
@@ -29,10 +29,10 @@ export class AuthService {
         const hashedPassword: string = await bcrypt.hash(createUserSignUpDto.password, salt);
         const savedUser: User = await this.usersService.createUser({ ...createUserSignUpDto, password: hashedPassword });
         await this.verificationService.initiateVerification(savedUser, VerificationActions.INITIATE_SIGN_UP);
-        return { id: savedUser.id };
+        return { userId: savedUser.id };
       }
       await this.verificationService.initiateVerification(user, VerificationActions.INITIATE_SIGN_UP);
-      return { id: user.id };
+      return { userId: user.id };
     }catch(error) {
       if(error instanceof QueryFailedError) {
         const existingUser: User = await this.usersService.retrieveUserViaEmail(createUserSignUpDto.email);
@@ -61,6 +61,7 @@ export class AuthService {
     if(user.verificationCode !== null || user.verificationCodeExpireTime !== null) {
       this.usersService.updateUserVerficationProps(userId, null, null, user.isVerified);
     }
+    await this.usersService.updateSignInAndExpirationTime(userId);
     //input user credentials are valid - generate JWT.
     const payload = { sub: userId };
     return {
@@ -88,12 +89,13 @@ export class AuthService {
 
   async forgotPasswordRequest(email: string) {
     const user: User = await this.usersService.retrieveUserViaEmail(email);
-    await this.verificationService.initiateVerification(user, VerificationActions.INITIATE_FORGOT_PASSWORD)
+    await this.verificationService.initiateVerification(user, VerificationActions.INITIATE_FORGOT_PASSWORD);
   }
 
   async forgotPasswordConfirm(verifyUserForgotPasswordDTO: VerifyUserForgotPasswordDTO) {
     const user: User = await this.usersService.retrieveUserViaEmail(verifyUserForgotPasswordDTO.email);
-    if(verifyUserForgotPasswordDTO.newPassword === user.password) {
+    const isMatching: boolean = await bcrypt.compare(verifyUserForgotPasswordDTO.newPassword, user.password);
+    if(isMatching) {
       throw new BadRequestException('Password input was previously used. Please provide a new one.');
     }
     await this.verificationService.completeVerification(user, verifyUserForgotPasswordDTO.inputVerificationCode);

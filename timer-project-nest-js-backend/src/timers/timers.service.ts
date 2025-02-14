@@ -99,8 +99,7 @@ export class TimersService {
     if(user.numberOfTimers === 0) {
       throw new BadRequestException('No timers to delete.');
     }
-    const timer: Timer = await this.retrieveTimer(timerId);
-    await this.timersRepository.remove(timer);
+    await this.timersRepository.delete({ id: timerId });
     this.usersService.updateUserTimerCount(userId, false, user.numberOfTimers);
   }
 }

@@ -11,12 +11,12 @@ export class UsersController {
   }
 
   @Patch('delete-user-request')
-  deleteUserRequest(@Req() request) {
-    this.usersService.deleteUserRequest(request.user.userId);
+  async deleteUserRequest(@Req() request) {
+    await this.usersService.deleteUserRequest(request.user.userId);
   }
 
   @Delete('delete-user-confirm/:inputVerificationCode')
-  deleteUserConfirm(@Req() request, @Param() params: any) {
-    this.usersService.deleteUserConfirm(request.user.userId, params.inputVerificationCode);
+  async deleteUserConfirm(@Req() request, @Param() params: any) {
+    await this.usersService.deleteUserConfirm(request.user.userId, params.inputVerificationCode);
   }
 }

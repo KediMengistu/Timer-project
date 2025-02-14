@@ -9,7 +9,7 @@ export class TimersController {
   constructor(private timerService: TimersService) {}
 
   @Post('create-timer')
-  createTimer(@Req() request, @Body() createTimerDTO: CreateTimerDTO) {
+  async createTimer(@Req() request, @Body() createTimerDTO: CreateTimerDTO) {
     return this.timerService.createTimer(request.user.userId, createTimerDTO);
   }
 
@@ -20,17 +20,17 @@ export class TimersController {
   }
 
   @Get('get-timer/:id')
-  getTimer(@Param() params: any) {
+  async getTimer(@Param() params: any) {
     return this.timerService.retrieveTimer(params.id);
   }
 
   @Get('get-all-timers')
-  getAllTimers(@Req() request) {
+  async getAllTimers(@Req() request) {
     return this.timerService.retrieveAllTimers(request.user.userId);
   }
 
   @Patch('pause-timer/:id')
-  pauseTimer(@Param() params: any) {
+  async pauseTimer(@Param() params: any) {
     return this.timerService.pauseTimer(params.id);
   }
 
@@ -41,7 +41,7 @@ export class TimersController {
   }
 
   @Patch('play-timer/:id')
-  playTimer(@Param() params: any) {
+  async playTimer(@Param() params: any) {
     return this.timerService.playTimer(params.id);
   }
 
@@ -52,7 +52,7 @@ export class TimersController {
   }
 
   @Delete('delete-timer/:id')
-  deleteTimer(@Req() request, @Param() params: any) {
+  async deleteTimer(@Req() request, @Param() params: any) {
     return this.timerService.removeTimer(request.user.userId, params.id);
   }
 }

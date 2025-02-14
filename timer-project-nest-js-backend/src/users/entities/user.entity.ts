@@ -52,6 +52,22 @@ export class User {
   )
   isVerified: string;
 
+  @Column(
+    { 
+      type: 'timestamp',
+      default: null
+    }
+  )
+  previousSigninTime: Date;
+
+  @Column(
+    { 
+      type: 'timestamp',
+      default: null
+    }
+  )
+  userAccountExpirationTime: Date;
+
   @CreateDateColumn(
     {
       name: 'created_at',
