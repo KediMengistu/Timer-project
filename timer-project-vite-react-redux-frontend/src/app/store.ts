@@ -1,9 +1,9 @@
 import { configureStore } from "@reduxjs/toolkit";
-import expandedViewReducer from "../features/expandedView/expandedViewSlice";
+import authReducer from "../features/auth/authSlice";
 
 export const store = configureStore({
   reducer: {
-    expandedView: expandedViewReducer,
+    auth: authReducer,
   },
 });
 

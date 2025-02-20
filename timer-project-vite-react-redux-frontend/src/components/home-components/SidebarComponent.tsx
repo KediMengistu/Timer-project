@@ -4,7 +4,7 @@ import SidebarMiddleBottomComponent from "./SidebarMiddleBottomComponent";
 function SidebarComponent() {
   return (
     <>
-      <div className="grid grid-rows-[1fr_4fr] bg-cyan-500">
+      <div className="grid grid-rows-[1fr_4fr] gap-4 p-4!">
         <SidebarTopComponent />
         <SidebarMiddleBottomComponent />
       </div>
