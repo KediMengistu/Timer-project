@@ -24,20 +24,15 @@ function HomePage() {
   return (
     <>
       <div className="grid grid-cols-[auto_1fr] gap-1">
-        <nav className="sticky top-0 bottom-0 left-0 flex w-24 flex-col justify-evenly gap-2 border-r-2 p-2! shadow-2xl">
-          <div className="flex flex-col gap-2">
+        <nav className="sticky top-0 bottom-0 left-0 flex w-24 flex-col gap-2 border-r-2 shadow-2xl">
+          <div className="flex flex-1 flex-col justify-center gap-2 border-b-2 bg-black pt-2! pb-2!">
             <div className="flex flex-row items-center justify-center">
-              <h1 className="text-center text-xs [text-orientation:upright] [writing-mode:vertical-rl]">
+              <h1 className="text-center text-xs text-white [text-orientation:upright] [writing-mode:vertical-rl]">
                 TIMER4U
               </h1>
             </div>
           </div>
-          <div className="flex flex-col gap-2">
-            <div className="flex flex-row items-center justify-center">
-              <h1 className="text-center text-xs underline underline-offset-2">
-                Click to Select:
-              </h1>
-            </div>
+          <div className="mr-2! ml-2! flex flex-auto flex-col justify-start gap-2">
             <div className="flex flex-col gap-2">
               <div className="relative">
                 <div
@@ -164,13 +159,8 @@ function HomePage() {
               </div>
             </div>
           </div>
-          <div className="flex flex-col gap-2">
-            <div className="flex flex-row items-center justify-center">
-              <h1 className="text-center text-xs underline underline-offset-2">
-                Toggle For Dark Mode:
-              </h1>
-            </div>
-            <div className="flex flex-col items-center justify-center gap-1 rounded-2xl border-2 p-1! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)]">
+          <div className="mr-2! mb-2! ml-2! flex flex-auto flex-col justify-end gap-2 pt-2!">
+            <div className="flex flex-col items-center justify-center gap-1 rounded-2xl border-2 bg-white p-1! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)]">
               <IoSunnyOutline className="h-6 w-6" />
               <label
                 htmlFor="check"
@@ -183,7 +173,11 @@ function HomePage() {
             </div>
           </div>
         </nav>
-        <div className="flex h-full w-full flex-row bg-white bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]"></div>
+        <main className="flex h-full w-full flex-row items-center justify-center bg-white bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]">
+          <div className="flex flex-row items-center justify-center rounded-2xl border-2 border-dashed border-black p-2!">
+            <h1 className="text-center text-9xl text-wrap">12hrs 49min 56s</h1>
+          </div>
+        </main>
       </div>
     </>
   );
