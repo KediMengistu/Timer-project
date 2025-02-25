@@ -1,9 +1,9 @@
 import { configureStore } from "@reduxjs/toolkit";
-import registerReducer from "../features/register/registerSlice";
+import defaultOptionsReducer from "../features/defaultOptions/defaultOptionsSlice";
 
 export const store = configureStore({
   reducer: {
-    register: registerReducer,
+    defaultOptions: defaultOptionsReducer,
   },
 });
 

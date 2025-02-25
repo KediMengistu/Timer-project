@@ -2,10 +2,9 @@ import "./index.css";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router";
 import App from "./components/App.tsx";
-import HomeComponent from "./components/home-components/HomeComponent.tsx";
-import AboutProjectComponent from "./components/about-components/AboutProjectComponent.tsx";
 import { store } from "./app/store.ts";
 import { Provider } from "react-redux";
+import HomePage from "./components/home-components/HomePage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -14,11 +13,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: "",
-        element: <HomeComponent />,
-      },
-      {
-        path: "about-project",
-        element: <AboutProjectComponent />,
+        element: <HomePage />,
       },
     ],
   },
