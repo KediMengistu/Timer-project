@@ -23,26 +23,26 @@ function HomePage() {
   const dispatch = useAppDispatch();
   return (
     <>
-      <div className="grid grid-cols-[auto_1fr] gap-1">
-        <nav className="sticky top-0 bottom-0 left-0 flex w-24 flex-col gap-2 border-r-2 shadow-2xl">
-          <div className="flex flex-1 flex-col justify-center gap-2 border-b-2 bg-black pt-2! pb-2!">
-            <div className="flex flex-row items-center justify-center">
-              <h1 className="text-center text-xs text-white [text-orientation:upright] [writing-mode:vertical-rl]">
+      <div className="grid grid-cols-none grid-rows-[auto_1fr] md:grid-cols-[auto_1fr] md:grid-rows-none">
+        <nav className="sticky top-0 left-0 flex h-24 w-full flex-row gap-1 border-r-0 border-b-2 shadow-2xl md:h-full md:w-24 md:flex-col md:gap-2 md:border-r-2 md:border-b-0">
+          <div className="flex flex-1 flex-row justify-center border-r-2 border-b-0 bg-black pr-2! pl-2! md:flex-col md:border-r-0 md:border-b-2">
+            <div className="md: flex flex-row items-center justify-center p-2!">
+              <h1 className="text-center text-xs text-white md:[text-orientation:upright] md:[writing-mode:vertical-rl]">
                 TIMER4U
               </h1>
             </div>
           </div>
-          <div className="mr-2! ml-2! flex flex-auto flex-col justify-start gap-2">
-            <div className="flex flex-col gap-2">
+          <div className="mt-2! mb-2! flex flex-auto flex-row items-center justify-center gap-2 md:mt-0! md:mr-2! md:mb-0! md:ml-2! md:flex-col md:justify-start">
+            <div className="flex flex-row gap-1 md:flex-col md:gap-2">
               <div className="relative">
                 <div
-                  className={`group flex flex-col items-center justify-center rounded-xl border-2 p-1! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] transition ease-in-out hover:cursor-pointer hover:bg-black active:opacity-55 ${userActionsState ? "bg-black" : "bg-white"}`}
+                  className={`group flex flex-col items-center justify-center rounded-xl border-2 p-2! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] transition ease-in-out hover:cursor-pointer hover:bg-black active:opacity-55 md:p-1! ${userActionsState ? "bg-black" : "bg-white"}`}
                   onClick={() => {
                     dispatch(toggleUserActionsOption());
                   }}
                 >
                   <RiUserShared2Fill
-                    className={`h-12 w-12 transition ease-in-out group-hover:fill-white ${userActionsState ? "fill-white" : "fill-black"}`}
+                    className={`h-4 w-4 transition ease-in-out group-hover:fill-white md:h-8 md:w-8 ${userActionsState ? "fill-white" : "fill-black"}`}
                   />
                   <h1
                     className={`text-center text-xs group-hover:text-white ${userActionsState ? "text-white" : "text-black"}`}
@@ -57,25 +57,22 @@ function HomePage() {
                       initial={{ opacity: 0, scale: 0 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0 }}
-                      className="absolute top-0 right-[-125px] bottom-0 flex w-[108.067px] flex-col justify-evenly gap-0.5 rounded-2xl"
+                      className="absolute top-[115%] left-1/2 flex h-auto w-[108.067px] -translate-x-1/2 flex-col gap-0.5 md:top-1/2 md:left-[125%] md:-translate-x-0 md:-translate-y-1/2"
                     >
-                      <div className="group relative flex flex-row items-center justify-center rounded-3xl border-2 border-black bg-black p-2! transition duration-300 ease-in-out hover:cursor-pointer hover:bg-white active:border-gray-300 active:bg-gray-200">
-                        <h1 className="text-xs text-white transition duration-300 ease-in-out group-hover:text-black group-active:text-gray-500">
+                      <div className="group relative flex flex-row items-center justify-center border-2 border-black bg-white p-2! transition duration-300 ease-in-out hover:cursor-pointer hover:bg-black active:opacity-55 md:rounded-tr-3xl md:rounded-br-3xl">
+                        <h1 className="text-xs text-black transition duration-300 ease-in-out group-hover:text-white">
                           Sign Up
                         </h1>
-                        <div className="absolute left-[-8px] h-0 w-0 border-t-8 border-r-8 border-b-8 border-t-transparent border-r-black border-b-transparent transition duration-300 ease-in-out group-active:border-r-gray-300"></div>
                       </div>
-                      <div className="group relative flex flex-row items-center justify-center rounded-3xl border-2 border-black bg-black p-2! transition duration-300 ease-in-out hover:cursor-pointer hover:bg-white active:border-gray-300 active:bg-gray-200">
-                        <h1 className="text-xs text-white transition duration-300 ease-in-out group-hover:text-black group-active:text-gray-500">
+                      <div className="group relative flex flex-row items-center justify-center border-2 border-black bg-white p-2! transition duration-300 ease-in-out hover:cursor-pointer hover:bg-black active:opacity-55 md:rounded-tr-3xl md:rounded-br-3xl">
+                        <h1 className="text-xs text-black transition duration-300 ease-in-out group-hover:text-white">
                           Sign In
                         </h1>
-                        <div className="absolute left-[-8px] h-0 w-0 border-t-8 border-r-8 border-b-8 border-t-transparent border-r-black border-b-transparent transition duration-300 ease-in-out group-active:border-r-gray-300"></div>
                       </div>
-                      <div className="group relative flex flex-row items-center justify-center rounded-3xl border-2 border-black bg-black p-2! transition duration-300 ease-in-out hover:cursor-pointer hover:bg-white active:border-gray-300 active:bg-gray-200">
-                        <h1 className="text-center text-xs text-white transition duration-300 ease-in-out group-hover:text-black group-active:text-gray-500">
+                      <div className="group relative flex flex-row items-center justify-center rounded-tr-none rounded-br-2xl rounded-bl-2xl border-2 border-black bg-white p-2! transition duration-300 ease-in-out hover:cursor-pointer hover:bg-black active:opacity-55 md:rounded-tr-3xl md:rounded-br-3xl md:rounded-bl-none">
+                        <h1 className="text-center text-xs text-black transition duration-300 ease-in-out group-hover:text-white">
                           Forgot Password
                         </h1>
-                        <div className="absolute left-[-8px] h-0 w-0 border-t-8 border-r-8 border-b-8 border-t-transparent border-r-black border-b-transparent transition duration-300 ease-in-out group-active:border-r-gray-300"></div>
                       </div>
                     </motion.div>
                   )}
@@ -83,13 +80,13 @@ function HomePage() {
               </div>
               <div className="relative">
                 <div
-                  className={`group flex flex-col items-center justify-center rounded-xl border-2 p-1! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] transition ease-in-out hover:cursor-pointer hover:bg-black active:opacity-55 ${guestTimerState ? "bg-black" : "bg-white"}`}
+                  className={`group flex flex-col items-center justify-center rounded-xl border-2 p-2! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] transition ease-in-out hover:cursor-pointer hover:bg-black active:opacity-55 md:p-1! ${guestTimerState ? "bg-black" : "bg-white"}`}
                   onClick={() => {
                     dispatch(toggleGuestTimerOption());
                   }}
                 >
                   <BsIncognito
-                    className={`h-12 w-12 transition ease-in-out group-hover:fill-white ${guestTimerState ? "fill-white" : "fill-black"}`}
+                    className={`h-4 w-4 transition ease-in-out group-hover:fill-white md:h-8 md:w-8 ${guestTimerState ? "fill-white" : "fill-black"}`}
                   />
                   <h1
                     className={`text-center text-xs group-hover:text-white ${guestTimerState ? "text-white" : "text-black"}`}
@@ -104,13 +101,12 @@ function HomePage() {
                       initial={{ opacity: 0, scale: 0 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0 }}
-                      className="absolute top-0 right-[-125px] bottom-0 flex w-[108.067px] flex-col justify-center rounded-2xl"
+                      className="absolute top-[115%] left-1/2 flex h-auto w-[108.067px] -translate-x-1/2 flex-col gap-0.5 md:top-1/2 md:left-[125%] md:-translate-x-0 md:-translate-y-1/2"
                     >
-                      <div className="group relative flex flex-row items-center justify-center rounded-3xl border-2 border-black bg-black p-2! transition duration-300 ease-in-out hover:cursor-pointer hover:bg-white active:border-gray-300 active:bg-gray-200">
-                        <h1 className="text-xs text-white transition duration-300 ease-in-out group-hover:text-black group-active:text-gray-500">
+                      <div className="group relative flex flex-row items-center justify-center rounded-tr-none rounded-br-2xl rounded-bl-2xl border-2 border-black bg-white p-2! transition duration-300 ease-in-out hover:cursor-pointer hover:bg-black active:opacity-55 md:rounded-tr-3xl md:rounded-br-3xl md:rounded-bl-none">
+                        <h1 className="text-xs text-black transition duration-300 ease-in-out group-hover:text-white">
                           Create Timer
                         </h1>
-                        <div className="absolute left-[-8px] h-0 w-0 border-t-8 border-r-8 border-b-8 border-t-transparent border-r-black border-b-transparent transition duration-300 ease-in-out group-active:border-r-gray-300"></div>
                       </div>
                     </motion.div>
                   )}
@@ -118,13 +114,13 @@ function HomePage() {
               </div>
               <div className="relative">
                 <div
-                  className={`group flex flex-col items-center justify-center rounded-xl border-2 p-1! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] transition ease-in-out hover:cursor-pointer hover:bg-black active:opacity-55 ${aboutOptionState ? "bg-black" : "bg-white"}`}
+                  className={`group flex flex-col items-center justify-center rounded-xl border-2 p-2! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] transition ease-in-out hover:cursor-pointer hover:bg-black active:opacity-55 md:p-1! ${aboutOptionState ? "bg-black" : "bg-white"}`}
                   onClick={() => {
                     dispatch(toggleAboutOption());
                   }}
                 >
                   <IoIosInformationCircle
-                    className={`h-12 w-12 transition ease-in-out group-hover:fill-white ${aboutOptionState ? "fill-white" : "fill-black"}`}
+                    className={`h-4 w-4 transition ease-in-out group-hover:fill-white md:h-8 md:w-8 ${aboutOptionState ? "fill-white" : "fill-black"}`}
                   />
                   <h1
                     className={`text-center text-xs group-hover:text-white ${aboutOptionState ? "text-white" : "text-black"}`}
@@ -139,19 +135,17 @@ function HomePage() {
                       initial={{ opacity: 0, scale: 0 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0 }}
-                      className="absolute top-0 right-[-125px] bottom-0 flex w-[108.067px] flex-col justify-center gap-0.5 rounded-2xl"
+                      className="absolute top-[115%] left-1/2 flex h-auto w-[108.067px] -translate-x-1/2 flex-col gap-0.5 md:top-1/2 md:left-[125%] md:-translate-x-0 md:-translate-y-1/2"
                     >
-                      <div className="group relative flex flex-row items-center justify-center rounded-3xl border-2 border-black bg-black p-2! transition duration-300 ease-in-out hover:cursor-pointer hover:bg-white active:border-gray-300 active:bg-gray-200">
-                        <h1 className="text-xs text-white transition duration-300 ease-in-out group-hover:text-black group-active:text-gray-500">
+                      <div className="group relative flex flex-row items-center justify-center border-2 border-black bg-white p-2! transition duration-300 ease-in-out hover:cursor-pointer hover:bg-black active:opacity-55 md:rounded-tr-3xl md:rounded-br-3xl">
+                        <h1 className="text-xs text-black transition duration-300 ease-in-out group-hover:text-white">
                           Stack
                         </h1>
-                        <div className="absolute left-[-8px] h-0 w-0 border-t-8 border-r-8 border-b-8 border-t-transparent border-r-black border-b-transparent transition duration-300 ease-in-out group-active:border-r-gray-300"></div>
                       </div>
-                      <div className="group relative flex flex-row items-center justify-center rounded-3xl border-2 border-black bg-black p-2! transition duration-300 ease-in-out hover:cursor-pointer hover:bg-white active:border-gray-300 active:bg-gray-200">
-                        <h1 className="text-xs text-white transition duration-300 ease-in-out group-hover:text-black group-active:text-gray-500">
+                      <div className="group relative flex flex-row items-center justify-center rounded-tr-none rounded-br-2xl rounded-bl-2xl border-2 border-black bg-white p-2! transition duration-300 ease-in-out hover:cursor-pointer hover:bg-black active:opacity-55 md:rounded-tr-3xl md:rounded-br-3xl md:rounded-bl-none">
+                        <h1 className="text-xs text-black transition duration-300 ease-in-out group-hover:text-white">
                           Background
                         </h1>
-                        <div className="absolute left-[-8px] h-0 w-0 border-t-8 border-r-8 border-b-8 border-t-transparent border-r-black border-b-transparent transition duration-300 ease-in-out group-active:border-r-gray-300"></div>
                       </div>
                     </motion.div>
                   )}
@@ -159,23 +153,23 @@ function HomePage() {
               </div>
             </div>
           </div>
-          <div className="mr-2! mb-2! ml-2! flex flex-auto flex-col justify-end gap-2 pt-2!">
-            <div className="flex flex-col items-center justify-center gap-1 rounded-2xl border-2 bg-white p-1! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)]">
-              <IoSunnyOutline className="h-6 w-6" />
+          <div className="mt-2! mb-2! flex flex-auto flex-row justify-end gap-2 pr-2! pb-0! md:mt-0! md:mr-2! md:mb-0! md:ml-2! md:flex-col md:pr-0! md:pb-2!">
+            <div className="flex flex-row items-center justify-center gap-1 rounded-2xl border-2 bg-white p-1! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] md:flex-col">
+              <IoSunnyOutline className="h-4 w-4" />
               <label
                 htmlFor="check"
-                className="relative flex h-16 w-8 flex-row rounded-2xl bg-black hover:cursor-pointer"
+                className="relative flex h-4 w-8 flex-row rounded-2xl bg-black hover:cursor-pointer md:h-16 md:w-8"
               >
                 <input type="checkbox" id="check" className="peer sr-only" />
-                <span className="absolute top-0.75 left-0.75 h-2/5 w-4/5 rounded-full border-2 border-black bg-white transition-all duration-150 peer-checked:top-8.5 peer-checked:border-white peer-checked:bg-black"></span>
+                <span className="absolute top-0.5 left-0.5 h-3 w-3 rounded-full border-2 border-black bg-white transition-transform duration-200 ease-in-out peer-checked:translate-x-4 peer-checked:border-white peer-checked:bg-black md:top-1 md:left-1 md:h-6 md:w-6 md:transform-gpu md:duration-200 md:ease-in-out md:peer-checked:translate-x-0 md:peer-checked:translate-y-8"></span>
               </label>
-              <IoMoonOutline className="h-6 w-6" />
+              <IoMoonOutline className="h-4 w-4" />
             </div>
           </div>
         </nav>
-        <main className="flex h-full w-full flex-row items-center justify-center bg-white bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]">
-          <div className="flex flex-row items-center justify-center rounded-2xl border-2 border-dashed border-black p-2!">
-            <h1 className="text-center text-9xl text-wrap">12hrs 49min 56s</h1>
+        <main className="flex h-full w-full flex-row bg-white bg-[radial-gradient(black_1px,transparent_1px)] [background-size:16px_16px]">
+          <div className="m-8! flex flex-1 flex-row items-center justify-center border-2 border-black bg-white md:m-16!">
+            hello
           </div>
         </main>
       </div>
