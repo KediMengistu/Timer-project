@@ -1,11 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
-import defaultOptionsReducer from "../features/defaultOptions/defaultOptionsSlice";
 import themeReducer from "../features/theme/themeSlice";
+import locationReducer from "../features/location/locationSlice";
 
 export const store = configureStore({
   reducer: {
-    defaultOptions: defaultOptionsReducer,
     theme: themeReducer,
+    location: locationReducer,
   },
 });
 
