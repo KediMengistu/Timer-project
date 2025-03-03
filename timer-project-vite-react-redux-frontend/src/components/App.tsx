@@ -3,16 +3,12 @@ import { useAppSelector } from "../app/hooks";
 import { useEffect } from "react";
 
 function App() {
-  const locationState = useAppSelector((state) => state.location.value);
+  const timezoneState = useAppSelector((state) => state.time.timezone);
   const themeState = useAppSelector((state) => state.theme.value);
 
   useEffect(() => {
-    if (localStorage.getItem("location") === null) {
-      localStorage.setItem("location", JSON.stringify(false));
-    } else {
-      localStorage.setItem("location", JSON.stringify(locationState));
-    }
-  }, [locationState]);
+    localStorage.setItem("timezone", timezoneState);
+  }, [timezoneState]);
 
   useEffect(() => {
     if (themeState) {

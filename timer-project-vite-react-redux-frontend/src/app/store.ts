@@ -1,11 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 import themeReducer from "../features/theme/themeSlice";
-import locationReducer from "../features/location/locationSlice";
+import timeReducer from "../features/time/timeSlice";
 
 export const store = configureStore({
   reducer: {
     theme: themeReducer,
-    location: locationReducer,
+    time: timeReducer,
   },
 });
 

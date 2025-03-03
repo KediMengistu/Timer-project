@@ -6,7 +6,7 @@ import { store } from "./app/store.ts";
 import { Provider } from "react-redux";
 import DefaultView from "./components/default-components/DefaultView.tsx";
 import DefaultMainComponent from "./components/default-components/DefaultMainComponent.tsx";
-import DefaultMainContent from "./components/default-components/DefaultMainContent.tsx";
+import DefaultMainContentContainer from "./components/default-components/DefaultMainContentContainer.tsx";
 import SignUpForm from "./components/auth-components/SignUpForm.tsx";
 import SignInForm from "./components/auth-components/SignInForm.tsx";
 import ForgotPasswordForm from "./components/auth-components/ForgotPasswordForm.tsx";
@@ -26,7 +26,7 @@ const router = createBrowserRouter([
             children: [
               {
                 index: true,
-                element: <DefaultMainContent />,
+                element: <DefaultMainContentContainer />,
               },
               {
                 path: "signup",

@@ -7,14 +7,14 @@ import { toggleTheme } from "../../features/theme/themeSlice";
 import { IoSunnyOutline, IoMoonOutline } from "react-icons/io5";
 import { useState } from "react";
 import { NavLink } from "react-router";
-import { toggleLocation } from "../../features/location/locationSlice";
+import { toggleTimezone } from "../../features/time/timeSlice";
 
 function Navbar() {
   const [userActionsState, setUserActionsState] = useState(false);
   const [guestTimerState, setGuestTimerState] = useState(false);
   const [aboutOptionState, setAboutOptionsState] = useState(false);
   const themeState = useAppSelector((state) => state.theme.value);
-  const locationState = useAppSelector((state) => state.location.value);
+  const timezoneState = useAppSelector((state) => state.time.timezone);
   const dispatch = useAppDispatch();
 
   const closeAllMenus = () => {
@@ -228,35 +228,35 @@ function Navbar() {
         <button
           className="flex h-fit w-[86px] flex-row rounded-md border-2 border-black bg-white p-1! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] hover:cursor-pointer hover:bg-black hover:text-white md:w-full dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-black"
           onClick={() => {
-            dispatch(toggleLocation());
+            dispatch(toggleTimezone());
           }}
         >
-          <h1 className="text-left text-xs">
-            Location:<span> </span>
+          <h1 className="text-center text-xs">
+            Timezone:<span> </span>
             <span>
               <AnimatePresence mode="wait">
-                {locationState ? (
+                {timezoneState === "local" ? (
                   <>
                     <motion.span
-                      key="locationSpanON"
+                      key="timezoneSpanLocal"
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -20 }}
                       transition={{ duration: 0.3 }}
                     >
-                      ON
+                      Local
                     </motion.span>
                   </>
                 ) : (
                   <>
                     <motion.span
-                      key="locationSpanOFF"
+                      key="timezoneSpan UTC"
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -20 }}
                       transition={{ duration: 0.3 }}
                     >
-                      OFF
+                      UTC
                     </motion.span>
                   </>
                 )}
