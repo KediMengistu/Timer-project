@@ -3,22 +3,17 @@ import { useAppSelector } from "../app/hooks";
 import { useEffect } from "react";
 
 function App() {
-  const timezoneState = useAppSelector((state) => state.time.timezone);
-  const themeState = useAppSelector((state) => state.theme.value);
+  const darkModeState = useAppSelector((state) => state.theme.darkMode);
 
   useEffect(() => {
-    localStorage.setItem("timezone", timezoneState);
-  }, [timezoneState]);
-
-  useEffect(() => {
-    if (themeState) {
+    if (darkModeState) {
       document.documentElement.classList.add("dark");
       localStorage.setItem("theme", "dark");
     } else {
       document.documentElement.classList.remove("dark");
       localStorage.setItem("theme", "light");
     }
-  }, [themeState]);
+  }, [darkModeState]);
 
   return (
     <>

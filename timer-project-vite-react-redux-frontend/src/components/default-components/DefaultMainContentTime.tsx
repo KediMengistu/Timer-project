@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useAppSelector } from "../../app/hooks";
 import { AnimatePresence, motion } from "framer-motion";
 
-function DefaultMainContent() {
+function DefaultMainContentTime() {
   const [time, setTime] = useState(new Date());
   const timezoneState = useAppSelector((state) => state.time.timezone);
 
@@ -18,14 +18,15 @@ function DefaultMainContent() {
     <h1 className="text-center text-xs text-black dark:text-white">
       Current{" "}
       <AnimatePresence mode="wait">
-        {timezoneState === "local" ? (
+        {timezoneState ? (
           <motion.span
             key="timezoneSpanLocal"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-            className="inline-block w-7 text-center font-bold text-red-500 italic underline underline-offset-2 dark:text-yellow-400"
+            transition={{ duration: 0.5, ease: "easeInOut" }}
+            style={{ willChange: "transform", backfaceVisibility: "hidden" }}
+            className="inline-block w-8 text-center font-bold text-red-500 italic underline underline-offset-2 dark:text-yellow-400"
           >
             Local
           </motion.span>
@@ -35,32 +36,34 @@ function DefaultMainContent() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-            className="inline-block w-7 text-center font-bold text-red-500 italic underline underline-offset-2 dark:text-yellow-400"
+            transition={{ duration: 0.5, ease: "easeInOut" }}
+            style={{ willChange: "transform", backfaceVisibility: "hidden" }}
+            className="inline-block w-8 text-center font-bold text-red-500 italic underline underline-offset-2 dark:text-yellow-400"
           >
-            {timezoneState}
+            UTC
           </motion.span>
         )}
       </AnimatePresence>{" "}
       Time: <br />
       <AnimatePresence mode="wait">
-        {timezoneState === "local" ? (
+        {timezoneState ? (
           <motion.span
             key="timeSpanLocal"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.5, ease: "easeInOut" }}
+            style={{ willChange: "transform", backfaceVisibility: "hidden" }}
           >
-            {time.getHours() < 10 ? "0" + time.getHours() : time.getHours()}:
+            {time.getHours() < 10 ? "0" + time.getHours() : time.getHours()}hrs{" "}
             {time.getMinutes() < 10
               ? "0" + time.getMinutes()
               : time.getMinutes()}
-            :
+            min{" "}
             {time.getSeconds() < 10
               ? "0" + time.getSeconds()
               : time.getSeconds()}
-            {time.getHours() < 12 ? " AM" : " PM"}
+            s{time.getHours() < 12 ? " in the AM" : " in the PM"}.
           </motion.span>
         ) : (
           <motion.span
@@ -68,20 +71,21 @@ function DefaultMainContent() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.5, ease: "easeInOut" }}
+            style={{ willChange: "transform", backfaceVisibility: "hidden" }}
           >
             {time.getUTCHours() < 10
               ? "0" + time.getUTCHours()
               : time.getUTCHours()}
-            :
+            hrs{" "}
             {time.getUTCMinutes() < 10
               ? "0" + time.getUTCMinutes()
               : time.getUTCMinutes()}
-            :
+            min{" "}
             {time.getUTCSeconds() < 10
               ? "0" + time.getUTCSeconds()
               : time.getUTCSeconds()}
-            {time.getUTCHours() < 12 ? " AM" : " PM"}
+            s{time.getUTCHours() < 12 ? " in the AM" : " in the PM"}.
           </motion.span>
         )}
       </AnimatePresence>
@@ -89,4 +93,4 @@ function DefaultMainContent() {
   );
 }
 
-export default DefaultMainContent;
+export default DefaultMainContentTime;

@@ -1,20 +1,14 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-export interface timeBreakdown {
-  hours: number;
-  minutes: number;
-  seconds: number;
-}
-
 export interface timeState {
-  timezone: "local" | "UTC";
+  timezone: boolean;
 }
 
 const initialState = {
   timezone:
     localStorage.getItem("timezone") !== null
       ? localStorage.getItem("timezone")
-      : "UTC",
+      : false && localStorage.setItem("timezone", "Local"),
 } as timeState;
 
 export const timeSlice = createSlice({
@@ -22,9 +16,7 @@ export const timeSlice = createSlice({
   initialState,
   reducers: {
     toggleTimezone: (state) => {
-      state.timezone === "local"
-        ? (state.timezone = "UTC")
-        : (state.timezone = "local");
+      state.timezone = !state.timezone;
     },
   },
 });
