@@ -4,6 +4,7 @@ import { useEffect } from "react";
 
 function App() {
   const darkModeState = useAppSelector((state) => state.theme.darkMode);
+  const timezoneState = useAppSelector((state) => state.time.timezone);
 
   useEffect(() => {
     if (darkModeState) {
@@ -14,6 +15,14 @@ function App() {
       localStorage.setItem("theme", "light");
     }
   }, [darkModeState]);
+
+  useEffect(() => {
+    if (timezoneState) {
+      localStorage.setItem("timezone", "UTC");
+    } else {
+      localStorage.setItem("timezone", "local");
+    }
+  }, [timezoneState]);
 
   return (
     <>

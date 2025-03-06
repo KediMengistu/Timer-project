@@ -5,9 +5,18 @@ import { MdEmail } from "react-icons/md";
 import { RiLockPasswordFill } from "react-icons/ri";
 import { FaCircleArrowLeft } from "react-icons/fa6";
 import { IoIosInformationCircleOutline } from "react-icons/io";
+import { useState } from "react";
+import { SignUpDTO, submitSignUp } from "../../features/auth/signupSlice";
+import { useAppDispatch } from "../../app/hooks";
 
 function SignUpForm() {
+  const dispatch = useAppDispatch();
   const location = useLocation();
+  const [firstname, setFirstname] = useState("");
+  const [lastname, setLastname] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   return (
     <AnimatePresence mode="wait">
       <motion.div
@@ -48,6 +57,13 @@ function SignUpForm() {
         <form
           onSubmit={(event) => {
             event.preventDefault();
+            const signupDTO: SignUpDTO = {
+              email,
+              password,
+              firstName: firstname,
+              lastName: lastname,
+            };
+            dispatch(submitSignUp(signupDTO));
           }}
           className="grid grid-rows-[1fr_auto] gap-1"
         >
@@ -65,6 +81,11 @@ function SignUpForm() {
                 id="firstname"
                 placeholder="First name"
                 autoComplete="off"
+                value={firstname}
+                required
+                onChange={(event) => {
+                  setFirstname(event.target.value);
+                }}
                 className="border-b-2 border-black text-xs outline-0 dark:border-gray-700"
               />
               <div className="relative flex items-center justify-center p-2!">
@@ -90,6 +111,11 @@ function SignUpForm() {
                 id="lastname"
                 placeholder="Last name"
                 autoComplete="off"
+                value={lastname}
+                required
+                onChange={(event) => {
+                  setLastname(event.target.value);
+                }}
                 className="border-b-2 border-black text-xs outline-0 dark:border-gray-700"
               />
               <div className="relative flex items-center justify-center p-2!">
@@ -115,6 +141,11 @@ function SignUpForm() {
                 id="email"
                 placeholder="Email"
                 autoComplete="off"
+                value={email}
+                required
+                onChange={(event) => {
+                  setEmail(event.target.value);
+                }}
                 className="border-b-2 border-black text-xs outline-0 dark:border-gray-700"
               />
               <div className="relative flex items-center justify-center p-2!">
@@ -140,6 +171,11 @@ function SignUpForm() {
                 id="password"
                 placeholder="Password"
                 autoComplete="off"
+                value={password}
+                required
+                onChange={(event) => {
+                  setPassword(event.target.value);
+                }}
                 className="border-b-2 border-black text-xs outline-0 dark:border-gray-700"
               />
               <div className="relative flex items-center justify-center p-2!">
@@ -165,6 +201,11 @@ function SignUpForm() {
                 id="confirmPassword"
                 placeholder="Confirm Password"
                 autoComplete="off"
+                value={confirmPassword}
+                required
+                onChange={(event) => {
+                  setConfirmPassword(event.target.value);
+                }}
                 className="border-b-2 border-black text-xs outline-0 dark:border-gray-700"
               />
               <div className="relative flex items-center justify-center p-2!">

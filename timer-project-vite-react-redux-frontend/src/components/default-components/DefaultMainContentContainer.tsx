@@ -27,7 +27,7 @@ function DefaultMainContentContainer() {
           <div className="flex items-center justify-center p-2!">
             <DefaultMainContentTime />
           </div>
-          <div className="absolute top-1/2 left-1/2 -z-10 h-40 w-40 -translate-x-1/2 -translate-y-1/2">
+          <div className="absolute top-0 left-1/2 -z-10 h-40 w-40 -translate-x-1/2 -translate-y-1/2">
             <div
               className={`${styles.globeBackground} border-2 border-black dark:border-white`}
             >

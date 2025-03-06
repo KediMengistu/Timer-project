@@ -3,9 +3,12 @@ import { NavLink, useLocation } from "react-router";
 import { MdEmail } from "react-icons/md";
 import { RiLockPasswordFill } from "react-icons/ri";
 import { FaCircleArrowLeft } from "react-icons/fa6";
+import { useState } from "react";
 
 function SignInForm() {
   const location = useLocation();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   return (
     <AnimatePresence mode="wait">
       <motion.div

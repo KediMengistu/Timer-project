@@ -272,7 +272,7 @@ function Navbar() {
             Timezone:<span> </span>
             <span>
               <AnimatePresence mode="wait">
-                {timezoneState ? (
+                {!timezoneState ? (
                   <>
                     <motion.span
                       key="timezoneSpanLocal"

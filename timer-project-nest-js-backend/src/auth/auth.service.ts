@@ -15,51 +15,67 @@ import { VerifyUserForgotPasswordDTO } from '../users/dto/verify-user-forgot-pas
 
 @Injectable()
 export class AuthService {
-   constructor(
+  constructor(
     private usersService: UsersService,
     private verificationService: VerificationService,
-    private jwtService: JwtService
+    private jwtService: JwtService,
   ) {}
 
-  async signup(createUserSignUpDto: CreateUserSignUpDto): Promise<{ userId: string }> {
+  async signup(
+    createUserSignUpDto: CreateUserSignUpDto,
+  ): Promise<{ userId: string }> {
     try {
-      const user: User = await this.usersService.retrieveUserViaEmail(createUserSignUpDto.email);
-      if(!user){
-        let salt: string = await bcrypt.genSalt(10);
-        const hashedPassword: string = await bcrypt.hash(createUserSignUpDto.password, salt);
-        const savedUser: User = await this.usersService.createUser({ ...createUserSignUpDto, password: hashedPassword });
-        await this.verificationService.initiateVerification(savedUser, VerificationActions.INITIATE_SIGN_UP);
-        return { userId: savedUser.id };
-      }
-      await this.verificationService.initiateVerification(user, VerificationActions.INITIATE_SIGN_UP);
-      return { userId: user.id };
-    }catch(error) {
-      if(error instanceof QueryFailedError) {
-        const existingUser: User = await this.usersService.retrieveUserViaEmail(createUserSignUpDto.email);
-        if(existingUser.isVerified === UserVerificationStatus.NOT_VERIFIED) {
-          throw new BadRequestException('User account that has not been verified. Please check email for verification code.');
-        }
-        else {
-          throw new BadRequestException('User account exists.');
-        }
-      }
-      else {
+      let salt: string = await bcrypt.genSalt(10);
+      const hashedPassword: string = await bcrypt.hash(
+        createUserSignUpDto.password,
+        salt,
+      );
+      const savedUser: User = await this.usersService.createUser({
+        ...createUserSignUpDto,
+        password: hashedPassword,
+      });
+      await this.verificationService.initiateVerification(
+        savedUser,
+        VerificationActions.INITIATE_SIGN_UP,
+      );
+      return { userId: savedUser.id };
+    } catch (error) {
+      if (error instanceof QueryFailedError) {
+        throw new BadRequestException('User account exists.');
+      } else {
         throw error;
       }
     }
   }
 
-  async verifySignup(verifyUserSignUpDTO: VerifyUserSignUpDTO): Promise<{ access_token: string}> {
-    const user: User = await this.usersService.retrieveUserViaId(verifyUserSignUpDTO.userId);
-    await this.verificationService.completeVerification(user, verifyUserSignUpDTO.inputVerificationCode);
-    const access_token_obj: { access_token: string } = await this.signin(user.id);
+  async verifySignup(
+    verifyUserSignUpDTO: VerifyUserSignUpDTO,
+  ): Promise<{ access_token: string }> {
+    const user: User = await this.usersService.retrieveUserViaId(
+      verifyUserSignUpDTO.userId,
+    );
+    await this.verificationService.completeVerification(
+      user,
+      verifyUserSignUpDTO.inputVerificationCode,
+    );
+    const access_token_obj: { access_token: string } = await this.signin(
+      user.id,
+    );
     return access_token_obj;
   }
 
-  async signin(userId: string): Promise<{ access_token: string}> {
+  async signin(userId: string): Promise<{ access_token: string }> {
     const user: User = await this.usersService.retrieveUserViaId(userId);
-    if(user.verificationCode !== null || user.verificationCodeExpireTime !== null) {
-      this.usersService.updateUserVerficationProps(userId, null, null, user.isVerified);
+    if (
+      user.verificationCode !== null ||
+      user.verificationCodeExpireTime !== null
+    ) {
+      this.usersService.updateUserVerficationProps(
+        userId,
+        null,
+        null,
+        user.isVerified,
+      );
     }
     await this.usersService.updateSignInAndExpirationTime(userId);
     //input user credentials are valid - generate JWT.
@@ -72,16 +88,20 @@ export class AuthService {
   async validateUser(email: string, password: string): Promise<User> {
     const user: User = await this.usersService.retrieveUserViaEmail(email);
     //user does not exist - exit.
-    if(!user) {
-      throw new UnauthorizedException('Provided email is not associated to any user account.');
+    if (!user) {
+      throw new UnauthorizedException(
+        'Provided email is not associated to any user account.',
+      );
     }
-    if(user.isVerified === UserVerificationStatus.NOT_VERIFIED){
-      throw new UnauthorizedException('Associated user account is not verified.');
+    if (user.isVerified === UserVerificationStatus.NOT_VERIFIED) {
+      throw new UnauthorizedException(
+        'Associated user account is not verified.',
+      );
     }
     //validate input user credentials are valid.
     const isMatching: boolean = await bcrypt.compare(password, user.password);
     //input user credentials are invalid.
-    if(!isMatching) {
+    if (!isMatching) {
       throw new UnauthorizedException('Provided password is incorrect.');
     }
     return user;
@@ -89,18 +109,36 @@ export class AuthService {
 
   async forgotPasswordRequest(email: string) {
     const user: User = await this.usersService.retrieveUserViaEmail(email);
-    await this.verificationService.initiateVerification(user, VerificationActions.INITIATE_FORGOT_PASSWORD);
+    await this.verificationService.initiateVerification(
+      user,
+      VerificationActions.INITIATE_FORGOT_PASSWORD,
+    );
   }
 
-  async forgotPasswordConfirm(verifyUserForgotPasswordDTO: VerifyUserForgotPasswordDTO) {
-    const user: User = await this.usersService.retrieveUserViaEmail(verifyUserForgotPasswordDTO.email);
-    const isMatching: boolean = await bcrypt.compare(verifyUserForgotPasswordDTO.newPassword, user.password);
-    if(isMatching) {
-      throw new BadRequestException('Password input was previously used. Please provide a new one.');
+  async forgotPasswordConfirm(
+    verifyUserForgotPasswordDTO: VerifyUserForgotPasswordDTO,
+  ) {
+    const user: User = await this.usersService.retrieveUserViaEmail(
+      verifyUserForgotPasswordDTO.email,
+    );
+    const isMatching: boolean = await bcrypt.compare(
+      verifyUserForgotPasswordDTO.newPassword,
+      user.password,
+    );
+    if (isMatching) {
+      throw new BadRequestException(
+        'Password input was previously used. Please provide a new one.',
+      );
     }
-    await this.verificationService.completeVerification(user, verifyUserForgotPasswordDTO.inputVerificationCode);
+    await this.verificationService.completeVerification(
+      user,
+      verifyUserForgotPasswordDTO.inputVerificationCode,
+    );
     let salt: string = await bcrypt.genSalt(10);
-    const hashedPassword: string = await bcrypt.hash(verifyUserForgotPasswordDTO.newPassword, salt);
+    const hashedPassword: string = await bcrypt.hash(
+      verifyUserForgotPasswordDTO.newPassword,
+      salt,
+    );
     await this.usersService.updateUserPassword(user.id, hashedPassword);
   }
 }

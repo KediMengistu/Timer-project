@@ -2,9 +2,11 @@ import { AnimatePresence, motion } from "motion/react";
 import { NavLink, useLocation } from "react-router";
 import { MdEmail } from "react-icons/md";
 import { FaCircleArrowLeft } from "react-icons/fa6";
+import { useState } from "react";
 
 function ForgotPasswordForm() {
   const location = useLocation();
+  const [email, setEmail] = useState("");
   return (
     <AnimatePresence mode="wait">
       <motion.div
