@@ -1,4 +1,10 @@
-import { Catch, ExceptionFilter, ArgumentsHost, HttpStatus, HttpException } from '@nestjs/common';
+import {
+  Catch,
+  ExceptionFilter,
+  ArgumentsHost,
+  HttpStatus,
+  HttpException,
+} from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
 
 @Catch()
@@ -21,15 +27,13 @@ export class CatchEverythingFilter implements ExceptionFilter {
       } else {
         originalResponse = { message: response };
       }
-    }
-    else if (exception instanceof Error) {
+    } else if (exception instanceof Error) {
       originalResponse = {
         name: exception.name,
         message: exception.message,
       };
       httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-    }
-    else {
+    } else {
       originalResponse = {
         message: String(exception),
       };

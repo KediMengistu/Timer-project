@@ -1,22 +1,40 @@
 import { AnimatePresence, motion } from "motion/react";
-import { NavLink, useLocation } from "react-router";
+import { NavLink, useLocation, useNavigate } from "react-router";
 import { RiUser3Fill } from "react-icons/ri";
 import { MdEmail } from "react-icons/md";
 import { RiLockPasswordFill } from "react-icons/ri";
 import { FaCircleArrowLeft } from "react-icons/fa6";
 import { IoIosInformationCircleOutline } from "react-icons/io";
-import { useState } from "react";
-import { SignUpDTO, submitSignUp } from "../../features/auth/signupSlice";
-import { useAppDispatch } from "../../app/hooks";
+import { useEffect, useState } from "react";
+import {
+  resetSignup,
+  SignUpDTO,
+  submitSignUp,
+} from "../../features/auth/signupSlice";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { ApiErrorResponse } from "../../app/appTypes";
 
 function SignUpForm() {
-  const dispatch = useAppDispatch();
   const location = useLocation();
-  const [firstname, setFirstname] = useState("");
-  const [lastname, setLastname] = useState("");
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const submitSignupState = useAppSelector((state) => state.signup.status);
+  const submitSignupErrorState = useAppSelector((state) => state.signup.error);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [firstname, setFirstname] = useState("");
+  const [lastname, setLastname] = useState("");
+  const [nonAPIError, setNonAPIError] = useState<ApiErrorResponse | null>(null);
+  useEffect(() => {
+    if (submitSignupState === "succeeded") {
+      navigate("/verify-user-from-signup");
+    }
+    return () => {
+      dispatch(resetSignup());
+    };
+  }, [submitSignupState]);
+
   return (
     <AnimatePresence mode="wait">
       <motion.div
@@ -57,13 +75,24 @@ function SignUpForm() {
         <form
           onSubmit={(event) => {
             event.preventDefault();
-            const signupDTO: SignUpDTO = {
-              email,
-              password,
-              firstName: firstname,
-              lastName: lastname,
-            };
-            dispatch(submitSignUp(signupDTO));
+            if (password === confirmPassword) {
+              setNonAPIError(null);
+              const signupDTO: SignUpDTO = {
+                email,
+                password,
+                firstName: firstname,
+                lastName: lastname,
+              };
+              dispatch(submitSignUp(signupDTO));
+            } else {
+              const error: ApiErrorResponse = {
+                timestamp: new Date().toISOString(),
+                path: location.pathname,
+                message: "Password entries do not match.",
+                statusCode: 400,
+              };
+              setNonAPIError(error);
+            }
           }}
           className="grid grid-rows-[1fr_auto] gap-1"
         >
@@ -219,7 +248,7 @@ function SignUpForm() {
               </div>
             </div>
           </div>
-          <div className="flex flex-row items-center justify-center p-1!">
+          <div className="relative flex flex-row items-center justify-center p-1!">
             <button
               type="submit"
               className="group flex flex-row items-center justify-center rounded-full border-2 border-white bg-white p-2! shadow-[0px_0px_0px_1px_rgba(0,0,0,0.06),0px_1px_1px_-0.5px_rgba(0,0,0,0.06),0px_3px_3px_-1.5px_rgba(0,0,0,0.06),_0px_6px_6px_-3px_rgba(0,0,0,0.06),0px_12px_12px_-6px_rgba(0,0,0,0.06),0px_24px_24px_-12px_rgba(0,0,0,0.06)] transition ease-in-out hover:cursor-pointer hover:border-black hover:bg-black active:opacity-55 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-gray-600 dark:hover:bg-gray-800"
@@ -228,6 +257,55 @@ function SignUpForm() {
                 Register
               </h1>
             </button>
+            <AnimatePresence mode="wait">
+              {nonAPIError !== null ? (
+                <>
+                  <motion.div
+                    key="nonAPIErrorDiv"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                    style={{
+                      willChange: "transform",
+                      backfaceVisibility: "hidden",
+                    }}
+                    className="absolute top-0 left-[65%] h-fit w-fit rounded-sm border-1 border-black bg-red-400 p-1! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-700 dark:bg-gray-800"
+                  >
+                    <h1 className="text-center text-xs text-black dark:text-white">
+                      {nonAPIError.message}
+                    </h1>
+                  </motion.div>
+                </>
+              ) : (
+                <>
+                  {submitSignupErrorState !== null ? (
+                    <>
+                      <motion.div
+                        key="nonAPIErrorDiv"
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 20 }}
+                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                        style={{
+                          willChange: "transform",
+                          backfaceVisibility: "hidden",
+                        }}
+                        className="absolute top-0 left-[65%] h-fit w-[150px] rounded-sm border-1 border-black bg-red-400 p-1! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-700 dark:bg-gray-800"
+                      >
+                        <h1 className="text-center text-xs text-black dark:text-white">
+                          {Array.isArray(submitSignupErrorState.message)
+                            ? submitSignupErrorState.message.join(" ")
+                            : submitSignupErrorState.message}
+                        </h1>
+                      </motion.div>
+                    </>
+                  ) : (
+                    <></>
+                  )}
+                </>
+              )}
+            </AnimatePresence>
           </div>
         </form>
       </motion.div>

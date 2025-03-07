@@ -11,6 +11,7 @@ import { BadRequestException } from '../exception/bad-request.exception';
 import { UnauthorizedException } from '../exception/unauthorized.exception';
 import { QueryFailedError } from 'typeorm';
 import { VerifyUserSignUpDTO } from '../users/dto/verify-user-sign-up.dto';
+import { UserForgotPasswordDTO } from 'src/users/dto/user-forgot-password.dto';
 import { VerifyUserForgotPasswordDTO } from '../users/dto/verify-user-forgot-password.dto';
 
 @Injectable()
@@ -21,9 +22,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signup(
-    createUserSignUpDto: CreateUserSignUpDto,
-  ): Promise<{ userId: string }> {
+  async signup(createUserSignUpDto: CreateUserSignUpDto) {
     try {
       let salt: string = await bcrypt.genSalt(10);
       const hashedPassword: string = await bcrypt.hash(
@@ -38,7 +37,6 @@ export class AuthService {
         savedUser,
         VerificationActions.INITIATE_SIGN_UP,
       );
-      return { userId: savedUser.id };
     } catch (error) {
       if (error instanceof QueryFailedError) {
         throw new BadRequestException('User account exists.');
@@ -51,9 +49,16 @@ export class AuthService {
   async verifySignup(
     verifyUserSignUpDTO: VerifyUserSignUpDTO,
   ): Promise<{ access_token: string }> {
-    const user: User = await this.usersService.retrieveUserViaId(
-      verifyUserSignUpDTO.userId,
+    const user: User = await this.usersService.retrieveUserViaEmail(
+      verifyUserSignUpDTO.email,
     );
+    const isMatching: boolean = await bcrypt.compare(
+      verifyUserSignUpDTO.password,
+      user.password,
+    );
+    if (!isMatching) {
+      throw new UnauthorizedException('Provided password is incorrect.');
+    }
     await this.verificationService.completeVerification(
       user,
       verifyUserSignUpDTO.inputVerificationCode,
@@ -107,8 +112,10 @@ export class AuthService {
     return user;
   }
 
-  async forgotPasswordRequest(email: string) {
-    const user: User = await this.usersService.retrieveUserViaEmail(email);
+  async forgotPasswordRequest(userForgotPasswordDTO: UserForgotPasswordDTO) {
+    const user: User = await this.usersService.retrieveUserViaEmail(
+      userForgotPasswordDTO.email,
+    );
     await this.verificationService.initiateVerification(
       user,
       VerificationActions.INITIATE_FORGOT_PASSWORD,

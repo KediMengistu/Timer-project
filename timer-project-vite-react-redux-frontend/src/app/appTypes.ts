@@ -3,7 +3,7 @@ import { Action, ThunkAction, createAsyncThunk } from "@reduxjs/toolkit";
 export interface ApiErrorResponse {
   timestamp: string;
   path: string;
-  message: string;
+  message: string | string[];
   statusCode: number;
 }
 

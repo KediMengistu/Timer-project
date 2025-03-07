@@ -10,6 +10,7 @@ import DefaultMainContentContainer from "./components/default-components/Default
 import SignUpForm from "./components/auth-components/SignUpForm.tsx";
 import SignInForm from "./components/auth-components/SignInForm.tsx";
 import ForgotPasswordForm from "./components/auth-components/ForgotPasswordForm.tsx";
+import SignUpVerifyUserForm from "./components/auth-components/SignUpVerifyUserForm.tsx";
 
 const router = createBrowserRouter([
   {
@@ -31,6 +32,10 @@ const router = createBrowserRouter([
               {
                 path: "signup",
                 element: <SignUpForm />,
+              },
+              {
+                path: "verify-user-from-signup",
+                element: <SignUpVerifyUserForm />,
               },
               {
                 path: "signin",

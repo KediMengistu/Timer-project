@@ -1,11 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
 import APP_URL from "../../utils/server/server-info";
-import { createAppAsyncThunk } from "../../app/appTypes";
+import { ApiErrorResponse, createAppAsyncThunk } from "../../app/appTypes";
 
 export interface SignupState {
-  userId: string | null;
   status: "idle" | "pending" | "succeeded" | "failed";
-  error: string | null;
+  error: ApiErrorResponse | null;
 }
 
 export interface SignUpDTO {
@@ -15,7 +14,7 @@ export interface SignUpDTO {
   lastName: string;
 }
 
-export const submitSignUp = createAppAsyncThunk<{ userId: string }, SignUpDTO>(
+export const submitSignUp = createAppAsyncThunk<void, SignUpDTO>(
   "signup/submitSignup",
   async (signupDTO: SignUpDTO, thunkAPI) => {
     try {
@@ -27,13 +26,11 @@ export const submitSignUp = createAppAsyncThunk<{ userId: string }, SignUpDTO>(
         body: JSON.stringify(signupDTO),
       });
 
-      const data = await response.json();
-
       if (!response.ok) {
-        return thunkAPI.rejectWithValue(data);
+        const errorData = await response.json();
+        return thunkAPI.rejectWithValue(errorData);
       }
-
-      return data;
+      return;
     } catch (error) {
       return thunkAPI.rejectWithValue({
         timestamp: new Date().toISOString(),
@@ -47,7 +44,6 @@ export const submitSignUp = createAppAsyncThunk<{ userId: string }, SignUpDTO>(
 );
 
 const initialState = {
-  userId: null,
   status: "idle",
   error: null,
 } as SignupState;
@@ -55,23 +51,29 @@ const initialState = {
 export const signupSlice = createSlice({
   name: "signup",
   initialState,
-  reducers: {},
+  reducers: {
+    resetSignup: (state) => {
+      state.status = "idle";
+      state.error = null;
+    },
+  },
   extraReducers(builder) {
     builder
       .addCase(submitSignUp.pending, (state) => {
         state.status = "pending";
         state.error = null;
       })
-      .addCase(submitSignUp.fulfilled, (state, action) => {
+      .addCase(submitSignUp.fulfilled, (state) => {
         state.status = "succeeded";
-        state.userId = action.payload.userId;
         state.error = null;
       })
       .addCase(submitSignUp.rejected, (state, action) => {
         state.status = "failed";
-        state.error = action.payload?.message || "Unknown Error";
+        state.error = action.payload || null;
       });
   },
 });
+
+export const { resetSignup } = signupSlice.actions;
 
 export default signupSlice.reducer;
