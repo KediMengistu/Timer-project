@@ -1,12 +1,18 @@
 import { AnimatePresence, motion } from "motion/react";
-import { NavLink, useLocation } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import { MdEmail } from "react-icons/md";
 import { FaCircleArrowLeft } from "react-icons/fa6";
 import { useState } from "react";
 
 function ForgotPasswordForm() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
+
+  const handleGoHomeClick = () => {
+    navigate("/");
+  };
+
   return (
     <AnimatePresence mode="wait">
       <motion.div
@@ -19,27 +25,20 @@ function ForgotPasswordForm() {
         className="grid h-36 w-64 grid-rows-[auto_1fr] gap-1 rounded-2xl border-2 border-black bg-white p-2! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-700 dark:bg-gray-800"
       >
         <div className="relative flex items-center justify-center border-b-2 border-black p-2! dark:border-gray-700">
-          <NavLink
-            to="/"
-            end
-            style={({ isActive }) => {
-              return isActive
-                ? {
-                    textDecoration: "none",
-                  }
-                : {
-                    textDecoration: "none",
-                  };
-            }}
-            className="absolute top-1/2 left-2 flex -translate-y-1/2 items-center justify-center"
-          >
-            <FaCircleArrowLeft className="peer transition ease-in-out hover:cursor-pointer hover:opacity-55"></FaCircleArrowLeft>
+          <div className="absolute top-1/2 left-2 flex -translate-y-1/2 items-center justify-center">
+            <button
+              type="button"
+              onClick={handleGoHomeClick}
+              className="peer cursor-pointer border-0 bg-transparent p-0 transition ease-in-out hover:opacity-55"
+            >
+              <FaCircleArrowLeft />
+            </button>
             <div className="pointer-events-none absolute top-1/2 right-[110%] flex w-[70px] -translate-y-1/2 items-center justify-center rounded-tr-full rounded-br-full border-2 border-black bg-white p-1! opacity-0 transition duration-200 ease-in-out peer-hover:opacity-100 dark:border-gray-700 dark:bg-gray-800">
               <h1 className="text-center text-xs text-black italic dark:text-white">
                 Go Home
               </h1>
             </div>
-          </NavLink>
+          </div>
           <h1 className="text-center text-xs text-black italic dark:text-white">
             Let's Fix This &#183; Forgot Password
           </h1>

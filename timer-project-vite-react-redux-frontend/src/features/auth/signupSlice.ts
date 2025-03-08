@@ -14,6 +14,12 @@ export interface SignUpDTO {
   lastName: string;
 }
 
+export interface VerifySignUpDTO {
+  email: string;
+  password: string;
+  inputVerificationCode: string;
+}
+
 export const submitSignUp = createAppAsyncThunk<void, SignUpDTO>(
   "signup/submitSignup",
   async (signupDTO: SignUpDTO, thunkAPI) => {
@@ -35,6 +41,35 @@ export const submitSignUp = createAppAsyncThunk<void, SignUpDTO>(
       return thunkAPI.rejectWithValue({
         timestamp: new Date().toISOString(),
         path: "/auth/signup",
+        message:
+          error instanceof Error ? error.message : "Network error occurred",
+        statusCode: 500,
+      });
+    }
+  },
+);
+
+export const verifySignUp = createAppAsyncThunk<void, VerifySignUpDTO>(
+  "signup/verifySignup",
+  async (verifySignUpDTO: VerifySignUpDTO, thunkAPI) => {
+    try {
+      const response = await fetch(`${APP_URL}/auth/verify-signup`, {
+        method: "PATCH",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify(verifySignUpDTO),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return thunkAPI.rejectWithValue(errorData);
+      }
+      return;
+    } catch (error) {
+      return thunkAPI.rejectWithValue({
+        timestamp: new Date().toISOString(),
+        path: "/auth/verify-user-from-signup",
         message:
           error instanceof Error ? error.message : "Network error occurred",
         statusCode: 500,
@@ -68,6 +103,18 @@ export const signupSlice = createSlice({
         state.error = null;
       })
       .addCase(submitSignUp.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload || null;
+      })
+      .addCase(verifySignUp.pending, (state) => {
+        state.status = "pending";
+        state.error = null;
+      })
+      .addCase(verifySignUp.fulfilled, (state) => {
+        state.status = "succeeded";
+        state.error = null;
+      })
+      .addCase(verifySignUp.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload || null;
       });
