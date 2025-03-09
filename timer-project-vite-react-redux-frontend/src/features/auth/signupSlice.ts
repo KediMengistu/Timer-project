@@ -20,6 +20,11 @@ export interface VerifySignUpDTO {
   inputVerificationCode: string;
 }
 
+export interface ReinitiateVerifySignUpDTO {
+  email: string;
+  verificationAction: string;
+}
+
 export const submitSignUp = createAppAsyncThunk<void, SignUpDTO>(
   "signup/submitSignup",
   async (signupDTO: SignUpDTO, thunkAPI) => {
@@ -78,6 +83,41 @@ export const verifySignUp = createAppAsyncThunk<void, VerifySignUpDTO>(
   },
 );
 
+export const reiniateVerification = createAppAsyncThunk<
+  void,
+  ReinitiateVerifySignUpDTO
+>(
+  "signup/reiniateVerification",
+  async (reinitiateVerifySignUpDTO: ReinitiateVerifySignUpDTO, thunkAPI) => {
+    try {
+      const response = await fetch(
+        `${APP_URL}/verification/reiniate-verification`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-type": "application/json",
+          },
+          body: JSON.stringify(reinitiateVerifySignUpDTO),
+        },
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return thunkAPI.rejectWithValue(errorData);
+      }
+      return;
+    } catch (error) {
+      return thunkAPI.rejectWithValue({
+        timestamp: new Date().toISOString(),
+        path: "/verification/reiniate-verification",
+        message:
+          error instanceof Error ? error.message : "Network error occurred",
+        statusCode: 500,
+      });
+    }
+  },
+);
+
 const initialState = {
   status: "idle",
   error: null,
@@ -115,6 +155,18 @@ export const signupSlice = createSlice({
         state.error = null;
       })
       .addCase(verifySignUp.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload || null;
+      })
+      .addCase(reiniateVerification.pending, (state) => {
+        state.status = "pending";
+        state.error = null;
+      })
+      .addCase(reiniateVerification.fulfilled, (state) => {
+        state.status = "succeeded";
+        state.error = null;
+      })
+      .addCase(reiniateVerification.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload || null;
       });

@@ -3,6 +3,7 @@ import { VerificationService } from './verification.service';
 import { UsersModule } from '../users/users.module';
 import { EmailsModule } from '../emails/emails.module';
 import { VerificationUtitliy } from './verification.utility';
+import { VerificationController } from './verification.controller';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { VerificationUtitliy } from './verification.utility';
     VerificationService, 
     VerificationUtitliy
   ],
-  exports: [VerificationService]
+  exports: [VerificationService],
+  controllers: [VerificationController]
 })
 export class VerificationModule {}
