@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsStrongPassword } from "class-validator";
+import { IsString, IsNotEmpty, IsStrongPassword } from 'class-validator';
 
 export class VerifyUserForgotPasswordDTO {
   @IsString()
@@ -13,4 +13,8 @@ export class VerifyUserForgotPasswordDTO {
   @IsStrongPassword()
   @IsNotEmpty()
   newPassword: string;
+
+  @IsString()
+  @IsNotEmpty()
+  verificationAction: string;
 }

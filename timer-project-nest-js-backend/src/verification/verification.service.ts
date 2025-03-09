@@ -18,25 +18,31 @@ export class VerificationService {
     private verificationUtility: VerificationUtitliy,
   ) {}
 
-  async initiateVerification(user: User, action: string) {
+  async initiateVerification(user: User, verificationAction: string) {
     if (
       user.verificationCode !== null &&
       user.verificationCodeExpireTime !== null
     ) {
-      throw new BadRequestException(
-        'A valid verification code has already been sent via email. Cannot reinitiate verification until previously issued code has expired.',
-      );
+      if (user.verificationAction === verificationAction) {
+        throw new BadRequestException(
+          `A valid verification code has already been sent via email for ${user.verificationAction}. Cannot reinitiate  ${user.verificationAction} until previously issued code has expired.`,
+        );
+      } else if (user.verificationAction !== verificationAction) {
+        throw new BadRequestException(
+          `A valid verification code has already been sent via email for an action that is not ${user.verificationAction}. Cannot reinitiate verification for ${verificationAction} until previously issued code has expired or ${user.verificationAction} is complete.`,
+        );
+      }
     }
     const verificationCode: string =
       this.verificationUtility.generateVerificationCode();
     await this.emailsService.createAndSendEmail(
       user.email,
       user.email,
-      `Timer Application: ${action}`,
-      `Code for ${action} is as follows: ${verificationCode}.`,
+      `Timer Application: ${verificationAction}`,
+      `Code for ${verificationAction} is as follows: ${verificationCode}.`,
       `
           <p>
-            Code for ${action} is as follows: ${verificationCode}.
+            Code for ${verificationAction} is as follows: ${verificationCode}.
           </p>
         `,
     );
@@ -55,6 +61,7 @@ export class VerificationService {
       hashedVerificationCode,
       verificationCodeExpireTime,
       user.isVerified,
+      verificationAction,
     );
   }
 
@@ -75,7 +82,11 @@ export class VerificationService {
     );
   }
 
-  async completeVerification(user: User, inputVerificationCode: string) {
+  async completeVerification(
+    user: User,
+    action: string,
+    inputVerificationCode: string,
+  ) {
     const now: Date = new Date();
     if (
       !user.verificationCode ||
@@ -86,8 +97,14 @@ export class VerificationService {
         null,
         null,
         user.isVerified,
+        null,
       );
       throw new BadRequestException('Verification code expired.');
+    }
+    if (user.verificationAction !== action) {
+      throw new BadRequestException(
+        `Currently issued verification code is for ${user.verificationAction} and not ${action}. Please wait for code to expire or complete ${user.verificationAction}.`,
+      );
     }
     const isMatching: boolean = await bcrypt.compare(
       inputVerificationCode,
@@ -104,12 +121,14 @@ export class VerificationService {
           null,
           null,
           UserVerificationStatus.VERIFIED,
+          null,
         )
       : await this.usersService.updateUserVerficationProps(
           user.id,
           null,
           null,
           user.isVerified,
+          null,
         );
   }
 }

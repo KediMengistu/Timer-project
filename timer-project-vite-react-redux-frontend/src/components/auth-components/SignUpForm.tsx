@@ -33,6 +33,7 @@ function SignUpForm() {
 
   useEffect(() => {
     if (submitSignupState === "succeeded") {
+      dispatch(resetSignup());
       navigate("/verify-user-from-signup");
     }
   }, [submitSignupState]);
@@ -122,7 +123,7 @@ function SignUpForm() {
                 <IoIosInformationCircleOutline className="peer hover:cursor-pointer" />
 
                 <div className="pointer-events-none absolute top-1/2 left-full flex h-auto w-[75px] -translate-y-1/2 flex-row items-center justify-center rounded-tl-full rounded-bl-full border-2 border-black bg-white p-1! opacity-0 transition duration-200 ease-in-out peer-hover:opacity-100 dark:border-gray-700 dark:bg-gray-800">
-                  <h1 className="text-center text-[7px] text-black dark:text-white">
+                  <h1 className="text-center text-[7px] text-black md:text-[9px] dark:text-white">
                     Must Not Be Empty.
                   </h1>
                 </div>
@@ -152,7 +153,7 @@ function SignUpForm() {
                 <IoIosInformationCircleOutline className="peer hover:cursor-pointer" />
 
                 <div className="pointer-events-none absolute top-1/2 left-full flex h-auto w-[75px] -translate-y-1/2 flex-row items-center justify-center rounded-tl-full rounded-bl-full border-2 border-black bg-white p-1! opacity-0 transition duration-200 ease-in-out peer-hover:opacity-100 dark:border-gray-700 dark:bg-gray-800">
-                  <h1 className="text-center text-[7px] text-black dark:text-white">
+                  <h1 className="text-center text-[7px] text-black md:text-[9px] dark:text-white">
                     Must Not Be Empty.
                   </h1>
                 </div>
@@ -182,7 +183,7 @@ function SignUpForm() {
                 <IoIosInformationCircleOutline className="peer hover:cursor-pointer" />
 
                 <div className="pointer-events-none absolute top-1/2 left-full flex h-auto w-[75px] -translate-y-1/2 flex-row items-center justify-center rounded-tl-full rounded-bl-full border-2 border-black bg-white p-1! opacity-0 transition duration-200 ease-in-out peer-hover:opacity-100 dark:border-gray-700 dark:bg-gray-800">
-                  <h1 className="text-center text-[7px] text-black dark:text-white">
+                  <h1 className="text-center text-[7px] text-black md:text-[9px] dark:text-white">
                     Must Be Valid Email.
                   </h1>
                 </div>
@@ -212,7 +213,7 @@ function SignUpForm() {
                 <IoIosInformationCircleOutline className="peer hover:cursor-pointer" />
 
                 <div className="pointer-events-none absolute top-1/2 left-full flex h-auto w-[75px] -translate-y-1/2 flex-row items-center justify-center rounded-tl-full rounded-bl-full border-2 border-black bg-white p-1! opacity-0 transition duration-200 ease-in-out peer-hover:opacity-100 dark:border-gray-700 dark:bg-gray-800">
-                  <h1 className="text-center text-[7px] text-black dark:text-white">
+                  <h1 className="text-center text-[7px] text-black md:text-[9px] dark:text-white">
                     8+ char: 1+ UC, LC, #, Symbol.
                   </h1>
                 </div>
@@ -242,7 +243,7 @@ function SignUpForm() {
                 <IoIosInformationCircleOutline className="peer hover:cursor-pointer" />
 
                 <div className="pointer-events-none absolute top-1/2 left-full flex h-auto w-[75px] -translate-y-1/2 flex-row items-center justify-center rounded-tl-full rounded-bl-full border-2 border-black bg-white p-1! opacity-0 transition duration-200 ease-in-out peer-hover:opacity-100 dark:border-gray-700 dark:bg-gray-800">
-                  <h1 className="text-center text-[7px] text-black dark:text-white">
+                  <h1 className="text-center text-[7px] text-black md:text-[9px] dark:text-white">
                     Must Be Same as Password.
                   </h1>
                 </div>
@@ -293,7 +294,7 @@ function SignUpForm() {
               }}
               className="absolute top-[98%] left-1/2 h-fit w-[150px] -translate-x-1/2 rounded-sm border-1 border-black bg-red-400 p-1! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-700 dark:bg-gray-800"
             >
-              <h1 className="text-center text-[10px] text-black dark:text-white">
+              <h1 className="text-center text-[10px] text-black md:text-[12px] dark:text-white">
                 {Array.isArray(submitSignupErrorState.message)
                   ? submitSignupErrorState.message.join(" ")
                   : submitSignupErrorState.message}

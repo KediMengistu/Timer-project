@@ -12,4 +12,8 @@ export class VerifyUserSignUpDTO {
   @IsString()
   @IsNotEmpty()
   inputVerificationCode: string;
+
+  @IsString()
+  @IsNotEmpty()
+  verificationAction: string;
 }

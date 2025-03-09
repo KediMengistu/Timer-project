@@ -52,6 +52,13 @@ export class AuthService {
     const user: User = await this.usersService.retrieveUserViaEmail(
       verifyUserSignUpDTO.email,
     );
+
+    if (!user) {
+      throw new UnauthorizedException(
+        'Provided email is not associated with any user account.',
+      );
+    }
+
     const isMatching: boolean = await bcrypt.compare(
       verifyUserSignUpDTO.password,
       user.password,
@@ -62,6 +69,7 @@ export class AuthService {
     await this.verificationService.completeVerification(
       user,
       verifyUserSignUpDTO.inputVerificationCode,
+      verifyUserSignUpDTO.verificationAction,
     );
     const access_token_obj: { access_token: string } = await this.signin(
       user.id,
@@ -80,6 +88,7 @@ export class AuthService {
         null,
         null,
         user.isVerified,
+        null,
       );
     }
     await this.usersService.updateSignInAndExpirationTime(userId);
@@ -116,6 +125,7 @@ export class AuthService {
     const user: User = await this.usersService.retrieveUserViaEmail(
       userForgotPasswordDTO.email,
     );
+
     await this.verificationService.initiateVerification(
       user,
       VerificationActions.INITIATE_FORGOT_PASSWORD,
@@ -140,6 +150,7 @@ export class AuthService {
     await this.verificationService.completeVerification(
       user,
       verifyUserForgotPasswordDTO.inputVerificationCode,
+      verifyUserForgotPasswordDTO.verificationAction,
     );
     let salt: string = await bcrypt.genSalt(10);
     const hashedPassword: string = await bcrypt.hash(

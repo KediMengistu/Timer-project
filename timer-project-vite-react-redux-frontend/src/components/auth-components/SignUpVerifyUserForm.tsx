@@ -29,7 +29,8 @@ function SignUpVerifyUserForm() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [refsInitialized, setRefsInitialized] = useState<boolean>(false);
-  const errorMessage = useRef("");
+  const [sentInitiateVerification, setSentReinitiateVerification] =
+    useState<boolean>(false);
 
   // Create a ref array for the verification code inputs
   const codeInputRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -42,7 +43,10 @@ function SignUpVerifyUserForm() {
   }, []);
 
   useEffect(() => {
-    if (verifySignupState === "succeeded") {
+    if (verifySignupState === "succeeded" && sentInitiateVerification) {
+      setSentReinitiateVerification(false);
+      dispatch(resetSignup());
+    } else if (verifySignupState === "succeeded" && !sentInitiateVerification) {
       navigate("/");
     }
   }, [verifySignupState]);
@@ -277,7 +281,7 @@ function SignUpVerifyUserForm() {
                 </h1>
               </button>
               <div className="pointer-events-none absolute top-1/2 right-[101.5%] flex w-[75px] -translate-y-1/2 flex-row items-center justify-center rounded-tr-full rounded-br-full border-2 border-black bg-white p-1! opacity-0 transition duration-200 ease-in-out peer-hover:opacity-100 dark:border-gray-700 dark:bg-gray-800">
-                <h1 className="text-center text-[8px] text-black dark:text-white">
+                <h1 className="text-center text-[8px] text-black md:text-[9px] dark:text-white">
                   Must Verify Later at Sign In.
                 </h1>
               </div>
@@ -308,7 +312,7 @@ function SignUpVerifyUserForm() {
               }}
               className="absolute top-[98%] left-1/2 h-fit w-[150px] -translate-x-1/2 rounded-sm border-1 border-black bg-red-400 p-1! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-700 dark:bg-gray-800"
             >
-              <h1 className="text-center text-[8px] text-black dark:text-white">
+              <h1 className="text-center text-[8px] text-black md:text-[9px] dark:text-white">
                 {Array.isArray(verifySignupErrorState.message)
                   ? verifySignupErrorState.message.join(" ")
                   : verifySignupErrorState.message}
@@ -325,6 +329,7 @@ function SignUpVerifyUserForm() {
                             email,
                             verificationAction: "sign up verification",
                           };
+                        setSentReinitiateVerification(true);
                         dispatch(
                           reiniateVerification(reiniateVerificationSignUpDTO),
                         );
@@ -334,11 +339,32 @@ function SignUpVerifyUserForm() {
                       {" "}
                       Click here to generate new code.
                     </span>
-                    <br />
                   </>
-                ) : (
-                  <></>
-                )}
+                ) : verifySignupErrorState.message ===
+                  "Cannot issue new verification code. Provided email is not associated to any user account." ? (
+                  <>
+                    {" "}
+                    Please fill out email field correctly and
+                    <br />
+                    <span
+                      onClick={() => {
+                        const reiniateVerificationSignUpDTO: ReinitiateVerifySignUpDTO =
+                          {
+                            email,
+                            verificationAction: "sign up verification",
+                          };
+                        setSentReinitiateVerification(true);
+                        dispatch(
+                          reiniateVerification(reiniateVerificationSignUpDTO),
+                        );
+                      }}
+                      className="text-blue-600 underline underline-offset-2 transition ease-in-out hover:cursor-pointer active:opacity-55 dark:text-yellow-500"
+                    >
+                      {" "}
+                      Click here to generate new code.
+                    </span>
+                  </>
+                ) : null}
               </h1>
             </motion.div>
           )}

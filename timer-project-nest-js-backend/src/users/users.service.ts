@@ -42,10 +42,16 @@ export class UsersService {
     verificationCode: string,
     verificationCodeExpireTime: Date,
     isVerified: string,
+    verificationAction: string,
   ) {
     await this.usersRepository.update(
       { id: userId },
-      { verificationCode, verificationCodeExpireTime, isVerified },
+      {
+        verificationCode,
+        verificationCodeExpireTime,
+        isVerified,
+        verificationAction,
+      },
     );
   }
 
@@ -104,6 +110,7 @@ export class UsersService {
     await this.verificationService.completeVerification(
       user,
       verifyUserDeleteDTO.inputVerificationCode,
+      verifyUserDeleteDTO.verificationAction,
     );
     await this.usersRepository.delete({ id: userId });
   }
