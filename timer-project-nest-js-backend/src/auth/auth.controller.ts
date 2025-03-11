@@ -74,6 +74,7 @@ export class AuthController {
     await this.authService.forgotPasswordConfirm(verifyUserForgotPasswordDTO);
   }
 
+  @Public()
   @Post('signout')
   async signout(@Res({ passthrough: true }) response) {
     response.clearCookie('jwt', {

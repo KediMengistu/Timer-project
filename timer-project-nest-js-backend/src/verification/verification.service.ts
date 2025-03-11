@@ -84,8 +84,8 @@ export class VerificationService {
 
   async completeVerification(
     user: User,
-    action: string,
     inputVerificationCode: string,
+    verificationAction: string,
   ) {
     const now: Date = new Date();
     if (
@@ -101,9 +101,9 @@ export class VerificationService {
       );
       throw new BadRequestException('Verification code expired.');
     }
-    if (user.verificationAction !== action) {
+    if (user.verificationAction !== verificationAction) {
       throw new BadRequestException(
-        `Currently issued verification code is for ${user.verificationAction} and not ${action}. Please wait for code to expire or complete ${user.verificationAction}.`,
+        `Currently issued verification code is for ${user.verificationAction} and not ${verificationAction}. Please wait for code to expire or complete ${user.verificationAction}.`,
       );
     }
     const isMatching: boolean = await bcrypt.compare(

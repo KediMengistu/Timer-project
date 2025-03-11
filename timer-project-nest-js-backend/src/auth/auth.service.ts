@@ -69,7 +69,7 @@ export class AuthService {
     await this.verificationService.completeVerification(
       user,
       verifyUserSignUpDTO.inputVerificationCode,
-      verifyUserSignUpDTO.verificationAction,
+      VerificationActions.INITIATE_SIGN_UP,
     );
     const access_token_obj: { access_token: string } = await this.signin(
       user.id,
@@ -150,7 +150,7 @@ export class AuthService {
     await this.verificationService.completeVerification(
       user,
       verifyUserForgotPasswordDTO.inputVerificationCode,
-      verifyUserForgotPasswordDTO.verificationAction,
+      VerificationActions.INITIATE_FORGOT_PASSWORD,
     );
     let salt: string = await bcrypt.genSalt(10);
     const hashedPassword: string = await bcrypt.hash(

@@ -13,8 +13,4 @@ export class VerifyUserForgotPasswordDTO {
   @IsStrongPassword()
   @IsNotEmpty()
   newPassword: string;
-
-  @IsString()
-  @IsNotEmpty()
-  verificationAction: string;
 }

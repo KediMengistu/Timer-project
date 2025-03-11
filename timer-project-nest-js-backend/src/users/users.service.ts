@@ -110,7 +110,7 @@ export class UsersService {
     await this.verificationService.completeVerification(
       user,
       verifyUserDeleteDTO.inputVerificationCode,
-      verifyUserDeleteDTO.verificationAction,
+      VerificationActions.INITIATE_DELETE,
     );
     await this.usersRepository.delete({ id: userId });
   }
