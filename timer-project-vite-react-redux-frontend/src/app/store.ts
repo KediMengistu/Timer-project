@@ -5,6 +5,7 @@ import signupReducer from "../features/auth/signupSlice";
 import signedInStatusReducer, {
   fetchAndSetSignedInStatus,
 } from "../features/auth/signedinStatusSlice";
+import signinReducer from "../features/auth/siginSlice";
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     time: timeReducer,
     signup: signupReducer,
     signedInStatus: signedInStatusReducer,
+    signin: signinReducer,
   },
 });
 

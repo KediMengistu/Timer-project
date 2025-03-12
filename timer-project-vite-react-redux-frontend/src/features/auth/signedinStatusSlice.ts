@@ -15,14 +15,16 @@ export const fetchAndSetSignedInStatus = (): AppThunk => {
     let currentSignedInStatusState: boolean = getState().signedInStatus.value;
 
     //localStorage has persisted the signedInStatusState key value between app starts so we extract it from localStorage.
-    //false - not signed in.
     //true - signed in.
-    if (localStorage.getItem("signedInStatus") === "not signed in") {
-      localStorage.removeItem("signedInStatus");
-    } else {
-      currentSignedInStatusState = true;
-      dispatch(setSignedInStatus(currentSignedInStatusState));
+    if (localStorage.getItem("signedInStatus") !== null) {
+      if (localStorage.getItem("signedInStatus") === "not signed in") {
+        localStorage.removeItem("signedInStatus");
+      }
+      if (localStorage.getItem("signedInStatus") === "signed in") {
+        currentSignedInStatusState = true;
+      }
     }
+    dispatch(setSignedInStatus(currentSignedInStatusState));
   };
 };
 

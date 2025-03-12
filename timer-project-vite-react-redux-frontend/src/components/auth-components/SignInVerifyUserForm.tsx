@@ -13,20 +13,20 @@ import {
 } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
-  reiniateSignUpVerification,
-  ReinitiateVerifySignUpDTO,
-  resetSignup,
-  verifySignUp,
-  VerifySignUpDTO,
-} from "../../features/auth/signupSlice";
+  reiniateSignInVerification,
+  ReinitiateVerifySignInDTO,
+  resetSignin,
+  verifySignIn,
+  VerifySignInDTO,
+} from "../../features/auth/siginSlice";
 import { setSignedInStatus } from "../../features/auth/signedinStatusSlice";
 
-function SignUpVerifyUserForm() {
+function SignInVerifyUserForm() {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const verifySignupState = useAppSelector((state) => state.signup.status);
-  const verifySignupErrorState = useAppSelector((state) => state.signup.error);
+  const verifySigninState = useAppSelector((state) => state.signin.status);
+  const verifySigninErrorState = useAppSelector((state) => state.signin.error);
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [refsInitialized, setRefsInitialized] = useState<boolean>(false);
@@ -44,22 +44,22 @@ function SignUpVerifyUserForm() {
   }, []);
 
   useEffect(() => {
-    if (verifySignupState === "succeeded" && sentReInitiateVerification) {
+    if (verifySigninState === "succeeded" && sentReInitiateVerification) {
       setSentReinitiateVerification(false);
-      dispatch(resetSignup());
+      dispatch(resetSignin());
     } else if (
-      verifySignupState === "succeeded" &&
+      verifySigninState === "succeeded" &&
       !sentReInitiateVerification
     ) {
-      dispatch(resetSignup());
+      dispatch(resetSignin());
       dispatch(setSignedInStatus(true));
       navigate("/manage-timers");
     }
-  }, [verifySignupState]);
+  }, [verifySigninState]);
 
   useEffect(() => {
     return () => {
-      dispatch(resetSignup());
+      dispatch(resetSignin());
     };
   }, []);
 
@@ -185,18 +185,18 @@ function SignUpVerifyUserForm() {
       >
         <div className="flex items-center justify-center border-b-2 border-black p-2! dark:border-gray-700">
           <h1 className="text-center text-xs text-black italic dark:text-white">
-            Account Verification &#183; Via Sign Up
+            Account Verification &#183; Via Sign In
           </h1>
         </div>
         <form
           onSubmit={(event) => {
             event.preventDefault();
-            const verifySignUpDTO: VerifySignUpDTO = {
+            const verifySignInDTO: VerifySignInDTO = {
               email,
               password,
               inputVerificationCode: codeValues.join(""),
             };
-            dispatch(verifySignUp(verifySignUpDTO));
+            dispatch(verifySignIn(verifySignInDTO));
           }}
           className="grid grid-rows-[1fr_auto] gap-1"
         >
@@ -305,9 +305,9 @@ function SignUpVerifyUserForm() {
 
         {/* Error display positioned relative to the parent motion div */}
         <AnimatePresence mode="wait">
-          {verifySignupErrorState !== null && (
+          {verifySigninErrorState !== null && (
             <motion.div
-              key={`signupAPIErrorDiv-${JSON.stringify(verifySignupErrorState)}`}
+              key={`signinAPIErrorDiv-${JSON.stringify(verifySigninErrorState)}`}
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
@@ -319,10 +319,10 @@ function SignUpVerifyUserForm() {
               className="absolute top-[98%] left-1/2 h-fit w-[150px] -translate-x-1/2 rounded-sm border-1 border-black bg-red-400 p-1! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-700 dark:bg-gray-800"
             >
               <h1 className="text-center text-[8px] text-black md:text-[9px] dark:text-white">
-                {Array.isArray(verifySignupErrorState.message)
-                  ? verifySignupErrorState.message.join(" ")
-                  : verifySignupErrorState.message}
-                {verifySignupErrorState.message ===
+                {Array.isArray(verifySigninErrorState.message)
+                  ? verifySigninErrorState.message.join(" ")
+                  : verifySigninErrorState.message}
+                {verifySigninErrorState.message ===
                 "Verification code expired." ? (
                   <>
                     {" "}
@@ -330,15 +330,15 @@ function SignUpVerifyUserForm() {
                     <br />
                     <span
                       onClick={() => {
-                        const reiniateVerificationSignUpDTO: ReinitiateVerifySignUpDTO =
+                        const reiniateVerificationSignInDTO: ReinitiateVerifySignInDTO =
                           {
                             email,
-                            verificationAction: "sign up verification",
+                            verificationAction: "sign in verification",
                           };
                         setSentReinitiateVerification(true);
                         dispatch(
-                          reiniateSignUpVerification(
-                            reiniateVerificationSignUpDTO,
+                          reiniateSignInVerification(
+                            reiniateVerificationSignInDTO,
                           ),
                         );
                       }}
@@ -348,7 +348,7 @@ function SignUpVerifyUserForm() {
                       Click here to generate new code.
                     </span>
                   </>
-                ) : verifySignupErrorState.message ===
+                ) : verifySigninErrorState.message ===
                   "Cannot issue new verification code. Provided email is not associated to any user account." ? (
                   <>
                     {" "}
@@ -356,15 +356,15 @@ function SignUpVerifyUserForm() {
                     <br />
                     <span
                       onClick={() => {
-                        const reiniateVerificationSignUpDTO: ReinitiateVerifySignUpDTO =
+                        const reiniateVerificationSignInDTO: ReinitiateVerifySignInDTO =
                           {
                             email,
-                            verificationAction: "sign up verification",
+                            verificationAction: "sign in verification",
                           };
                         setSentReinitiateVerification(true);
                         dispatch(
-                          reiniateSignUpVerification(
-                            reiniateVerificationSignUpDTO,
+                          reiniateSignInVerification(
+                            reiniateVerificationSignInDTO,
                           ),
                         );
                       }}
@@ -384,4 +384,4 @@ function SignUpVerifyUserForm() {
   );
 }
 
-export default SignUpVerifyUserForm;
+export default SignInVerifyUserForm;

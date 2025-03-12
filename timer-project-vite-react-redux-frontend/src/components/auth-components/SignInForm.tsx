@@ -3,11 +3,20 @@ import { useLocation, useNavigate } from "react-router";
 import { MdEmail } from "react-icons/md";
 import { RiLockPasswordFill } from "react-icons/ri";
 import { FaCircleArrowLeft } from "react-icons/fa6";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import {
+  resetSignin,
+  SignInDTO,
+  submitSignIn,
+} from "../../features/auth/siginSlice";
 
 function SignInForm() {
   const location = useLocation();
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const submitSigninState = useAppSelector((state) => state.signin.status);
+  const submitSigninErrorState = useAppSelector((state) => state.signin.error);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -19,6 +28,19 @@ function SignInForm() {
     navigate("/");
   };
 
+  useEffect(() => {
+    if (submitSigninState === "succeeded") {
+      dispatch(resetSignin());
+      navigate("/verify-user-from-signin");
+    }
+  }, [submitSigninState]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(resetSignin());
+    };
+  }, []);
+
   return (
     <AnimatePresence mode="wait">
       <motion.div
@@ -28,7 +50,7 @@ function SignInForm() {
         exit={{ opacity: 0, y: -20 }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
         style={{ willChange: "transform", backfaceVisibility: "hidden" }}
-        className="grid h-48 w-64 grid-rows-[auto_1fr] gap-1 rounded-2xl border-2 border-black bg-white p-2! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-700 dark:bg-gray-800"
+        className="relative grid h-48 w-64 grid-rows-[auto_1fr] gap-1 rounded-2xl border-2 border-black bg-white p-2! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-700 dark:bg-gray-800"
       >
         <div className="relative flex items-center justify-center border-b-2 border-black p-2! dark:border-gray-700">
           <div className="absolute top-1/2 left-2 flex -translate-y-1/2 items-center justify-center">
@@ -52,6 +74,11 @@ function SignInForm() {
         <form
           onSubmit={(event) => {
             event.preventDefault();
+            const signInDTO: SignInDTO = {
+              email,
+              password,
+            };
+            dispatch(submitSignIn(signInDTO));
           }}
           className="grid grid-rows-[1fr_auto] gap-1"
         >
@@ -69,6 +96,11 @@ function SignInForm() {
                 id="email"
                 placeholder="Email"
                 autoComplete="off"
+                value={email}
+                required
+                onChange={(event) => {
+                  setEmail(event.target.value);
+                }}
                 className="border-b-2 border-black text-xs outline-0 dark:border-gray-700"
               />
             </div>
@@ -85,6 +117,11 @@ function SignInForm() {
                 id="password"
                 placeholder="Password"
                 autoComplete="off"
+                value={password}
+                required
+                onChange={(event) => {
+                  setPassword(event.target.value);
+                }}
                 className="border-b-2 border-black text-xs outline-0 dark:border-gray-700"
               />
             </div>
@@ -109,6 +146,30 @@ function SignInForm() {
             </button>
           </div>
         </form>
+
+        {/* Error display positioned relative to the parent motion div */}
+        <AnimatePresence mode="wait">
+          {submitSigninErrorState !== null && (
+            <motion.div
+              key={`signupAPIErrorDiv-${JSON.stringify(submitSigninErrorState)}`}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.35, ease: "easeInOut" }}
+              style={{
+                willChange: "transform",
+                backfaceVisibility: "hidden",
+              }}
+              className="absolute top-[98%] left-1/2 h-fit w-[150px] -translate-x-1/2 rounded-sm border-1 border-black bg-red-400 p-1! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-700 dark:bg-gray-800"
+            >
+              <h1 className="text-center text-[10px] text-black md:text-[12px] dark:text-white">
+                {Array.isArray(submitSigninErrorState.message)
+                  ? submitSigninErrorState.message.join(" ")
+                  : submitSigninErrorState.message}
+              </h1>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
     </AnimatePresence>
   );

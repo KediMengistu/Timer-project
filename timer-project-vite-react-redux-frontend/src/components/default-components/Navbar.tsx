@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { toggleTheme } from "../../features/theme/themeSlice";
 import { IoSunnyOutline, IoMoonOutline } from "react-icons/io5";
+import { CiClock2 } from "react-icons/ci";
 import { useState } from "react";
 import { NavLink } from "react-router";
 import { toggleTimezone } from "../../features/time/timeSlice";
@@ -15,6 +16,7 @@ function Navbar() {
   const [aboutOptionState, setAboutOptionsState] = useState(false);
   const darkModeState = useAppSelector((state) => state.theme.darkMode);
   const timezoneState = useAppSelector((state) => state.time.timezone);
+  const signedInState = useAppSelector((state) => state.signedInStatus.value);
   const dispatch = useAppDispatch();
 
   const closeAllMenus = () => {
@@ -90,7 +92,7 @@ function Navbar() {
                   className="absolute top-[115%] left-1/2 z-20 flex h-auto w-[108.067px] -translate-x-1/2 flex-col gap-0.5 md:top-1/2 md:left-[125%] md:-translate-x-0 md:-translate-y-1/2"
                 >
                   <NavLink
-                    to="/signup"
+                    to={!signedInState ? "/signup" : "/account-info"}
                     end
                     style={({ isActive }) => {
                       return isActive
@@ -107,11 +109,11 @@ function Navbar() {
                     className="group relative flex flex-row items-center justify-center border-2 border-black bg-white p-2! transition duration-300 ease-in-out hover:cursor-pointer hover:bg-black active:opacity-55 md:rounded-tr-3xl md:rounded-br-3xl dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-800"
                   >
                     <h1 className="text-xs text-black transition duration-300 ease-in-out group-hover:text-white dark:text-white">
-                      Sign Up
+                      {!signedInState ? <>Sign Up</> : <>Account Info</>}
                     </h1>
                   </NavLink>
                   <NavLink
-                    to="/signin"
+                    to={!signedInState ? "/signin" : "/signout"}
                     end
                     style={({ isActive }) => {
                       return isActive
@@ -128,11 +130,11 @@ function Navbar() {
                     className="group relative flex flex-row items-center justify-center border-2 border-black bg-white p-2! transition duration-300 ease-in-out hover:cursor-pointer hover:bg-black active:opacity-55 md:rounded-tr-3xl md:rounded-br-3xl dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-800"
                   >
                     <h1 className="text-xs text-black transition duration-300 ease-in-out group-hover:text-white dark:text-white">
-                      Sign In
+                      {!signedInState ? <>Sign In</> : <>Sign Out</>}
                     </h1>
                   </NavLink>
                   <NavLink
-                    to="/forgotpassword"
+                    to={!signedInState ? "/forgotpassword" : "/delete-account"}
                     end
                     style={({ isActive }) => {
                       return isActive
@@ -149,7 +151,11 @@ function Navbar() {
                     className="group relative flex flex-row items-center justify-center rounded-tr-none rounded-br-2xl rounded-bl-2xl border-2 border-black bg-white p-2! transition duration-300 ease-in-out hover:cursor-pointer hover:bg-black active:opacity-55 md:rounded-tr-3xl md:rounded-br-3xl md:rounded-bl-none dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-800"
                   >
                     <h1 className="text-center text-xs text-black transition duration-300 ease-in-out group-hover:text-white dark:text-white">
-                      Forgot Password
+                      {!signedInState ? (
+                        <>Forgot Password</>
+                      ) : (
+                        <>Delete Account</>
+                      )}
                     </h1>
                   </NavLink>
                 </motion.div>
@@ -169,18 +175,95 @@ function Navbar() {
                 setAboutOptionsState(false);
               }}
             >
-              <BsIncognito
-                className={`h-4 w-4 transition ease-in-out group-hover:fill-white md:h-8 md:w-8 ${
-                  guestTimerState ? "fill-white" : "fill-black dark:fill-white"
-                }`}
-              />
-              <h1
-                className={`text-center text-xs group-hover:text-white ${
-                  guestTimerState ? "text-white" : "text-black dark:text-white"
-                }`}
-              >
-                Guest User
-              </h1>
+              <AnimatePresence mode="wait">
+                {!signedInState ? (
+                  <>
+                    <motion.span
+                      key="guestUserIconSpan"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.3, ease: "easeInOut" }}
+                      style={{
+                        willChange: "transform",
+                        backfaceVisibility: "hidden",
+                      }}
+                    >
+                      <BsIncognito
+                        className={`h-4 w-4 transition ease-in-out group-hover:fill-white md:h-8 md:w-8 ${
+                          guestTimerState
+                            ? "fill-white"
+                            : "fill-black dark:fill-white"
+                        }`}
+                      />
+                    </motion.span>
+                    <motion.span
+                      key="guestUserTextSpan"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.3, ease: "easeInOut" }}
+                      style={{
+                        willChange: "transform",
+                        backfaceVisibility: "hidden",
+                      }}
+                    >
+                      <h1
+                        className={`text-center text-xs group-hover:text-white ${
+                          guestTimerState
+                            ? "text-white"
+                            : "text-black dark:text-white"
+                        }`}
+                      >
+                        Guest User
+                      </h1>
+                    </motion.span>
+                  </>
+                ) : (
+                  <>
+                    <motion.span
+                      key="manageTimerIconSpan"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.3, ease: "easeInOut" }}
+                      style={{
+                        willChange: "transform",
+                        backfaceVisibility: "hidden",
+                      }}
+                    >
+                      <CiClock2
+                        className={`h-4 w-4 transition ease-in-out group-hover:fill-white md:h-8 md:w-8 ${
+                          guestTimerState
+                            ? "fill-white"
+                            : "fill-black dark:fill-white"
+                        }`}
+                      />
+                    </motion.span>
+                    <motion.span
+                      key="manageTimerTextSpan"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.3, ease: "easeInOut" }}
+                      style={{
+                        willChange: "transform",
+                        backfaceVisibility: "hidden",
+                      }}
+                    >
+                      <h1
+                        className={`text-center text-xs group-hover:text-white ${
+                          guestTimerState
+                            ? "text-white"
+                            : "text-black dark:text-white"
+                        }`}
+                      >
+                        Timers
+                      </h1>
+                    </motion.span>
+                  </>
+                )}
+              </AnimatePresence>
             </div>
             <AnimatePresence>
               {guestTimerState && (
@@ -197,8 +280,12 @@ function Navbar() {
                   className="absolute top-[115%] left-1/2 z-20 flex h-auto w-[108.067px] -translate-x-1/2 flex-col gap-0.5 md:top-1/2 md:left-[125%] md:-translate-x-0 md:-translate-y-1/2"
                 >
                   <div className="group relative flex flex-row items-center justify-center rounded-tr-none rounded-br-2xl rounded-bl-2xl border-2 border-black bg-white p-2! transition duration-300 ease-in-out hover:cursor-pointer hover:bg-black active:opacity-55 md:rounded-tr-3xl md:rounded-br-3xl md:rounded-bl-none dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-800">
-                    <h1 className="text-xs text-black transition duration-300 ease-in-out group-hover:text-white dark:text-white">
-                      Create Timer
+                    <h1 className="text-[10px] text-black transition duration-300 ease-in-out group-hover:text-white dark:text-white">
+                      {!signedInState ? (
+                        <>Create Guest Timer</>
+                      ) : (
+                        <>Manage Timers</>
+                      )}
                     </h1>
                   </div>
                 </motion.div>
