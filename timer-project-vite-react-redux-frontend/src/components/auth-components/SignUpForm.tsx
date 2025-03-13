@@ -64,8 +64,8 @@ function SignUpForm() {
             >
               <FaCircleArrowLeft />
             </button>
-            <div className="pointer-events-none absolute top-1/2 right-[110%] flex w-[70px] -translate-y-1/2 items-center justify-center rounded-tr-full rounded-br-full border-2 border-black bg-white p-1! opacity-0 transition duration-200 ease-in-out peer-hover:opacity-100 dark:border-gray-700 dark:bg-gray-800">
-              <h1 className="text-center text-xs text-black italic dark:text-white">
+            <div className="pointer-events-none absolute top-1/2 right-[110%] flex w-[55px] -translate-y-1/2 items-center justify-center rounded-tr-full rounded-br-full border-2 border-black bg-white p-1! opacity-0 transition duration-200 ease-in-out peer-hover:opacity-100 md:w-[70px] dark:border-gray-700 dark:bg-gray-800">
+              <h1 className="text-center text-[10px] text-black italic md:text-xs dark:text-white">
                 Go Home
               </h1>
             </div>
@@ -122,8 +122,8 @@ function SignUpForm() {
               <div className="relative flex items-center justify-center p-2!">
                 <IoIosInformationCircleOutline className="peer hover:cursor-pointer" />
 
-                <div className="pointer-events-none absolute top-1/2 left-full flex h-auto w-[75px] -translate-y-1/2 flex-row items-center justify-center rounded-tl-full rounded-bl-full border-2 border-black bg-white p-1! opacity-0 transition duration-200 ease-in-out peer-hover:opacity-100 dark:border-gray-700 dark:bg-gray-800">
-                  <h1 className="text-center text-[7px] text-black md:text-[9px] dark:text-white">
+                <div className="pointer-events-none absolute top-1/2 left-0 flex h-auto w-[75px] -translate-y-1/2 flex-row items-center justify-center rounded-tl-full rounded-bl-full border-2 border-black bg-white p-1! opacity-0 transition duration-200 ease-in-out peer-hover:opacity-100 md:left-full dark:border-gray-700 dark:bg-gray-800">
+                  <h1 className="text-center text-[8px] text-black md:text-[9px] dark:text-white">
                     Must Not Be Empty.
                   </h1>
                 </div>
@@ -152,8 +152,8 @@ function SignUpForm() {
               <div className="relative flex items-center justify-center p-2!">
                 <IoIosInformationCircleOutline className="peer hover:cursor-pointer" />
 
-                <div className="pointer-events-none absolute top-1/2 left-full flex h-auto w-[75px] -translate-y-1/2 flex-row items-center justify-center rounded-tl-full rounded-bl-full border-2 border-black bg-white p-1! opacity-0 transition duration-200 ease-in-out peer-hover:opacity-100 dark:border-gray-700 dark:bg-gray-800">
-                  <h1 className="text-center text-[7px] text-black md:text-[9px] dark:text-white">
+                <div className="pointer-events-none absolute top-1/2 left-0 flex h-auto w-[75px] -translate-y-1/2 flex-row items-center justify-center rounded-tl-full rounded-bl-full border-2 border-black bg-white p-1! opacity-0 transition duration-200 ease-in-out peer-hover:opacity-100 md:left-full dark:border-gray-700 dark:bg-gray-800">
+                  <h1 className="text-center text-[8px] text-black md:text-[9px] dark:text-white">
                     Must Not Be Empty.
                   </h1>
                 </div>
@@ -182,8 +182,8 @@ function SignUpForm() {
               <div className="relative flex items-center justify-center p-2!">
                 <IoIosInformationCircleOutline className="peer hover:cursor-pointer" />
 
-                <div className="pointer-events-none absolute top-1/2 left-full flex h-auto w-[75px] -translate-y-1/2 flex-row items-center justify-center rounded-tl-full rounded-bl-full border-2 border-black bg-white p-1! opacity-0 transition duration-200 ease-in-out peer-hover:opacity-100 dark:border-gray-700 dark:bg-gray-800">
-                  <h1 className="text-center text-[7px] text-black md:text-[9px] dark:text-white">
+                <div className="pointer-events-none absolute top-1/2 left-0 flex h-auto w-[75px] -translate-y-1/2 flex-row items-center justify-center rounded-tl-full rounded-bl-full border-2 border-black bg-white p-1! opacity-0 transition duration-200 ease-in-out peer-hover:opacity-100 md:left-full dark:border-gray-700 dark:bg-gray-800">
+                  <h1 className="text-center text-[8px] text-black md:text-[9px] dark:text-white">
                     Must Be Valid Email.
                   </h1>
                 </div>
@@ -212,8 +212,8 @@ function SignUpForm() {
               <div className="relative flex items-center justify-center p-2!">
                 <IoIosInformationCircleOutline className="peer hover:cursor-pointer" />
 
-                <div className="pointer-events-none absolute top-1/2 left-full flex h-auto w-[75px] -translate-y-1/2 flex-row items-center justify-center rounded-tl-full rounded-bl-full border-2 border-black bg-white p-1! opacity-0 transition duration-200 ease-in-out peer-hover:opacity-100 dark:border-gray-700 dark:bg-gray-800">
-                  <h1 className="text-center text-[7px] text-black md:text-[9px] dark:text-white">
+                <div className="pointer-events-none absolute top-1/2 left-0 flex h-auto w-[75px] -translate-y-1/2 flex-row items-center justify-center rounded-tl-full rounded-bl-full border-2 border-black bg-white p-1! opacity-0 transition duration-200 ease-in-out peer-hover:opacity-100 md:left-full dark:border-gray-700 dark:bg-gray-800">
+                  <h1 className="text-center text-[8px] text-black md:text-[9px] dark:text-white">
                     8+ char: 1+ UC, LC, #, Symbol.
                   </h1>
                 </div>
@@ -242,8 +242,8 @@ function SignUpForm() {
               <div className="relative flex items-center justify-center p-2!">
                 <IoIosInformationCircleOutline className="peer hover:cursor-pointer" />
 
-                <div className="pointer-events-none absolute top-1/2 left-full flex h-auto w-[75px] -translate-y-1/2 flex-row items-center justify-center rounded-tl-full rounded-bl-full border-2 border-black bg-white p-1! opacity-0 transition duration-200 ease-in-out peer-hover:opacity-100 dark:border-gray-700 dark:bg-gray-800">
-                  <h1 className="text-center text-[7px] text-black md:text-[9px] dark:text-white">
+                <div className="pointer-events-none absolute top-1/2 left-0 flex h-auto w-[75px] -translate-y-1/2 flex-row items-center justify-center rounded-tl-full rounded-bl-full border-2 border-black bg-white p-1! opacity-0 transition duration-200 ease-in-out peer-hover:opacity-100 md:left-full dark:border-gray-700 dark:bg-gray-800">
+                  <h1 className="text-center text-[8px] text-black md:text-[9px] dark:text-white">
                     Must Be Same as Password.
                   </h1>
                 </div>
@@ -277,7 +277,7 @@ function SignUpForm() {
               }}
               className="absolute top-[98%] left-1/2 h-fit w-[150px] -translate-x-1/2 rounded-sm border-1 border-black bg-red-400 p-1! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-700 dark:bg-gray-800"
             >
-              <h1 className="text-center text-[10px] text-black dark:text-white">
+              <h1 className="text-center text-[8px] text-black md:text-[9px] dark:text-white">
                 {nonAPIError.message}
               </h1>
             </motion.div>
@@ -294,7 +294,7 @@ function SignUpForm() {
               }}
               className="absolute top-[98%] left-1/2 h-fit w-[150px] -translate-x-1/2 rounded-sm border-1 border-black bg-red-400 p-1! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-700 dark:bg-gray-800"
             >
-              <h1 className="text-center text-[10px] text-black md:text-[12px] dark:text-white">
+              <h1 className="text-center text-[8px] text-black md:text-[9px] dark:text-white">
                 {Array.isArray(submitSignupErrorState.message)
                   ? submitSignupErrorState.message.join(" ")
                   : submitSignupErrorState.message}

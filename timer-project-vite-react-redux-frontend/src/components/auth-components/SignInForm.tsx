@@ -10,6 +10,7 @@ import {
   SignInDTO,
   submitSignIn,
 } from "../../features/auth/siginSlice";
+import { setSignedInStatus } from "../../features/auth/signedinStatusSlice";
 
 function SignInForm() {
   const location = useLocation();
@@ -19,6 +20,7 @@ function SignInForm() {
   const submitSigninErrorState = useAppSelector((state) => state.signin.error);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [proceedToVerify, setProceedToVerify] = useState(false);
 
   const handleForgotPasswordClick = () => {
     navigate("/forgotpassword");
@@ -31,9 +33,17 @@ function SignInForm() {
   useEffect(() => {
     if (submitSigninState === "succeeded") {
       dispatch(resetSignin());
-      navigate("/verify-user-from-signin");
+      dispatch(setSignedInStatus(true));
+      navigate("/manage-timers");
     }
   }, [submitSigninState]);
+
+  useEffect(() => {
+    if (proceedToVerify) {
+      dispatch(resetSignin());
+      navigate("/verify-user-from-signin");
+    }
+  }, [proceedToVerify]);
 
   useEffect(() => {
     return () => {
@@ -61,8 +71,8 @@ function SignInForm() {
             >
               <FaCircleArrowLeft />
             </button>
-            <div className="pointer-events-none absolute top-1/2 right-[110%] flex w-[70px] -translate-y-1/2 items-center justify-center rounded-tr-full rounded-br-full border-2 border-black bg-white p-1! opacity-0 transition duration-200 ease-in-out peer-hover:opacity-100 dark:border-gray-700 dark:bg-gray-800">
-              <h1 className="text-center text-xs text-black italic dark:text-white">
+            <div className="pointer-events-none absolute top-1/2 right-[110%] flex w-[55px] -translate-y-1/2 items-center justify-center rounded-tr-full rounded-br-full border-2 border-black bg-white p-1! opacity-0 transition duration-200 ease-in-out peer-hover:opacity-100 md:w-[70px] dark:border-gray-700 dark:bg-gray-800">
+              <h1 className="text-center text-[10px] text-black italic md:text-xs dark:text-white">
                 Go Home
               </h1>
             </div>
@@ -162,10 +172,26 @@ function SignInForm() {
               }}
               className="absolute top-[98%] left-1/2 h-fit w-[150px] -translate-x-1/2 rounded-sm border-1 border-black bg-red-400 p-1! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-700 dark:bg-gray-800"
             >
-              <h1 className="text-center text-[10px] text-black md:text-[12px] dark:text-white">
+              <h1 className="text-center text-[8px] text-black md:text-[9px] dark:text-white">
                 {Array.isArray(submitSigninErrorState.message)
                   ? submitSigninErrorState.message.join(" ")
                   : submitSigninErrorState.message}
+                {submitSigninErrorState.message ===
+                "Associated user account is not verified." ? (
+                  <>
+                    {" "}
+                    <span
+                      onClick={() => {
+                        setProceedToVerify(true);
+                      }}
+                      className="text-blue-600 underline underline-offset-2 transition ease-in-out hover:cursor-pointer active:opacity-55 dark:text-yellow-500"
+                    >
+                      Click here to verify account.
+                    </span>
+                  </>
+                ) : (
+                  <></>
+                )}
               </h1>
             </motion.div>
           )}

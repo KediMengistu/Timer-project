@@ -286,7 +286,7 @@ function SignInVerifyUserForm() {
                   Continue as Guest &rarr;
                 </h1>
               </button>
-              <div className="pointer-events-none absolute top-1/2 right-[101.5%] flex w-[75px] -translate-y-1/2 flex-row items-center justify-center rounded-tr-full rounded-br-full border-2 border-black bg-white p-1! opacity-0 transition duration-200 ease-in-out peer-hover:opacity-100 dark:border-gray-700 dark:bg-gray-800">
+              <div className="pointer-events-none absolute top-1/2 right-[101.5%] flex w-[60px] -translate-y-1/2 flex-row items-center justify-center rounded-tr-full rounded-br-full border-2 border-black bg-white p-1! opacity-0 transition duration-200 ease-in-out peer-hover:opacity-100 md:w-[80px] dark:border-gray-700 dark:bg-gray-800">
                 <h1 className="text-center text-[8px] text-black md:text-[9px] dark:text-white">
                   Must Verify Later at Sign In.
                 </h1>
@@ -333,7 +333,7 @@ function SignInVerifyUserForm() {
                         const reiniateVerificationSignInDTO: ReinitiateVerifySignInDTO =
                           {
                             email,
-                            verificationAction: "sign in verification",
+                            verificationAction: "sign up verification",
                           };
                         setSentReinitiateVerification(true);
                         dispatch(
@@ -359,7 +359,7 @@ function SignInVerifyUserForm() {
                         const reiniateVerificationSignInDTO: ReinitiateVerifySignInDTO =
                           {
                             email,
-                            verificationAction: "sign in verification",
+                            verificationAction: "sign up verification",
                           };
                         setSentReinitiateVerification(true);
                         dispatch(

@@ -6,8 +6,8 @@ import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { toggleTheme } from "../../features/theme/themeSlice";
 import { IoSunnyOutline, IoMoonOutline } from "react-icons/io5";
 import { CiClock2 } from "react-icons/ci";
-import { useState } from "react";
-import { NavLink } from "react-router";
+import { useEffect, useState } from "react";
+import { NavLink, useLocation } from "react-router";
 import { toggleTimezone } from "../../features/time/timeSlice";
 
 function Navbar() {
@@ -17,13 +17,19 @@ function Navbar() {
   const darkModeState = useAppSelector((state) => state.theme.darkMode);
   const timezoneState = useAppSelector((state) => state.time.timezone);
   const signedInState = useAppSelector((state) => state.signedInStatus.value);
+  const location = useLocation();
   const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    closeAllMenus();
+  }, [location.pathname]);
 
   const closeAllMenus = () => {
     setUserActionsState(false);
     setGuestTimerState(false);
     setAboutOptionsState(false);
   };
+
   return (
     <nav className="sticky top-0 left-0 z-10 flex h-28 w-full flex-row gap-1 border-r-0 border-b-2 bg-white shadow-2xl md:h-full md:w-26 md:flex-col md:gap-2 md:border-r-2 md:border-b-0 dark:border-gray-700 dark:bg-gray-800">
       <NavLink
@@ -44,7 +50,7 @@ function Navbar() {
         className="flex flex-auto flex-row justify-center bg-black pr-1! pl-1! md:flex-1 md:flex-col md:pr-2! md:pl-2! dark:bg-gray-700"
       >
         <div className="flex flex-row items-center justify-center p-2!">
-          <h1 className="text-center text-xs text-white md:[text-orientation:upright] md:[writing-mode:vertical-rl]">
+          <h1 className="text-center text-[8.5px] text-white md:[text-orientation:upright] md:[writing-mode:vertical-rl] 2xl:text-xs">
             TIMER4U
           </h1>
         </div>
@@ -89,7 +95,7 @@ function Navbar() {
                     willChange: "transform",
                     backfaceVisibility: "hidden",
                   }}
-                  className="absolute top-[115%] left-1/2 z-20 flex h-auto w-[108.067px] -translate-x-1/2 flex-col gap-0.5 md:top-1/2 md:left-[125%] md:-translate-x-0 md:-translate-y-1/2"
+                  className="absolute top-[115%] left-1/2 z-20 flex h-auto w-[75px] -translate-x-1/2 flex-col gap-0.5 md:top-1/2 md:left-[125%] md:w-[108.067px] md:-translate-x-0 md:-translate-y-1/2"
                 >
                   <NavLink
                     to={!signedInState ? "/signup" : "/account-info"}
@@ -106,9 +112,9 @@ function Navbar() {
                     onClick={() => {
                       closeAllMenus();
                     }}
-                    className="group relative flex flex-row items-center justify-center border-2 border-black bg-white p-2! transition duration-300 ease-in-out hover:cursor-pointer hover:bg-black active:opacity-55 md:rounded-tr-3xl md:rounded-br-3xl dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-800"
+                    className="group relative flex flex-row items-center justify-center border-2 border-black bg-white p-2! shadow-[4px_4px_0_2px_rgba(0,0,0,0.516)] transition duration-300 ease-in-out hover:cursor-pointer hover:bg-black active:opacity-55 md:rounded-tr-3xl md:rounded-br-3xl md:shadow-[-4px_4px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-800"
                   >
-                    <h1 className="text-xs text-black transition duration-300 ease-in-out group-hover:text-white dark:text-white">
+                    <h1 className="text-[8px] text-black transition duration-300 ease-in-out group-hover:text-white md:text-[10px] dark:text-white">
                       {!signedInState ? <>Sign Up</> : <>Account Info</>}
                     </h1>
                   </NavLink>
@@ -127,9 +133,9 @@ function Navbar() {
                     onClick={() => {
                       closeAllMenus();
                     }}
-                    className="group relative flex flex-row items-center justify-center border-2 border-black bg-white p-2! transition duration-300 ease-in-out hover:cursor-pointer hover:bg-black active:opacity-55 md:rounded-tr-3xl md:rounded-br-3xl dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-800"
+                    className="group relative flex flex-row items-center justify-center border-2 border-black bg-white p-2! shadow-[4px_4px_0_2px_rgba(0,0,0,0.516)] transition duration-300 ease-in-out hover:cursor-pointer hover:bg-black active:opacity-55 md:rounded-tr-3xl md:rounded-br-3xl md:shadow-[-4px_4px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-800"
                   >
-                    <h1 className="text-xs text-black transition duration-300 ease-in-out group-hover:text-white dark:text-white">
+                    <h1 className="text-[8px] text-black transition duration-300 ease-in-out group-hover:text-white md:text-[10px] dark:text-white">
                       {!signedInState ? <>Sign In</> : <>Sign Out</>}
                     </h1>
                   </NavLink>
@@ -148,9 +154,9 @@ function Navbar() {
                     onClick={() => {
                       closeAllMenus();
                     }}
-                    className="group relative flex flex-row items-center justify-center rounded-tr-none rounded-br-2xl rounded-bl-2xl border-2 border-black bg-white p-2! transition duration-300 ease-in-out hover:cursor-pointer hover:bg-black active:opacity-55 md:rounded-tr-3xl md:rounded-br-3xl md:rounded-bl-none dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-800"
+                    className="group relative flex flex-row items-center justify-center border-2 border-black bg-white p-2! shadow-[4px_4px_0_2px_rgba(0,0,0,0.516)] transition duration-300 ease-in-out hover:cursor-pointer hover:bg-black active:opacity-55 md:rounded-tr-3xl md:rounded-br-3xl md:shadow-[-4px_4px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-800"
                   >
-                    <h1 className="text-center text-xs text-black transition duration-300 ease-in-out group-hover:text-white dark:text-white">
+                    <h1 className="text-center text-[7px] text-black transition duration-300 ease-in-out group-hover:text-white md:text-[10px] dark:text-white">
                       {!signedInState ? (
                         <>Forgot Password</>
                       ) : (
@@ -215,7 +221,7 @@ function Navbar() {
                             : "text-black dark:text-white"
                         }`}
                       >
-                        Guest User
+                        Guest Actions
                       </h1>
                     </motion.span>
                   </>
@@ -258,7 +264,7 @@ function Navbar() {
                             : "text-black dark:text-white"
                         }`}
                       >
-                        Timers
+                        Timer Actions
                       </h1>
                     </motion.span>
                   </>
@@ -277,10 +283,10 @@ function Navbar() {
                     willChange: "transform",
                     backfaceVisibility: "hidden",
                   }}
-                  className="absolute top-[115%] left-1/2 z-20 flex h-auto w-[108.067px] -translate-x-1/2 flex-col gap-0.5 md:top-1/2 md:left-[125%] md:-translate-x-0 md:-translate-y-1/2"
+                  className="absolute top-[115%] left-1/2 z-20 flex h-auto w-[75px] -translate-x-1/2 flex-col gap-0.5 md:top-1/2 md:left-[125%] md:w-[108.067px] md:-translate-x-0 md:-translate-y-1/2"
                 >
-                  <div className="group relative flex flex-row items-center justify-center rounded-tr-none rounded-br-2xl rounded-bl-2xl border-2 border-black bg-white p-2! transition duration-300 ease-in-out hover:cursor-pointer hover:bg-black active:opacity-55 md:rounded-tr-3xl md:rounded-br-3xl md:rounded-bl-none dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-800">
-                    <h1 className="text-[10px] text-black transition duration-300 ease-in-out group-hover:text-white dark:text-white">
+                  <div className="group relative flex flex-row items-center justify-center border-2 border-black bg-white p-2! shadow-[4px_4px_0_2px_rgba(0,0,0,0.516)] transition duration-300 ease-in-out hover:cursor-pointer hover:bg-black active:opacity-55 md:rounded-tr-3xl md:rounded-br-3xl md:shadow-[-4px_4px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-800">
+                    <h1 className="text-center text-[8px] text-black transition duration-300 ease-in-out group-hover:text-white md:text-[10px] dark:text-white">
                       {!signedInState ? (
                         <>Create Guest Timer</>
                       ) : (
@@ -330,15 +336,15 @@ function Navbar() {
                     willChange: "transform",
                     backfaceVisibility: "hidden",
                   }}
-                  className="absolute top-[115%] left-1/2 z-20 flex h-auto w-[108.067px] -translate-x-1/2 flex-col gap-0.5 md:top-1/2 md:left-[125%] md:-translate-x-0 md:-translate-y-1/2"
+                  className="absolute top-[115%] left-1/2 z-20 flex h-auto w-[75px] -translate-x-1/2 flex-col gap-0.5 md:top-1/2 md:left-[125%] md:w-[108.067px] md:-translate-x-0 md:-translate-y-1/2"
                 >
-                  <div className="group relative flex flex-row items-center justify-center border-2 border-black bg-white p-2! transition duration-300 ease-in-out hover:cursor-pointer hover:bg-black active:opacity-55 md:rounded-tr-3xl md:rounded-br-3xl dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-800">
-                    <h1 className="text-xs text-black transition duration-300 ease-in-out group-hover:text-white dark:text-white">
+                  <div className="group relative flex flex-row items-center justify-center border-2 border-black bg-white p-2! shadow-[4px_4px_0_2px_rgba(0,0,0,0.516)] transition duration-300 ease-in-out hover:cursor-pointer hover:bg-black active:opacity-55 md:rounded-tr-3xl md:rounded-br-3xl md:shadow-[-4px_4px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-800">
+                    <h1 className="text-center text-[8px] text-black transition duration-300 ease-in-out group-hover:text-white md:text-[10px] dark:text-white">
                       Stack
                     </h1>
                   </div>
-                  <div className="group relative flex flex-row items-center justify-center rounded-tr-none rounded-br-2xl rounded-bl-2xl border-2 border-black bg-white p-2! transition duration-300 ease-in-out hover:cursor-pointer hover:bg-black active:opacity-55 md:rounded-tr-3xl md:rounded-br-3xl md:rounded-bl-none dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-800">
-                    <h1 className="text-xs text-black transition duration-300 ease-in-out group-hover:text-white dark:text-white">
+                  <div className="group relative flex flex-row items-center justify-center border-2 border-black bg-white p-2! shadow-[4px_4px_0_2px_rgba(0,0,0,0.516)] transition duration-300 ease-in-out hover:cursor-pointer hover:bg-black active:opacity-55 md:rounded-tr-3xl md:rounded-br-3xl md:shadow-[-4px_4px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-800">
+                    <h1 className="text-center text-[8px] text-black transition duration-300 ease-in-out group-hover:text-white md:text-[10px] dark:text-white">
                       Background
                     </h1>
                   </div>
