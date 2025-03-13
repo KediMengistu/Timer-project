@@ -21,7 +21,7 @@ function DefaultMainContentContainer() {
           <div className="flex items-center justify-center border-b-2 border-b-black p-2! dark:border-b-gray-600">
             <h1 className="text-xs italic">
               <span className="font-bold">Home</span> &#183; Navigate
-              Application via Navbar
+              Application Via Navbar
             </h1>
           </div>
           <div className="flex items-center justify-center p-2!">
