@@ -107,16 +107,16 @@ export class AuthService {
         'Provided email is not associated to any user account.',
       );
     }
-    if (user.isVerified === UserVerificationStatus.NOT_VERIFIED) {
-      throw new UnauthorizedException(
-        'Associated user account is not verified.',
-      );
-    }
     //validate input user credentials are valid.
     const isMatching: boolean = await bcrypt.compare(password, user.password);
     //input user credentials are invalid.
     if (!isMatching) {
       throw new UnauthorizedException('Provided password is incorrect.');
+    }
+    if (user.isVerified === UserVerificationStatus.NOT_VERIFIED) {
+      throw new UnauthorizedException(
+        'Associated user account is not verified.',
+      );
     }
     return user;
   }
@@ -125,7 +125,11 @@ export class AuthService {
     const user: User = await this.usersService.retrieveUserViaEmail(
       userForgotPasswordDTO.email,
     );
-
+    if (!user) {
+      throw new UnauthorizedException(
+        'Provided email is not associated to any user account.',
+      );
+    }
     await this.verificationService.initiateVerification(
       user,
       VerificationActions.INITIATE_FORGOT_PASSWORD,
@@ -138,13 +142,18 @@ export class AuthService {
     const user: User = await this.usersService.retrieveUserViaEmail(
       verifyUserForgotPasswordDTO.email,
     );
+    if (!user) {
+      throw new UnauthorizedException(
+        'Provided email is not associated to any user account.',
+      );
+    }
     const isMatching: boolean = await bcrypt.compare(
       verifyUserForgotPasswordDTO.newPassword,
       user.password,
     );
     if (isMatching) {
       throw new BadRequestException(
-        'Password input was previously used. Please provide a new one.',
+        'Password was previously used. Please provide a different one.',
       );
     }
     await this.verificationService.completeVerification(

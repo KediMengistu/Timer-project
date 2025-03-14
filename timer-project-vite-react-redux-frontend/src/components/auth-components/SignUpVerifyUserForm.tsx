@@ -323,7 +323,17 @@ function SignUpVerifyUserForm() {
                   ? verifySignupErrorState.message.join(" ")
                   : verifySignupErrorState.message}
                 {verifySignupErrorState.message ===
-                "Verification code expired." ? (
+                  `Verification code for sign up verification has expired.` ||
+                (verifySignupErrorState.message.includes(
+                  "Verification code for",
+                ) &&
+                  verifySignupErrorState.message.includes("has expired") &&
+                  (verifySignupErrorState.message.includes(
+                    "It is now possible to initiate sign up verification",
+                  ) ||
+                    verifySignupErrorState.message.includes(
+                      "sign up verification",
+                    ))) ? (
                   <>
                     {" "}
                     Please fill out email field on the form and

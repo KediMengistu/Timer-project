@@ -2,16 +2,44 @@ import { AnimatePresence, motion } from "motion/react";
 import { useLocation, useNavigate } from "react-router";
 import { MdEmail } from "react-icons/md";
 import { FaCircleArrowLeft } from "react-icons/fa6";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import {
+  ForgotPasswordDTO,
+  resetForgotPassword,
+  submitForgotPassword,
+  reiniateForgotPasswordVerification,
+  ReinitiateForgotPasswordDTO,
+} from "../../features/auth/forgotPasswordSlice";
 
 function ForgotPasswordForm() {
   const location = useLocation();
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const submitForgotPasswordState = useAppSelector(
+    (state) => state.forgotPassword.status,
+  );
+  const submitForgotPasswordErrorState = useAppSelector(
+    (state) => state.forgotPassword.error,
+  );
   const [email, setEmail] = useState("");
 
   const handleGoHomeClick = () => {
     navigate("/");
   };
+
+  useEffect(() => {
+    if (submitForgotPasswordState === "succeeded") {
+      dispatch(resetForgotPassword());
+      navigate("/verify-user-forgot-password");
+    }
+  }, [submitForgotPasswordState]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(resetForgotPassword());
+    };
+  }, [dispatch]);
 
   return (
     <AnimatePresence mode="wait">
@@ -46,6 +74,10 @@ function ForgotPasswordForm() {
         <form
           onSubmit={(event) => {
             event.preventDefault();
+            const forgotPasswordDTO: ForgotPasswordDTO = {
+              email,
+            };
+            dispatch(submitForgotPassword(forgotPasswordDTO));
           }}
           className="grid grid-rows-[1fr_auto] gap-1"
         >
@@ -63,6 +95,11 @@ function ForgotPasswordForm() {
                 id="email"
                 placeholder="Email"
                 autoComplete="off"
+                value={email}
+                required
+                onChange={(event) => {
+                  setEmail(event.target.value);
+                }}
                 className="border-b-2 border-black text-xs outline-0 dark:border-gray-700"
               />
             </div>
@@ -78,6 +115,92 @@ function ForgotPasswordForm() {
             </button>
           </div>
         </form>
+
+        {/* Error display positioned relative to the parent motion div */}
+        <AnimatePresence mode="wait">
+          {submitForgotPasswordErrorState !== null && (
+            <motion.div
+              key={`forgotPasswordAPIErrorDiv-${JSON.stringify(submitForgotPasswordErrorState)}`}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.35, ease: "easeInOut" }}
+              style={{
+                willChange: "transform",
+                backfaceVisibility: "hidden",
+              }}
+              className="absolute top-[98%] left-1/2 h-fit w-[150px] -translate-x-1/2 rounded-sm border-1 border-black bg-red-400 p-1! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-700 dark:bg-gray-800"
+            >
+              <h1 className="text-center text-[8px] text-black md:text-[9px] dark:text-white">
+                {Array.isArray(submitForgotPasswordErrorState.message)
+                  ? submitForgotPasswordErrorState.message.join(" ")
+                  : submitForgotPasswordErrorState.message}
+                {submitForgotPasswordErrorState.message ===
+                  `Verification code for forgot password verification has expired.` ||
+                (submitForgotPasswordErrorState.message.includes(
+                  "Verification code for",
+                ) &&
+                  submitForgotPasswordErrorState.message.includes(
+                    "has expired",
+                  ) &&
+                  (submitForgotPasswordErrorState.message.includes(
+                    "It is now possible to initiate forgot password verification",
+                  ) ||
+                    submitForgotPasswordErrorState.message.includes(
+                      "forgot password verification",
+                    ))) ? (
+                  <>
+                    {" "}
+                    <br />
+                    <span
+                      onClick={() => {
+                        const reiniateVerificationForgotPasswordDTO: ReinitiateForgotPasswordDTO =
+                          {
+                            email,
+                            verificationAction: "forgot password verification",
+                          };
+                        dispatch(
+                          reiniateForgotPasswordVerification(
+                            reiniateVerificationForgotPasswordDTO,
+                          ),
+                        );
+                      }}
+                      className="text-blue-600 underline underline-offset-2 transition ease-in-out hover:cursor-pointer active:opacity-55 dark:text-yellow-500"
+                    >
+                      {" "}
+                      Click here to generate new code & proceed to verification.
+                    </span>
+                  </>
+                ) : submitForgotPasswordErrorState.message ===
+                  "Cannot issue new verification code. Provided email is not associated to any user account." ? (
+                  <>
+                    {" "}
+                    Please fill out email field correctly and
+                    <br />
+                    <span
+                      onClick={() => {
+                        const reiniateVerificationForgotPasswordDTO: ReinitiateForgotPasswordDTO =
+                          {
+                            email,
+                            verificationAction: "forgot password verification",
+                          };
+                        dispatch(
+                          reiniateForgotPasswordVerification(
+                            reiniateVerificationForgotPasswordDTO,
+                          ),
+                        );
+                      }}
+                      className="text-blue-600 underline underline-offset-2 transition ease-in-out hover:cursor-pointer active:opacity-55 dark:text-yellow-500"
+                    >
+                      {" "}
+                      Click here to generate new code & proceed to verification.
+                    </span>
+                  </>
+                ) : null}
+              </h1>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
     </AnimatePresence>
   );

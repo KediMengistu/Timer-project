@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { useLocation, useNavigate } from "react-router";
 import { MdEmail } from "react-icons/md";
 import { RiLockPasswordFill } from "react-icons/ri";
+import { IoIosInformationCircleOutline } from "react-icons/io";
 import {
   useState,
   useRef,
@@ -13,23 +14,29 @@ import {
 } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
-  reiniateSignInVerification,
-  ReinitiateVerifySignInDTO,
-  resetSignin,
-  verifySignIn,
-  VerifySignInDTO,
-} from "../../features/auth/siginSlice";
-import { setSignedInStatus } from "../../features/auth/signedinStatusSlice";
+  reiniateForgotPasswordVerification,
+  ReinitiateForgotPasswordDTO,
+  resetForgotPassword,
+  verifyForgotPassword,
+  VerifyForgotPasswordDTO,
+} from "../../features/auth/forgotPasswordSlice";
+import { ApiErrorResponse } from "../../app/appTypes";
 
-function SignInVerifyUserForm() {
+function ForgotPasswordUserVerifyForm() {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const verifySigninState = useAppSelector((state) => state.signin.status);
-  const verifySigninErrorState = useAppSelector((state) => state.signin.error);
+  const verifyForgotPasswordState = useAppSelector(
+    (state) => state.forgotPassword.status,
+  );
+  const verifyForgotPasswordErrorState = useAppSelector(
+    (state) => state.forgotPassword.error,
+  );
   const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
+  const [newPassword, setNewPassword] = useState<string>("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState<string>("");
   const [refsInitialized, setRefsInitialized] = useState<boolean>(false);
+  const [nonAPIError, setNonAPIError] = useState<ApiErrorResponse | null>(null);
   const [sentReInitiateVerification, setSentReinitiateVerification] =
     useState<boolean>(false);
 
@@ -44,22 +51,25 @@ function SignInVerifyUserForm() {
   }, []);
 
   useEffect(() => {
-    if (verifySigninState === "succeeded" && sentReInitiateVerification) {
+    if (
+      verifyForgotPasswordState === "succeeded" &&
+      sentReInitiateVerification
+    ) {
       setSentReinitiateVerification(false);
-      dispatch(resetSignin());
+      dispatch(resetForgotPassword());
+      navigate("/signin");
     } else if (
-      verifySigninState === "succeeded" &&
+      verifyForgotPasswordState === "succeeded" &&
       !sentReInitiateVerification
     ) {
-      dispatch(resetSignin());
-      dispatch(setSignedInStatus(true));
-      navigate("/manage-timers");
+      dispatch(resetForgotPassword());
+      navigate("/signin");
     }
-  }, [verifySigninState]);
+  }, [verifyForgotPasswordState]);
 
   useEffect(() => {
     return () => {
-      dispatch(resetSignin());
+      dispatch(resetForgotPassword());
     };
   }, []);
 
@@ -80,10 +90,6 @@ function SignInVerifyUserForm() {
     },
     [],
   );
-
-  const handleContinueAsGuestClick = () => {
-    navigate("/");
-  };
 
   // Function to handle label click to focus on the first empty input
   const handleCodeLabelClick = (): void => {
@@ -181,26 +187,37 @@ function SignInVerifyUserForm() {
         exit={{ opacity: 0, y: -20 }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
         style={{ willChange: "transform", backfaceVisibility: "hidden" }}
-        className="relative grid h-60 w-64 grid-rows-[auto_1fr] gap-1 rounded-2xl border-2 border-black bg-white p-2! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-700 dark:bg-gray-800"
+        className="relative grid h-72 w-64 grid-rows-[auto_1fr] gap-1 rounded-2xl border-2 border-black bg-white p-2! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-700 dark:bg-gray-800"
       >
         <div className="flex items-center justify-center border-b-2 border-black p-2! dark:border-gray-700">
           <h1 className="text-center text-xs text-black italic dark:text-white">
-            Account Verification &#183; Via Sign In
+            Password Reset &#183; Verification
           </h1>
         </div>
         <form
           onSubmit={(event) => {
             event.preventDefault();
-            const verifySignInDTO: VerifySignInDTO = {
-              email,
-              password,
-              inputVerificationCode: codeValues.join(""),
-            };
-            dispatch(verifySignIn(verifySignInDTO));
+            if (newPassword === confirmNewPassword) {
+              setNonAPIError(null);
+              const verifyForgotPasswordDTO: VerifyForgotPasswordDTO = {
+                email,
+                inputVerificationCode: codeValues.join(""),
+                newPassword,
+              };
+              dispatch(verifyForgotPassword(verifyForgotPasswordDTO));
+            } else {
+              const error: ApiErrorResponse = {
+                timestamp: new Date().toISOString(),
+                path: location.pathname,
+                message: "Password entries do not match.",
+                statusCode: 400,
+              };
+              setNonAPIError(error);
+            }
           }}
           className="grid grid-rows-[1fr_auto] gap-1"
         >
-          <div className="grid grid-rows-3 gap-1">
+          <div className="grid grid-rows-4 gap-1">
             <div className="grid grid-cols-[auto_1fr] gap-1">
               <label
                 htmlFor="email"
@@ -220,24 +237,59 @@ function SignInVerifyUserForm() {
                 className="border-b-2 border-black text-xs outline-0 dark:border-gray-700"
               />
             </div>
-            <div className="grid grid-cols-[auto_1fr] gap-1">
+            <div className="grid grid-cols-[auto_1fr_auto] gap-1">
               <label
-                htmlFor="password"
+                htmlFor="newPassword"
                 className="flex items-center justify-center p-2! hover:cursor-pointer"
               >
                 <RiLockPasswordFill />
               </label>
               <input
                 type="password"
-                name="password"
-                id="password"
-                placeholder="Password"
+                name="newPassword"
+                id="newPassword"
+                placeholder="New Password"
                 autoComplete="off"
-                value={password}
+                value={newPassword}
                 required
-                onChange={(event) => setPassword(event.target.value)}
+                onChange={(event) => setNewPassword(event.target.value)}
                 className="border-b-2 border-black text-xs outline-0 dark:border-gray-700"
               />
+              <div className="relative flex items-center justify-center p-2!">
+                <IoIosInformationCircleOutline className="peer hover:cursor-pointer" />
+                <div className="pointer-events-none absolute top-1/2 left-0 flex h-auto w-[75px] -translate-y-1/2 flex-row items-center justify-center rounded-tl-full rounded-bl-full border-2 border-black bg-white p-1! opacity-0 shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] transition duration-200 ease-in-out peer-hover:opacity-100 md:left-full dark:border-gray-700 dark:bg-gray-800">
+                  <h1 className="text-center text-[8px] text-black md:text-[9px] dark:text-white">
+                    8+ char: 1+ UC, LC, #, Symbol.
+                  </h1>
+                </div>
+              </div>
+            </div>
+            <div className="grid grid-cols-[auto_1fr_auto] gap-1">
+              <label
+                htmlFor="confirmNewPassword"
+                className="flex items-center justify-center p-2! hover:cursor-pointer"
+              >
+                <RiLockPasswordFill />
+              </label>
+              <input
+                type="password"
+                name="confirmNewPassword"
+                id="confirmNewPassword"
+                placeholder="Confirm New Password"
+                autoComplete="off"
+                value={confirmNewPassword}
+                required
+                onChange={(event) => setConfirmNewPassword(event.target.value)}
+                className="border-b-2 border-black text-xs outline-0 dark:border-gray-700"
+              />
+              <div className="relative flex items-center justify-center p-2!">
+                <IoIosInformationCircleOutline className="peer hover:cursor-pointer" />
+                <div className="pointer-events-none absolute top-1/2 left-0 flex h-auto w-[75px] -translate-y-1/2 flex-row items-center justify-center rounded-tl-full rounded-bl-full border-2 border-black bg-white p-1! opacity-0 shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] transition duration-200 ease-in-out peer-hover:opacity-100 md:left-full dark:border-gray-700 dark:bg-gray-800">
+                  <h1 className="text-center text-[8px] text-black md:text-[9px] dark:text-white">
+                    Same as New Password.
+                  </h1>
+                </div>
+              </div>
             </div>
             <div className="grid grid-cols-[auto_1fr] border-black p-1! dark:border-gray-700">
               <label
@@ -275,29 +327,13 @@ function SignInVerifyUserForm() {
               </div>
             </div>
           </div>
-          <div className="flex-rows flex items-center justify-evenly gap-1 pb-1!">
-            <div className="relative">
-              <button
-                type="button"
-                onClick={handleContinueAsGuestClick}
-                className="peer flex w-full flex-row items-center justify-center rounded-sm border-2 border-black bg-black p-2! shadow-[0px_0px_0px_1px_rgba(0,0,0,0.06),0px_1px_1px_-0.5px_rgba(0,0,0,0.06),0px_3px_3px_-1.5px_rgba(0,0,0,0.06),_0px_6px_6px_-3px_rgba(0,0,0,0.06),0px_12px_12px_-6px_rgba(0,0,0,0.06),0px_24px_24px_-12px_rgba(0,0,0,0.06)] transition ease-in-out hover:cursor-pointer active:opacity-55 dark:border-gray-600 dark:bg-gray-700"
-              >
-                <h1 className="text-center text-[10px] text-white">
-                  Continue as Guest &rarr;
-                </h1>
-              </button>
-              <div className="pointer-events-none absolute top-1/2 right-[101.5%] flex w-[60px] -translate-y-1/2 flex-row items-center justify-center rounded-tr-full rounded-br-full border-2 border-black bg-white p-1! opacity-0 shadow-[-2.25px_3px_0_2px_rgba(0,0,0,0.516)] transition duration-200 ease-in-out peer-hover:opacity-100 md:w-[80px] dark:border-gray-700 dark:bg-gray-800">
-                <h1 className="text-center text-[8px] text-black md:text-[9px] dark:text-white">
-                  Must Verify Later at Sign In.
-                </h1>
-              </div>
-            </div>
+          <div className="flex-rows flex items-center justify-center gap-1 pb-1!">
             <button
               type="submit"
               className="group flex flex-row items-center justify-center rounded-full border-2 border-white bg-white p-2! shadow-[0px_0px_0px_1px_rgba(0,0,0,0.06),0px_1px_1px_-0.5px_rgba(0,0,0,0.06),0px_3px_3px_-1.5px_rgba(0,0,0,0.06),_0px_6px_6px_-3px_rgba(0,0,0,0.06),0px_12px_12px_-6px_rgba(0,0,0,0.06),0px_24px_24px_-12px_rgba(0,0,0,0.06)] transition ease-in-out hover:cursor-pointer hover:border-black hover:bg-black active:opacity-55 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-gray-600 dark:hover:bg-gray-800"
             >
               <h1 className="text-center text-xs text-black group-hover:text-white dark:text-white">
-                Verify Account
+                Reset Password
               </h1>
             </button>
           </div>
@@ -305,9 +341,9 @@ function SignInVerifyUserForm() {
 
         {/* Error display positioned relative to the parent motion div */}
         <AnimatePresence mode="wait">
-          {verifySigninErrorState !== null && (
+          {nonAPIError !== null ? (
             <motion.div
-              key={`signinAPIErrorDiv-${JSON.stringify(verifySigninErrorState)}`}
+              key={`nonAPIErrorDiv-${JSON.stringify(nonAPIError)}`}
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
@@ -319,20 +355,39 @@ function SignInVerifyUserForm() {
               className="absolute top-[98%] left-1/2 h-fit w-[150px] -translate-x-1/2 rounded-sm border-1 border-black bg-red-400 p-1! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-700 dark:bg-gray-800"
             >
               <h1 className="text-center text-[8px] text-black md:text-[9px] dark:text-white">
-                {Array.isArray(verifySigninErrorState.message)
-                  ? verifySigninErrorState.message.join(" ")
-                  : verifySigninErrorState.message}
-                {verifySigninErrorState.message ===
-                  `Verification code for sign up verification has expired.` ||
-                (verifySigninErrorState.message.includes(
+                {nonAPIError.message}
+              </h1>
+            </motion.div>
+          ) : verifyForgotPasswordErrorState !== null ? (
+            <motion.div
+              key={`forgotPasswordVerifyAPIErrorDiv-${JSON.stringify(verifyForgotPasswordErrorState)}`}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.35, ease: "easeInOut" }}
+              style={{
+                willChange: "transform",
+                backfaceVisibility: "hidden",
+              }}
+              className="absolute top-[98%] left-1/2 h-fit w-[150px] -translate-x-1/2 rounded-sm border-1 border-black bg-red-400 p-1! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-700 dark:bg-gray-800"
+            >
+              <h1 className="text-center text-[8px] text-black md:text-[9px] dark:text-white">
+                {Array.isArray(verifyForgotPasswordErrorState.message)
+                  ? verifyForgotPasswordErrorState.message.join(" ")
+                  : verifyForgotPasswordErrorState.message}
+                {verifyForgotPasswordErrorState.message ===
+                  `Verification code for forgot password verification has expired.` ||
+                (verifyForgotPasswordErrorState.message.includes(
                   "Verification code for",
                 ) &&
-                  verifySigninErrorState.message.includes("has expired") &&
-                  (verifySigninErrorState.message.includes(
-                    "It is now possible to initiate sign up verification",
+                  verifyForgotPasswordErrorState.message.includes(
+                    "has expired",
+                  ) &&
+                  (verifyForgotPasswordErrorState.message.includes(
+                    "It is now possible to initiate forgot password verification",
                   ) ||
-                    verifySigninErrorState.message.includes(
-                      "sign up verification",
+                    verifyForgotPasswordErrorState.message.includes(
+                      "forgot password verification",
                     ))) ? (
                   <>
                     {" "}
@@ -340,15 +395,15 @@ function SignInVerifyUserForm() {
                     <br />
                     <span
                       onClick={() => {
-                        const reiniateVerificationSignInDTO: ReinitiateVerifySignInDTO =
+                        const reiniateVerificationForgotPasswordDTO: ReinitiateForgotPasswordDTO =
                           {
                             email,
-                            verificationAction: "sign up verification",
+                            verificationAction: "forgot password verification",
                           };
                         setSentReinitiateVerification(true);
                         dispatch(
-                          reiniateSignInVerification(
-                            reiniateVerificationSignInDTO,
+                          reiniateForgotPasswordVerification(
+                            reiniateVerificationForgotPasswordDTO,
                           ),
                         );
                       }}
@@ -358,7 +413,7 @@ function SignInVerifyUserForm() {
                       Click here to generate new code.
                     </span>
                   </>
-                ) : verifySigninErrorState.message ===
+                ) : verifyForgotPasswordErrorState.message ===
                   "Cannot issue new verification code. Provided email is not associated to any user account." ? (
                   <>
                     {" "}
@@ -366,15 +421,15 @@ function SignInVerifyUserForm() {
                     <br />
                     <span
                       onClick={() => {
-                        const reiniateVerificationSignInDTO: ReinitiateVerifySignInDTO =
+                        const reiniateVerificationForgotPasswordDTO: ReinitiateForgotPasswordDTO =
                           {
                             email,
-                            verificationAction: "sign up verification",
+                            verificationAction: "forgot password verification",
                           };
                         setSentReinitiateVerification(true);
                         dispatch(
-                          reiniateSignInVerification(
-                            reiniateVerificationSignInDTO,
+                          reiniateForgotPasswordVerification(
+                            reiniateVerificationForgotPasswordDTO,
                           ),
                         );
                       }}
@@ -387,11 +442,11 @@ function SignInVerifyUserForm() {
                 ) : null}
               </h1>
             </motion.div>
-          )}
+          ) : null}
         </AnimatePresence>
       </motion.div>
     </AnimatePresence>
   );
 }
 
-export default SignInVerifyUserForm;
+export default ForgotPasswordUserVerifyForm;

@@ -6,6 +6,7 @@ import signedInStatusReducer, {
   fetchAndSetSignedInStatus,
 } from "../features/auth/signedinStatusSlice";
 import signinReducer from "../features/auth/siginSlice";
+import forgotPasswordReducer from "../features/auth/forgotPasswordSlice";
 
 export const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ export const store = configureStore({
     signup: signupReducer,
     signedInStatus: signedInStatusReducer,
     signin: signinReducer,
+    forgotPassword: forgotPasswordReducer,
   },
 });
 

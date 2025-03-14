@@ -13,6 +13,7 @@ import ForgotPasswordForm from "./components/auth-components/ForgotPasswordForm.
 import SignUpVerifyUserForm from "./components/auth-components/SignUpVerifyUserForm.tsx";
 import TimerHome from "./components/timer-components/users/TimerHome.tsx";
 import SignInVerifyUserForm from "./components/auth-components/SignInVerifyUserForm.tsx";
+import ForgotPasswordUserVerifyForm from "./components/auth-components/ForgotPasswordVerifyUserForm.tsx";
 
 const router = createBrowserRouter([
   {
@@ -50,6 +51,10 @@ const router = createBrowserRouter([
               {
                 path: "forgotpassword",
                 element: <ForgotPasswordForm />,
+              },
+              {
+                path: "verify-user-forgot-password",
+                element: <ForgotPasswordUserVerifyForm />,
               },
               {
                 path: "manage-timers",

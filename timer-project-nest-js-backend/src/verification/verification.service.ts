@@ -8,6 +8,7 @@ import { BadRequestException } from '../exception/bad-request.exception';
 import { UnauthorizedException } from '../exception/unauthorized.exception';
 import { ReinitiateUserVerificationDTO } from 'src/users/dto/reinitiate-user-verification.dto';
 import { UserVerificationStatus } from '../users/enums/user-verification-status.enum';
+import { VerificationActions } from './enums/verification-actions.enums';
 
 @Injectable()
 export class VerificationService {
@@ -19,17 +20,34 @@ export class VerificationService {
   ) {}
 
   async initiateVerification(user: User, verificationAction: string) {
+    const checkTime: Date = new Date();
     if (
       user.verificationCode !== null &&
-      user.verificationCodeExpireTime !== null
+      user.verificationCodeExpireTime !== null &&
+      user.verificationCodeExpireTime.getTime() > checkTime.getTime()
     ) {
       if (user.verificationAction === verificationAction) {
         throw new BadRequestException(
-          `A valid verification code has already been sent via email for ${user.verificationAction}. Cannot reinitiate  ${user.verificationAction} until previously issued code has expired.`,
+          `A valid verification code has already been sent via email for ${user.verificationAction}. Cannot reinitiate ${verificationAction} until previously issued code for it has expired.`,
         );
       } else if (user.verificationAction !== verificationAction) {
         throw new BadRequestException(
-          `A valid verification code has already been sent via email for an action that is not ${user.verificationAction}. Cannot reinitiate verification for ${verificationAction} until previously issued code has expired or ${user.verificationAction} is complete.`,
+          `A valid verification code has already been sent via email for an action that is not ${verificationAction}. Cannot initiate ${verificationAction} until previously issued code for ${user.verificationAction} expires or ${user.verificationAction} completes.`,
+        );
+      }
+    }
+    if (
+      user.verificationCode !== null &&
+      user.verificationCodeExpireTime !== null &&
+      user.verificationCodeExpireTime.getTime() <= checkTime.getTime()
+    ) {
+      if (user.verificationAction === verificationAction) {
+        throw new BadRequestException(
+          `Verification code for ${user.verificationAction} has expired.`,
+        );
+      } else if (user.verificationAction !== verificationAction) {
+        throw new BadRequestException(
+          `Verification code for ${user.verificationAction} has expired. It is now possible to initiate ${verificationAction}.`,
         );
       }
     }
@@ -68,7 +86,7 @@ export class VerificationService {
   async reiniateVerification(
     reinitiateUserVerificationDTO: ReinitiateUserVerificationDTO,
   ) {
-    const user: User = await this.usersService.retrieveUserViaEmail(
+    let user: User = await this.usersService.retrieveUserViaEmail(
       reinitiateUserVerificationDTO.email,
     );
     if (!user) {
@@ -76,6 +94,22 @@ export class VerificationService {
         'Cannot issue new verification code. Provided email is not associated to any user account.',
       );
     }
+    if (
+      user.verificationCode !== null &&
+      user.verificationCodeExpireTime !== null &&
+      user.verificationCodeExpireTime.getTime() <= new Date().getTime()
+    ) {
+      await this.usersService.updateUserVerficationProps(
+        user.id,
+        null,
+        null,
+        user.isVerified,
+        null,
+      );
+    }
+    user = await this.usersService.retrieveUserViaEmail(
+      reinitiateUserVerificationDTO.email,
+    );
     await this.initiateVerification(
       user,
       reinitiateUserVerificationDTO.verificationAction,
@@ -89,22 +123,30 @@ export class VerificationService {
   ) {
     const now: Date = new Date();
     if (
-      !user.verificationCode ||
-      user.verificationCodeExpireTime.getTime() < now.getTime()
+      user.verificationCode !== null &&
+      user.verificationCodeExpireTime !== null &&
+      user.verificationCodeExpireTime.getTime() > now.getTime()
     ) {
-      await this.usersService.updateUserVerficationProps(
-        user.id,
-        null,
-        null,
-        user.isVerified,
-        null,
-      );
-      throw new BadRequestException('Verification code expired.');
+      if (user.verificationAction !== verificationAction) {
+        throw new BadRequestException(
+          `Currently issued verification code is for ${user.verificationAction} and not ${verificationAction}. Please wait for code to expire or complete ${user.verificationAction}.`,
+        );
+      }
     }
-    if (user.verificationAction !== verificationAction) {
-      throw new BadRequestException(
-        `Currently issued verification code is for ${user.verificationAction} and not ${verificationAction}. Please wait for code to expire or complete ${user.verificationAction}.`,
-      );
+    if (
+      user.verificationCode !== null &&
+      user.verificationCodeExpireTime !== null &&
+      user.verificationCodeExpireTime.getTime() <= now.getTime()
+    ) {
+      if (user.verificationAction === verificationAction) {
+        throw new BadRequestException(
+          `Verification code for ${user.verificationAction} has expired.`,
+        );
+      } else if (user.verificationAction !== verificationAction) {
+        throw new BadRequestException(
+          `Verification code for ${user.verificationAction} has expired. It is now possible to initiate ${verificationAction}.`,
+        );
+      }
     }
     const isMatching: boolean = await bcrypt.compare(
       inputVerificationCode,
@@ -115,7 +157,8 @@ export class VerificationService {
         'Provided verification code is incorrect.',
       );
     }
-    user.isVerified !== UserVerificationStatus.VERIFIED
+    user.isVerified !== UserVerificationStatus.VERIFIED &&
+    verificationAction === VerificationActions.INITIATE_SIGN_UP
       ? await this.usersService.updateUserVerficationProps(
           user.id,
           null,

@@ -11,6 +11,10 @@ import {
   submitSignIn,
 } from "../../features/auth/siginSlice";
 import { setSignedInStatus } from "../../features/auth/signedinStatusSlice";
+import {
+  reiniateForgotPasswordVerification,
+  ReinitiateForgotPasswordDTO,
+} from "../../features/auth/forgotPasswordSlice";
 
 function SignInForm() {
   const location = useLocation();
@@ -21,6 +25,7 @@ function SignInForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [proceedToVerify, setProceedToVerify] = useState(false);
+  const [verificationRequested, setVerificationRequested] = useState(false);
 
   const handleForgotPasswordClick = () => {
     navigate("/forgotpassword");
@@ -29,6 +34,44 @@ function SignInForm() {
   const handleGoHomeClick = () => {
     navigate("/");
   };
+
+  const handleProceedToVerification = () => {
+    // Request a new verification code before proceeding
+    const reinitiateDTO: ReinitiateForgotPasswordDTO = {
+      email,
+      verificationAction: "sign up verification",
+    };
+
+    dispatch(reiniateForgotPasswordVerification(reinitiateDTO))
+      .unwrap()
+      .then(() => {
+        // If successful, navigate to verification
+        setVerificationRequested(true);
+      })
+      .catch((rejectedValueOrSerializedError) => {
+        // Only prevent navigation if it's the specific error about invalid email
+        if (
+          rejectedValueOrSerializedError &&
+          typeof rejectedValueOrSerializedError === "object" &&
+          "message" in rejectedValueOrSerializedError &&
+          rejectedValueOrSerializedError.message ===
+            "Cannot issue new verification code. Provided email is not associated to any user account."
+        ) {
+          // Don't navigate - just display the error
+          return;
+        }
+
+        // For all other errors, still proceed to verification
+        setVerificationRequested(true);
+      });
+  };
+
+  useEffect(() => {
+    if (verificationRequested) {
+      setProceedToVerify(true);
+      setVerificationRequested(false);
+    }
+  }, [verificationRequested]);
 
   useEffect(() => {
     if (submitSigninState === "succeeded") {
@@ -181,12 +224,24 @@ function SignInForm() {
                   <>
                     {" "}
                     <span
-                      onClick={() => {
-                        setProceedToVerify(true);
-                      }}
+                      onClick={handleProceedToVerification}
                       className="text-blue-600 underline underline-offset-2 transition ease-in-out hover:cursor-pointer active:opacity-55 dark:text-yellow-500"
                     >
-                      Click here to verify account.
+                      Click here to proceed to verification.
+                    </span>
+                  </>
+                ) : submitSigninErrorState.message ===
+                  "Cannot issue new verification code. Provided email is not associated to any user account." ? (
+                  <>
+                    {" "}
+                    Please fill out email field correctly and
+                    <br />
+                    <span
+                      onClick={handleProceedToVerification}
+                      className="text-blue-600 underline underline-offset-2 transition ease-in-out hover:cursor-pointer active:opacity-55 dark:text-yellow-500"
+                    >
+                      {" "}
+                      Click here to generate new code.
                     </span>
                   </>
                 ) : (

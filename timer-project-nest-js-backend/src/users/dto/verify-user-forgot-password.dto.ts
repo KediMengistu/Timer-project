@@ -10,7 +10,7 @@ export class VerifyUserForgotPasswordDTO {
   inputVerificationCode: string;
 
   @IsString()
-  @IsStrongPassword()
+  @IsStrongPassword({}, { message: 'Password provided is too weak.' })
   @IsNotEmpty()
   newPassword: string;
 }
