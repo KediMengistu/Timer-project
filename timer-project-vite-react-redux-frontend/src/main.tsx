@@ -14,6 +14,7 @@ import SignUpVerifyUserForm from "./components/auth-components/SignUpVerifyUserF
 import TimerHome from "./components/timer-components/users/TimerHome.tsx";
 import SignInVerifyUserForm from "./components/auth-components/SignInVerifyUserForm.tsx";
 import ForgotPasswordUserVerifyForm from "./components/auth-components/ForgotPasswordVerifyUserForm.tsx";
+import SignOutForm from "./components/auth-components/SignOutForm.tsx";
 
 const router = createBrowserRouter([
   {
@@ -47,6 +48,10 @@ const router = createBrowserRouter([
               {
                 path: "signin",
                 element: <SignInForm />,
+              },
+              {
+                path: "signout",
+                element: <SignOutForm />,
               },
               {
                 path: "forgotpassword",

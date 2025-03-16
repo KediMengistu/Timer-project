@@ -54,9 +54,7 @@ export class AuthService {
     );
 
     if (!user) {
-      throw new UnauthorizedException(
-        'Provided email is not associated with any user account.',
-      );
+      throw new UnauthorizedException('Email not found.');
     }
 
     const isMatching: boolean = await bcrypt.compare(
@@ -103,9 +101,7 @@ export class AuthService {
     const user: User = await this.usersService.retrieveUserViaEmail(email);
     //user does not exist - exit.
     if (!user) {
-      throw new UnauthorizedException(
-        'Provided email is not associated to any user account.',
-      );
+      throw new UnauthorizedException('Email not found.');
     }
     //validate input user credentials are valid.
     const isMatching: boolean = await bcrypt.compare(password, user.password);
@@ -126,9 +122,7 @@ export class AuthService {
       userForgotPasswordDTO.email,
     );
     if (!user) {
-      throw new UnauthorizedException(
-        'Provided email is not associated to any user account.',
-      );
+      throw new UnauthorizedException('Email not found.');
     }
     await this.verificationService.initiateVerification(
       user,
@@ -143,9 +137,7 @@ export class AuthService {
       verifyUserForgotPasswordDTO.email,
     );
     if (!user) {
-      throw new UnauthorizedException(
-        'Provided email is not associated to any user account.',
-      );
+      throw new UnauthorizedException('Email not found.');
     }
     const isMatching: boolean = await bcrypt.compare(
       verifyUserForgotPasswordDTO.newPassword,

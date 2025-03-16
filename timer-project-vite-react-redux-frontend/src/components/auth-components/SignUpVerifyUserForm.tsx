@@ -307,7 +307,7 @@ function SignUpVerifyUserForm() {
         <AnimatePresence mode="wait">
           {verifySignupErrorState !== null && (
             <motion.div
-              key={`signupAPIErrorDiv-${JSON.stringify(verifySignupErrorState)}`}
+              key={`verifySignupAPIErrorDiv-${JSON.stringify(verifySignupErrorState)}`}
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
@@ -323,17 +323,9 @@ function SignUpVerifyUserForm() {
                   ? verifySignupErrorState.message.join(" ")
                   : verifySignupErrorState.message}
                 {verifySignupErrorState.message ===
-                  `Verification code for sign up verification has expired.` ||
-                (verifySignupErrorState.message.includes(
-                  "Verification code for",
-                ) &&
-                  verifySignupErrorState.message.includes("has expired") &&
-                  (verifySignupErrorState.message.includes(
-                    "It is now possible to initiate sign up verification",
-                  ) ||
-                    verifySignupErrorState.message.includes(
-                      "sign up verification",
-                    ))) ? (
+                  `Verification code has expired. Please request a new one.` ||
+                verifySignupErrorState.message ===
+                  `Previous verification has expired. You can now proceed.` ? (
                   <>
                     {" "}
                     Please fill out email field on the form and
@@ -358,8 +350,7 @@ function SignUpVerifyUserForm() {
                       Click here to generate new code.
                     </span>
                   </>
-                ) : verifySignupErrorState.message ===
-                  "Cannot issue new verification code. Provided email is not associated to any user account." ? (
+                ) : verifySignupErrorState.message === "Email not found." ? (
                   <>
                     {" "}
                     Please fill out email field correctly and

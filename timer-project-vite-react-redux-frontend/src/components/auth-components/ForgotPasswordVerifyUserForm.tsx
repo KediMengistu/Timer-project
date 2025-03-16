@@ -343,7 +343,7 @@ function ForgotPasswordUserVerifyForm() {
         <AnimatePresence mode="wait">
           {nonAPIError !== null ? (
             <motion.div
-              key={`nonAPIErrorDiv-${JSON.stringify(nonAPIError)}`}
+              key={`nonAPIVerifyForgotPasswordErrorDiv-${JSON.stringify(nonAPIError)}`}
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
@@ -360,7 +360,7 @@ function ForgotPasswordUserVerifyForm() {
             </motion.div>
           ) : verifyForgotPasswordErrorState !== null ? (
             <motion.div
-              key={`forgotPasswordVerifyAPIErrorDiv-${JSON.stringify(verifyForgotPasswordErrorState)}`}
+              key={`VerifyForgotPasswordAPIErrorDiv-${JSON.stringify(verifyForgotPasswordErrorState)}`}
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
@@ -376,19 +376,9 @@ function ForgotPasswordUserVerifyForm() {
                   ? verifyForgotPasswordErrorState.message.join(" ")
                   : verifyForgotPasswordErrorState.message}
                 {verifyForgotPasswordErrorState.message ===
-                  `Verification code for forgot password verification has expired.` ||
-                (verifyForgotPasswordErrorState.message.includes(
-                  "Verification code for",
-                ) &&
-                  verifyForgotPasswordErrorState.message.includes(
-                    "has expired",
-                  ) &&
-                  (verifyForgotPasswordErrorState.message.includes(
-                    "It is now possible to initiate forgot password verification",
-                  ) ||
-                    verifyForgotPasswordErrorState.message.includes(
-                      "forgot password verification",
-                    ))) ? (
+                  `Verification code has expired. Please request a new one.` ||
+                verifyForgotPasswordErrorState.message ===
+                  `Previous verification has expired. You can now proceed.` ? (
                   <>
                     {" "}
                     Please fill out email field on the form and
@@ -414,7 +404,7 @@ function ForgotPasswordUserVerifyForm() {
                     </span>
                   </>
                 ) : verifyForgotPasswordErrorState.message ===
-                  "Cannot issue new verification code. Provided email is not associated to any user account." ? (
+                  "Email not found." ? (
                   <>
                     {" "}
                     Please fill out email field correctly and

@@ -136,19 +136,9 @@ function ForgotPasswordForm() {
                   ? submitForgotPasswordErrorState.message.join(" ")
                   : submitForgotPasswordErrorState.message}
                 {submitForgotPasswordErrorState.message ===
-                  `Verification code for forgot password verification has expired.` ||
-                (submitForgotPasswordErrorState.message.includes(
-                  "Verification code for",
-                ) &&
-                  submitForgotPasswordErrorState.message.includes(
-                    "has expired",
-                  ) &&
-                  (submitForgotPasswordErrorState.message.includes(
-                    "It is now possible to initiate forgot password verification",
-                  ) ||
-                    submitForgotPasswordErrorState.message.includes(
-                      "forgot password verification",
-                    ))) ? (
+                  `Verification code has expired. Please request a new one.` ||
+                submitForgotPasswordErrorState.message ===
+                  `Previous verification has expired. You can now proceed.` ? (
                   <>
                     {" "}
                     <br />
@@ -172,7 +162,7 @@ function ForgotPasswordForm() {
                     </span>
                   </>
                 ) : submitForgotPasswordErrorState.message ===
-                  "Cannot issue new verification code. Provided email is not associated to any user account." ? (
+                  "Email not found." ? (
                   <>
                     {" "}
                     Please fill out email field correctly and

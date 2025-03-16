@@ -6,6 +6,7 @@ import { CreateUserSignUpDto } from './dto/create-user-sign-up.dto';
 import { VerificationService } from '../verification/verification.service';
 import { VerificationActions } from '../verification/enums/verification-actions.enums';
 import { VerifyUserDeleteDTO } from './dto/verify-user-delete.dto';
+import { UnauthorizedException } from 'src/exception/unauthorized.exception';
 
 @Injectable()
 export class UsersService {
@@ -96,6 +97,11 @@ export class UsersService {
 
   async deleteUserRequest(userId: string) {
     const user: User = await this.retrieveUserViaId(userId);
+    if (!user) {
+      throw new UnauthorizedException(
+        'Insufficient user data to peform delete.',
+      );
+    }
     await this.verificationService.initiateVerification(
       user,
       VerificationActions.INITIATE_DELETE,
@@ -107,6 +113,11 @@ export class UsersService {
     verifyUserDeleteDTO: VerifyUserDeleteDTO,
   ) {
     const user: User = await this.retrieveUserViaId(userId);
+    if (!user) {
+      throw new UnauthorizedException(
+        'Insufficient user data to peform delete.',
+      );
+    }
     await this.verificationService.completeVerification(
       user,
       verifyUserDeleteDTO.inputVerificationCode,

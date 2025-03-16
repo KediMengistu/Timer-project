@@ -28,11 +28,11 @@ export class VerificationService {
     ) {
       if (user.verificationAction === verificationAction) {
         throw new BadRequestException(
-          `A valid verification code has already been sent via email for ${user.verificationAction}. Cannot reinitiate ${verificationAction} until previously issued code for it has expired.`,
+          `A verification code has already been sent. Please check your email.`,
         );
       } else if (user.verificationAction !== verificationAction) {
         throw new BadRequestException(
-          `A valid verification code has already been sent via email for an action that is not ${verificationAction}. Cannot initiate ${verificationAction} until previously issued code for ${user.verificationAction} expires or ${user.verificationAction} completes.`,
+          `Please complete your pending verification first.`,
         );
       }
     }
@@ -43,11 +43,11 @@ export class VerificationService {
     ) {
       if (user.verificationAction === verificationAction) {
         throw new BadRequestException(
-          `Verification code for ${user.verificationAction} has expired.`,
+          `Verification code has expired. Please request a new one.`,
         );
       } else if (user.verificationAction !== verificationAction) {
         throw new BadRequestException(
-          `Verification code for ${user.verificationAction} has expired. It is now possible to initiate ${verificationAction}.`,
+          `Previous verification has expired. You can now proceed.`,
         );
       }
     }
@@ -90,9 +90,7 @@ export class VerificationService {
       reinitiateUserVerificationDTO.email,
     );
     if (!user) {
-      throw new BadRequestException(
-        'Cannot issue new verification code. Provided email is not associated to any user account.',
-      );
+      throw new UnauthorizedException('Email not found.');
     }
     if (
       user.verificationCode !== null &&
@@ -129,7 +127,7 @@ export class VerificationService {
     ) {
       if (user.verificationAction !== verificationAction) {
         throw new BadRequestException(
-          `Currently issued verification code is for ${user.verificationAction} and not ${verificationAction}. Please wait for code to expire or complete ${user.verificationAction}.`,
+          `Please complete your pending verification first.`,
         );
       }
     }
@@ -140,11 +138,11 @@ export class VerificationService {
     ) {
       if (user.verificationAction === verificationAction) {
         throw new BadRequestException(
-          `Verification code for ${user.verificationAction} has expired.`,
+          `Verification code has expired. Please request a new one.`,
         );
       } else if (user.verificationAction !== verificationAction) {
         throw new BadRequestException(
-          `Verification code for ${user.verificationAction} has expired. It is now possible to initiate ${verificationAction}.`,
+          `Previous verification has expired. You can now proceed.`,
         );
       }
     }
@@ -154,7 +152,7 @@ export class VerificationService {
     );
     if (!isMatching) {
       throw new UnauthorizedException(
-        'Provided verification code is incorrect.',
+        'Incorrect verification code. Please try again.',
       );
     }
     user.isVerified !== UserVerificationStatus.VERIFIED &&

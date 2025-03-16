@@ -266,7 +266,7 @@ function SignUpForm() {
         <AnimatePresence mode="wait">
           {nonAPIError !== null ? (
             <motion.div
-              key={`nonAPIErrorDiv-${JSON.stringify(nonAPIError)}`}
+              key={`nonAPISignUpErrorDiv-${JSON.stringify(nonAPIError)}`}
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}

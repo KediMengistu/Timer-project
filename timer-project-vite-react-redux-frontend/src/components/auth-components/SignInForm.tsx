@@ -6,15 +6,13 @@ import { FaCircleArrowLeft } from "react-icons/fa6";
 import { useState, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
+  reiniateSignInVerification,
+  ReinitiateVerifySignInDTO,
   resetSignin,
   SignInDTO,
   submitSignIn,
 } from "../../features/auth/siginSlice";
 import { setSignedInStatus } from "../../features/auth/signedinStatusSlice";
-import {
-  reiniateForgotPasswordVerification,
-  ReinitiateForgotPasswordDTO,
-} from "../../features/auth/forgotPasswordSlice";
 
 function SignInForm() {
   const location = useLocation();
@@ -26,6 +24,9 @@ function SignInForm() {
   const [password, setPassword] = useState("");
   const [proceedToVerify, setProceedToVerify] = useState(false);
   const [verificationRequested, setVerificationRequested] = useState(false);
+  // Add state to track if the email error is from verification
+  const [isEmailErrorFromVerification, setIsEmailErrorFromVerification] =
+    useState(false);
 
   const handleForgotPasswordClick = () => {
     navigate("/forgotpassword");
@@ -37,12 +38,15 @@ function SignInForm() {
 
   const handleProceedToVerification = () => {
     // Request a new verification code before proceeding
-    const reinitiateDTO: ReinitiateForgotPasswordDTO = {
+    const reinitiateDTO: ReinitiateVerifySignInDTO = {
       email,
       verificationAction: "sign up verification",
     };
 
-    dispatch(reiniateForgotPasswordVerification(reinitiateDTO))
+    // Set flag to indicate we're attempting verification
+    setIsEmailErrorFromVerification(true);
+
+    dispatch(reiniateSignInVerification(reinitiateDTO))
       .unwrap()
       .then(() => {
         // If successful, navigate to verification
@@ -54,10 +58,10 @@ function SignInForm() {
           rejectedValueOrSerializedError &&
           typeof rejectedValueOrSerializedError === "object" &&
           "message" in rejectedValueOrSerializedError &&
-          rejectedValueOrSerializedError.message ===
-            "Cannot issue new verification code. Provided email is not associated to any user account."
+          rejectedValueOrSerializedError.message === "Email not found."
         ) {
           // Don't navigate - just display the error
+          // Flag stays true to indicate this was from verification
           return;
         }
 
@@ -93,6 +97,14 @@ function SignInForm() {
       dispatch(resetSignin());
     };
   }, []);
+
+  // Reset the verification error flag when the error state changes
+  // This ensures we only track verification-specific errors
+  useEffect(() => {
+    if (!submitSigninErrorState) {
+      setIsEmailErrorFromVerification(false);
+    }
+  }, [submitSigninErrorState]);
 
   return (
     <AnimatePresence mode="wait">
@@ -131,6 +143,8 @@ function SignInForm() {
               email,
               password,
             };
+            // Reset verification error flag when submitting normal sign-in
+            setIsEmailErrorFromVerification(false);
             dispatch(submitSignIn(signInDTO));
           }}
           className="grid grid-rows-[1fr_auto] gap-1"
@@ -204,7 +218,7 @@ function SignInForm() {
         <AnimatePresence mode="wait">
           {submitSigninErrorState !== null && (
             <motion.div
-              key={`signupAPIErrorDiv-${JSON.stringify(submitSigninErrorState)}`}
+              key={`signinAPIErrorDiv-${JSON.stringify(submitSigninErrorState)}`}
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
@@ -227,11 +241,11 @@ function SignInForm() {
                       onClick={handleProceedToVerification}
                       className="text-blue-600 underline underline-offset-2 transition ease-in-out hover:cursor-pointer active:opacity-55 dark:text-yellow-500"
                     >
-                      Click here to proceed to verification.
+                      Click here to verify your account.
                     </span>
                   </>
-                ) : submitSigninErrorState.message ===
-                  "Cannot issue new verification code. Provided email is not associated to any user account." ? (
+                ) : submitSigninErrorState.message === "Email not found." &&
+                  isEmailErrorFromVerification ? (
                   <>
                     {" "}
                     Please fill out email field correctly and
@@ -241,7 +255,7 @@ function SignInForm() {
                       className="text-blue-600 underline underline-offset-2 transition ease-in-out hover:cursor-pointer active:opacity-55 dark:text-yellow-500"
                     >
                       {" "}
-                      Click here to generate new code.
+                      Click here to try again.
                     </span>
                   </>
                 ) : (
