@@ -8,9 +8,10 @@ import {
   ForgotPasswordDTO,
   resetForgotPassword,
   submitForgotPassword,
-  reiniateForgotPasswordVerification,
+  reinitiateForgotPasswordVerification,
   ReinitiateForgotPasswordDTO,
 } from "../../features/auth/forgotPasswordSlice";
+import { ApiErrorResponse } from "../../app/appTypes";
 
 function ForgotPasswordForm() {
   const location = useLocation();
@@ -23,17 +24,22 @@ function ForgotPasswordForm() {
     (state) => state.forgotPassword.error,
   );
   const [email, setEmail] = useState("");
+  const [nonAPIError, setNonAPIError] = useState<ApiErrorResponse | null>(null);
 
   const handleGoHomeClick = () => {
     navigate("/");
   };
 
   useEffect(() => {
-    if (submitForgotPasswordState === "succeeded") {
+    if (
+      submitForgotPasswordState === "succeeded" ||
+      submitForgotPasswordErrorState?.message ===
+        "A verification code has already been sent. Please check your email."
+    ) {
       dispatch(resetForgotPassword());
       navigate("/verify-user-forgot-password");
     }
-  }, [submitForgotPasswordState]);
+  }, [submitForgotPasswordState, submitForgotPasswordErrorState]);
 
   useEffect(() => {
     return () => {
@@ -74,6 +80,9 @@ function ForgotPasswordForm() {
         <form
           onSubmit={(event) => {
             event.preventDefault();
+            if (nonAPIError) {
+              setNonAPIError(null);
+            }
             const forgotPasswordDTO: ForgotPasswordDTO = {
               email,
             };
@@ -115,12 +124,10 @@ function ForgotPasswordForm() {
             </button>
           </div>
         </form>
-
-        {/* Error display positioned relative to the parent motion div */}
         <AnimatePresence mode="wait">
-          {submitForgotPasswordErrorState !== null && (
+          {nonAPIError !== null ? (
             <motion.div
-              key={`forgotPasswordAPIErrorDiv-${JSON.stringify(submitForgotPasswordErrorState)}`}
+              key={`nonAPIErrorForgotPasswordDiv-${JSON.stringify(nonAPIError)}`}
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
@@ -132,64 +139,102 @@ function ForgotPasswordForm() {
               className="absolute top-[98%] left-1/2 h-fit w-[150px] -translate-x-1/2 rounded-sm border-1 border-black bg-red-400 p-1! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-700 dark:bg-gray-800"
             >
               <h1 className="text-center text-[8px] text-black md:text-[9px] dark:text-white">
-                {Array.isArray(submitForgotPasswordErrorState.message)
-                  ? submitForgotPasswordErrorState.message.join(" ")
-                  : submitForgotPasswordErrorState.message}
-                {submitForgotPasswordErrorState.message ===
-                  `Verification code has expired. Please request a new one.` ||
-                submitForgotPasswordErrorState.message ===
-                  `Previous verification has expired. You can now proceed.` ? (
-                  <>
-                    {" "}
-                    <br />
-                    <span
-                      onClick={() => {
-                        const reiniateVerificationForgotPasswordDTO: ReinitiateForgotPasswordDTO =
-                          {
-                            email,
-                            verificationAction: "forgot password verification",
-                          };
-                        dispatch(
-                          reiniateForgotPasswordVerification(
-                            reiniateVerificationForgotPasswordDTO,
-                          ),
-                        );
-                      }}
-                      className="text-blue-600 underline underline-offset-2 transition ease-in-out hover:cursor-pointer active:opacity-55 dark:text-yellow-500"
-                    >
-                      {" "}
-                      Click here to generate new code & proceed to verification.
-                    </span>
-                  </>
-                ) : submitForgotPasswordErrorState.message ===
-                  "Email not found." ? (
-                  <>
-                    {" "}
-                    Please fill out email field correctly and
-                    <br />
-                    <span
-                      onClick={() => {
-                        const reiniateVerificationForgotPasswordDTO: ReinitiateForgotPasswordDTO =
-                          {
-                            email,
-                            verificationAction: "forgot password verification",
-                          };
-                        dispatch(
-                          reiniateForgotPasswordVerification(
-                            reiniateVerificationForgotPasswordDTO,
-                          ),
-                        );
-                      }}
-                      className="text-blue-600 underline underline-offset-2 transition ease-in-out hover:cursor-pointer active:opacity-55 dark:text-yellow-500"
-                    >
-                      {" "}
-                      Click here to generate new code & proceed to verification.
-                    </span>
-                  </>
-                ) : null}
+                {nonAPIError.message}
+                <br />
+                <span
+                  onClick={() => {
+                    if (email !== "") {
+                      setNonAPIError(null);
+                      const reinitiateVerificationForgotPasswordDTO: ReinitiateForgotPasswordDTO =
+                        {
+                          email,
+                          verificationAction: "forgot password verification",
+                        };
+                      dispatch(
+                        reinitiateForgotPasswordVerification(
+                          reinitiateVerificationForgotPasswordDTO,
+                        ),
+                      );
+                    } else {
+                      const error: ApiErrorResponse = {
+                        timestamp: new Date().toISOString(),
+                        path: location.pathname,
+                        message: "Email must be provided for password reset.",
+                        statusCode: 400,
+                      };
+                      setNonAPIError(error);
+                    }
+                  }}
+                  className="text-blue-600 underline underline-offset-2 transition ease-in-out hover:cursor-pointer active:opacity-55 dark:text-yellow-500"
+                >
+                  Click here to verify again.
+                </span>
               </h1>
             </motion.div>
-          )}
+          ) : submitForgotPasswordErrorState !== null ? (
+            <motion.div
+              key={`APIErrorForgotPasswordDiv-${JSON.stringify(submitForgotPasswordErrorState)}`}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.35, ease: "easeInOut" }}
+              style={{
+                willChange: "transform",
+                backfaceVisibility: "hidden",
+              }}
+              className="absolute top-[98%] left-1/2 h-fit w-[150px] -translate-x-1/2 rounded-sm border-1 border-black bg-red-400 p-1! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-700 dark:bg-gray-800"
+            >
+              <h1 className="text-center text-[8px] text-black md:text-[9px] dark:text-white">
+                {Array.isArray(submitForgotPasswordErrorState.message) ? (
+                  <>{submitForgotPasswordErrorState.message.join(" ")}</>
+                ) : (
+                  <>
+                    {submitForgotPasswordErrorState.message ===
+                      `Verification code has expired. Please request a new one.` ||
+                    submitForgotPasswordErrorState.message ===
+                      `Previous verification has expired. You can now proceed.` ? (
+                      <>
+                        Previous verification code has expired.
+                        <br />
+                        <span
+                          onClick={() => {
+                            if (email !== "") {
+                              setNonAPIError(null);
+                              const reinitiateVerificationForgotPasswordDTO: ReinitiateForgotPasswordDTO =
+                                {
+                                  email,
+                                  verificationAction:
+                                    "forgot password verification",
+                                };
+                              dispatch(
+                                reinitiateForgotPasswordVerification(
+                                  reinitiateVerificationForgotPasswordDTO,
+                                ),
+                              );
+                            } else {
+                              const error: ApiErrorResponse = {
+                                timestamp: new Date().toISOString(),
+                                path: location.pathname,
+                                message:
+                                  "Email must be provided for password reset.",
+                                statusCode: 400,
+                              };
+                              setNonAPIError(error);
+                            }
+                          }}
+                          className="text-blue-600 underline underline-offset-2 transition ease-in-out hover:cursor-pointer active:opacity-55 dark:text-yellow-500"
+                        >
+                          Click here to get new code.
+                        </span>
+                      </>
+                    ) : (
+                      <>{submitForgotPasswordErrorState.message}</>
+                    )}
+                  </>
+                )}
+              </h1>
+            </motion.div>
+          ) : null}
         </AnimatePresence>
       </motion.div>
     </AnimatePresence>

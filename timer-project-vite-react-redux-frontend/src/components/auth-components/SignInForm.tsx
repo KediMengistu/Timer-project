@@ -4,15 +4,16 @@ import { MdEmail } from "react-icons/md";
 import { RiLockPasswordFill } from "react-icons/ri";
 import { FaCircleArrowLeft } from "react-icons/fa6";
 import { useState, useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
-  reiniateSignInVerification,
+  reinitiateSignInVerification,
   ReinitiateVerifySignInDTO,
   resetSignin,
   SignInDTO,
   submitSignIn,
 } from "../../features/auth/siginSlice";
 import { setSignedInStatus } from "../../features/auth/signedinStatusSlice";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { ApiErrorResponse } from "../../app/appTypes";
 
 function SignInForm() {
   const location = useLocation();
@@ -20,91 +21,38 @@ function SignInForm() {
   const dispatch = useAppDispatch();
   const submitSigninState = useAppSelector((state) => state.signin.status);
   const submitSigninErrorState = useAppSelector((state) => state.signin.error);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [proceedToVerify, setProceedToVerify] = useState(false);
-  const [verificationRequested, setVerificationRequested] = useState(false);
-  // Add state to track if the email error is from verification
-  const [isEmailErrorFromVerification, setIsEmailErrorFromVerification] =
-    useState(false);
-
-  const handleForgotPasswordClick = () => {
-    navigate("/forgotpassword");
-  };
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [nonAPIError, setNonAPIError] = useState<ApiErrorResponse | null>(null);
 
   const handleGoHomeClick = () => {
     navigate("/");
   };
 
-  const handleProceedToVerification = () => {
-    // Request a new verification code before proceeding
-    const reinitiateDTO: ReinitiateVerifySignInDTO = {
-      email,
-      verificationAction: "sign up verification",
-    };
-
-    // Set flag to indicate we're attempting verification
-    setIsEmailErrorFromVerification(true);
-
-    dispatch(reiniateSignInVerification(reinitiateDTO))
-      .unwrap()
-      .then(() => {
-        // If successful, navigate to verification
-        setVerificationRequested(true);
-      })
-      .catch((rejectedValueOrSerializedError) => {
-        // Only prevent navigation if it's the specific error about invalid email
-        if (
-          rejectedValueOrSerializedError &&
-          typeof rejectedValueOrSerializedError === "object" &&
-          "message" in rejectedValueOrSerializedError &&
-          rejectedValueOrSerializedError.message === "Email not found."
-        ) {
-          // Don't navigate - just display the error
-          // Flag stays true to indicate this was from verification
-          return;
-        }
-
-        // For all other errors, still proceed to verification
-        setVerificationRequested(true);
-      });
+  const handleForgotPasswordClick = () => {
+    navigate("/forgotpassword");
   };
-
-  useEffect(() => {
-    if (verificationRequested) {
-      setProceedToVerify(true);
-      setVerificationRequested(false);
-    }
-  }, [verificationRequested]);
 
   useEffect(() => {
     if (submitSigninState === "succeeded") {
       dispatch(resetSignin());
       dispatch(setSignedInStatus(true));
-      navigate("/manage-timers");
-    }
-  }, [submitSigninState]);
-
-  useEffect(() => {
-    if (proceedToVerify) {
+      const from = location.state?.from?.pathname || "/manage-timers";
+      navigate(from, { replace: true });
+    } else if (
+      submitSigninErrorState?.message ===
+      "A verification code has already been sent. Please check your email."
+    ) {
       dispatch(resetSignin());
       navigate("/verify-user-from-signin");
     }
-  }, [proceedToVerify]);
+  }, [submitSigninState, submitSigninErrorState]);
 
   useEffect(() => {
     return () => {
       dispatch(resetSignin());
     };
   }, []);
-
-  // Reset the verification error flag when the error state changes
-  // This ensures we only track verification-specific errors
-  useEffect(() => {
-    if (!submitSigninErrorState) {
-      setIsEmailErrorFromVerification(false);
-    }
-  }, [submitSigninErrorState]);
 
   return (
     <AnimatePresence mode="wait">
@@ -139,12 +87,13 @@ function SignInForm() {
         <form
           onSubmit={(event) => {
             event.preventDefault();
+            if (nonAPIError) {
+              setNonAPIError(null);
+            }
             const signInDTO: SignInDTO = {
               email,
               password,
             };
-            // Reset verification error flag when submitting normal sign-in
-            setIsEmailErrorFromVerification(false);
             dispatch(submitSignIn(signInDTO));
           }}
           className="grid grid-rows-[1fr_auto] gap-1"
@@ -213,12 +162,10 @@ function SignInForm() {
             </button>
           </div>
         </form>
-
-        {/* Error display positioned relative to the parent motion div */}
         <AnimatePresence mode="wait">
-          {submitSigninErrorState !== null && (
+          {nonAPIError !== null ? (
             <motion.div
-              key={`signinAPIErrorDiv-${JSON.stringify(submitSigninErrorState)}`}
+              key={`nonAPIErrorSignInDiv-${JSON.stringify(nonAPIError)}`}
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
@@ -230,40 +177,98 @@ function SignInForm() {
               className="absolute top-[98%] left-1/2 h-fit w-[150px] -translate-x-1/2 rounded-sm border-1 border-black bg-red-400 p-1! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-700 dark:bg-gray-800"
             >
               <h1 className="text-center text-[8px] text-black md:text-[9px] dark:text-white">
-                {Array.isArray(submitSigninErrorState.message)
-                  ? submitSigninErrorState.message.join(" ")
-                  : submitSigninErrorState.message}
-                {submitSigninErrorState.message ===
-                "Associated user account is not verified." ? (
-                  <>
-                    {" "}
-                    <span
-                      onClick={handleProceedToVerification}
-                      className="text-blue-600 underline underline-offset-2 transition ease-in-out hover:cursor-pointer active:opacity-55 dark:text-yellow-500"
-                    >
-                      Click here to verify your account.
-                    </span>
-                  </>
-                ) : submitSigninErrorState.message === "Email not found." &&
-                  isEmailErrorFromVerification ? (
-                  <>
-                    {" "}
-                    Please fill out email field correctly and
-                    <br />
-                    <span
-                      onClick={handleProceedToVerification}
-                      className="text-blue-600 underline underline-offset-2 transition ease-in-out hover:cursor-pointer active:opacity-55 dark:text-yellow-500"
-                    >
-                      {" "}
-                      Click here to try again.
-                    </span>
-                  </>
+                {nonAPIError.message}
+                <br />
+                <span
+                  onClick={() => {
+                    if (email !== "") {
+                      setNonAPIError(null);
+                      const reinitiateVerifySignInDTO: ReinitiateVerifySignInDTO =
+                        {
+                          email,
+                          verificationAction: "sign up verification",
+                        };
+                      dispatch(
+                        reinitiateSignInVerification(reinitiateVerifySignInDTO),
+                      );
+                    } else {
+                      const error: ApiErrorResponse = {
+                        timestamp: new Date().toISOString(),
+                        path: location.pathname,
+                        message:
+                          "Email must be provided for Account Verification.",
+                        statusCode: 400,
+                      };
+                      setNonAPIError(error);
+                    }
+                  }}
+                  className="text-blue-600 underline underline-offset-2 transition ease-in-out hover:cursor-pointer active:opacity-55 dark:text-yellow-500"
+                >
+                  Click here to verify again.
+                </span>
+              </h1>
+            </motion.div>
+          ) : submitSigninErrorState !== null ? (
+            <motion.div
+              key={`APIErrorSignInDiv-${JSON.stringify(submitSigninErrorState)}`}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.35, ease: "easeInOut" }}
+              style={{
+                willChange: "transform",
+                backfaceVisibility: "hidden",
+              }}
+              className="absolute top-[98%] left-1/2 h-fit w-[150px] -translate-x-1/2 rounded-sm border-1 border-black bg-red-400 p-1! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-700 dark:bg-gray-800"
+            >
+              <h1 className="text-center text-[8px] text-black md:text-[9px] dark:text-white">
+                {Array.isArray(submitSigninErrorState.message) ? (
+                  <>{submitSigninErrorState.message.join(" ")}</>
                 ) : (
-                  <></>
+                  <>
+                    {submitSigninErrorState.message ===
+                    "Associated user account is not verified." ? (
+                      <>
+                        Account not verified.
+                        <br />
+                        <span
+                          onClick={() => {
+                            if (email !== "") {
+                              setNonAPIError(null);
+                              const reinitiateVerifySignInDTO: ReinitiateVerifySignInDTO =
+                                {
+                                  email,
+                                  verificationAction: "sign up verification",
+                                };
+                              dispatch(
+                                reinitiateSignInVerification(
+                                  reinitiateVerifySignInDTO,
+                                ),
+                              );
+                            } else {
+                              const error: ApiErrorResponse = {
+                                timestamp: new Date().toISOString(),
+                                path: location.pathname,
+                                message:
+                                  "Email must be provided for Account Verification.",
+                                statusCode: 400,
+                              };
+                              setNonAPIError(error);
+                            }
+                          }}
+                          className="text-blue-600 underline underline-offset-2 transition ease-in-out hover:cursor-pointer active:opacity-55 dark:text-yellow-500"
+                        >
+                          Click here to verify.
+                        </span>
+                      </>
+                    ) : (
+                      <>{submitSigninErrorState.message}</>
+                    )}
+                  </>
                 )}
               </h1>
             </motion.div>
-          )}
+          ) : null}
         </AnimatePresence>
       </motion.div>
     </AnimatePresence>

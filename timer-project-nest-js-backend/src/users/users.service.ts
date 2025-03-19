@@ -18,7 +18,14 @@ export class UsersService {
   ) {}
 
   async createUser(createUserSignUpDto: CreateUserSignUpDto): Promise<User> {
-    const user: User = this.usersRepository.create({ ...createUserSignUpDto });
+    // Email normalization should be done in the auth service before this method is called
+    // But we can ensure it's normalized here as a safeguard
+    const normalizedUser = {
+      ...createUserSignUpDto,
+      email: createUserSignUpDto.email.toLowerCase(),
+    };
+
+    const user: User = this.usersRepository.create({ ...normalizedUser });
     const savedUser: User = await this.usersRepository.save(user);
     return savedUser;
   }
@@ -29,7 +36,11 @@ export class UsersService {
   }
 
   async retrieveUserViaEmail(email: string): Promise<User> {
-    const user: User = await this.usersRepository.findOneBy({ email });
+    // Normalize email before querying the database
+    const normalizedEmail = email.toLowerCase();
+    const user: User = await this.usersRepository.findOneBy({
+      email: normalizedEmail,
+    });
     return user;
   }
 

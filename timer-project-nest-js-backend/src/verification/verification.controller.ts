@@ -7,11 +7,11 @@ import { ReinitiateUserVerificationDTO } from 'src/users/dto/reinitiate-user-ver
 export class VerificationController {
   constructor(private verificationService: VerificationService) {}
   @Public()
-  @Patch('reiniate-verification')
-  async reiniateVerification(
+  @Patch('reinitiate-verification')
+  async reinitiateVerification(
     @Body() reinitiateUserVerificationDTO: ReinitiateUserVerificationDTO,
   ) {
-    return this.verificationService.reiniateVerification(
+    return this.verificationService.reinitiateVerification(
       reinitiateUserVerificationDTO,
     );
   }

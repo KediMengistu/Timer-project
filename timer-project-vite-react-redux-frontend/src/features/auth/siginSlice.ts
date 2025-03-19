@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
-import APP_URL from "../../utils/server/server-info";
 import { ApiErrorResponse, createAppAsyncThunk } from "../../app/appTypes";
 
+// --- Types ---
 export interface SigninState {
   status: "idle" | "pending" | "succeeded" | "failed";
   error: ApiErrorResponse | null;
@@ -23,11 +23,12 @@ export interface ReinitiateVerifySignInDTO {
   verificationAction: string;
 }
 
+// --- Thunks ---
 export const submitSignIn = createAppAsyncThunk<void, SignInDTO>(
   "signin/submitSignin",
   async (signinDTO: SignInDTO, thunkAPI) => {
     try {
-      const response = await fetch(`${APP_URL}/auth/signin`, {
+      const response = await fetch("/api/auth/signin", {
         method: "POST",
         headers: {
           "Content-type": "application/json",
@@ -56,7 +57,8 @@ export const verifySignIn = createAppAsyncThunk<void, VerifySignInDTO>(
   "signin/verifySignin",
   async (verifySignInDTO: VerifySignInDTO, thunkAPI) => {
     try {
-      const response = await fetch(`${APP_URL}/auth/verify-signup`, {
+      // Original code calls "/auth/verify-signup" — leaving as-is
+      const response = await fetch("/api/auth/verify-signup", {
         method: "PATCH",
         headers: {
           "Content-type": "application/json",
@@ -81,15 +83,15 @@ export const verifySignIn = createAppAsyncThunk<void, VerifySignInDTO>(
   },
 );
 
-export const reiniateSignInVerification = createAppAsyncThunk<
+export const reinitiateSignInVerification = createAppAsyncThunk<
   void,
   ReinitiateVerifySignInDTO
 >(
-  "signin/reiniateVerification",
+  "signin/reinitiateVerification",
   async (reinitiateVerifySignInDTO: ReinitiateVerifySignInDTO, thunkAPI) => {
     try {
       const response = await fetch(
-        `${APP_URL}/verification/reiniate-verification`,
+        "/api/verification/reinitiate-verification",
         {
           method: "PATCH",
           headers: {
@@ -107,7 +109,7 @@ export const reiniateSignInVerification = createAppAsyncThunk<
     } catch (error) {
       return thunkAPI.rejectWithValue({
         timestamp: new Date().toISOString(),
-        path: "/verification/reiniate-verification",
+        path: "/verification/reinitiate-verification",
         message:
           error instanceof Error ? error.message : "Network error occurred",
         statusCode: 500,
@@ -116,10 +118,11 @@ export const reiniateSignInVerification = createAppAsyncThunk<
   },
 );
 
-const initialState = {
+// --- Slice ---
+const initialState: SigninState = {
   status: "idle",
   error: null,
-} as SigninState;
+};
 
 export const signinSlice = createSlice({
   name: "signin",
@@ -144,6 +147,7 @@ export const signinSlice = createSlice({
         state.status = "failed";
         state.error = action.payload || null;
       })
+
       .addCase(verifySignIn.pending, (state) => {
         state.status = "pending";
         state.error = null;
@@ -156,15 +160,16 @@ export const signinSlice = createSlice({
         state.status = "failed";
         state.error = action.payload || null;
       })
-      .addCase(reiniateSignInVerification.pending, (state) => {
+
+      .addCase(reinitiateSignInVerification.pending, (state) => {
         state.status = "pending";
         state.error = null;
       })
-      .addCase(reiniateSignInVerification.fulfilled, (state) => {
+      .addCase(reinitiateSignInVerification.fulfilled, (state) => {
         state.status = "succeeded";
         state.error = null;
       })
-      .addCase(reiniateSignInVerification.rejected, (state, action) => {
+      .addCase(reinitiateSignInVerification.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload || null;
       });
@@ -172,5 +177,4 @@ export const signinSlice = createSlice({
 });
 
 export const { resetSignin } = signinSlice.actions;
-
 export default signinSlice.reducer;

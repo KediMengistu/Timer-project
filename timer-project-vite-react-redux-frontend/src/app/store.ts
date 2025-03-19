@@ -7,6 +7,8 @@ import signedInStatusReducer, {
 } from "../features/auth/signedinStatusSlice";
 import signinReducer from "../features/auth/siginSlice";
 import forgotPasswordReducer from "../features/auth/forgotPasswordSlice";
+import deleteAccountReducer from "../features/user/deleteAccountSlice";
+import userEmailReducer from "../features/user/retrieveUserEmailSlice";
 
 export const store = configureStore({
   reducer: {
@@ -16,6 +18,8 @@ export const store = configureStore({
     signedInStatus: signedInStatusReducer,
     signin: signinReducer,
     forgotPassword: forgotPasswordReducer,
+    deleteAccount: deleteAccountReducer,
+    userEmail: userEmailReducer,
   },
 });
 

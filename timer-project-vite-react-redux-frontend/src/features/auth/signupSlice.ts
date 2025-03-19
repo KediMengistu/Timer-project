@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
-import APP_URL from "../../utils/server/server-info";
 import { ApiErrorResponse, createAppAsyncThunk } from "../../app/appTypes";
 
+// --- Types ---
 export interface SignupState {
   status: "idle" | "pending" | "succeeded" | "failed";
   error: ApiErrorResponse | null;
@@ -25,11 +25,13 @@ export interface ReinitiateVerifySignUpDTO {
   verificationAction: string;
 }
 
+// --- Thunks ---
 export const submitSignUp = createAppAsyncThunk<void, SignUpDTO>(
   "signup/submitSignup",
   async (signupDTO: SignUpDTO, thunkAPI) => {
     try {
-      const response = await fetch(`${APP_URL}/auth/signup`, {
+      // Replaced `APP_URL` with `/api`
+      const response = await fetch("/api/auth/signup", {
         method: "POST",
         headers: {
           "Content-type": "application/json",
@@ -58,7 +60,7 @@ export const verifySignUp = createAppAsyncThunk<void, VerifySignUpDTO>(
   "signup/verifySignup",
   async (verifySignUpDTO: VerifySignUpDTO, thunkAPI) => {
     try {
-      const response = await fetch(`${APP_URL}/auth/verify-signup`, {
+      const response = await fetch("/api/auth/verify-signup", {
         method: "PATCH",
         headers: {
           "Content-type": "application/json",
@@ -83,15 +85,15 @@ export const verifySignUp = createAppAsyncThunk<void, VerifySignUpDTO>(
   },
 );
 
-export const reiniateSignUpVerification = createAppAsyncThunk<
+export const reinitiateSignUpVerification = createAppAsyncThunk<
   void,
   ReinitiateVerifySignUpDTO
 >(
-  "signup/reiniateVerification",
+  "signup/reinitiateVerification",
   async (reinitiateVerifySignUpDTO: ReinitiateVerifySignUpDTO, thunkAPI) => {
     try {
       const response = await fetch(
-        `${APP_URL}/verification/reiniate-verification`,
+        "/api/verification/reinitiate-verification",
         {
           method: "PATCH",
           headers: {
@@ -109,7 +111,7 @@ export const reiniateSignUpVerification = createAppAsyncThunk<
     } catch (error) {
       return thunkAPI.rejectWithValue({
         timestamp: new Date().toISOString(),
-        path: "/verification/reiniate-verification",
+        path: "/verification/reinitiate-verification",
         message:
           error instanceof Error ? error.message : "Network error occurred",
         statusCode: 500,
@@ -118,10 +120,11 @@ export const reiniateSignUpVerification = createAppAsyncThunk<
   },
 );
 
-const initialState = {
+// --- Slice ---
+const initialState: SignupState = {
   status: "idle",
   error: null,
-} as SignupState;
+};
 
 export const signupSlice = createSlice({
   name: "signup",
@@ -146,6 +149,7 @@ export const signupSlice = createSlice({
         state.status = "failed";
         state.error = action.payload || null;
       })
+
       .addCase(verifySignUp.pending, (state) => {
         state.status = "pending";
         state.error = null;
@@ -158,15 +162,16 @@ export const signupSlice = createSlice({
         state.status = "failed";
         state.error = action.payload || null;
       })
-      .addCase(reiniateSignUpVerification.pending, (state) => {
+
+      .addCase(reinitiateSignUpVerification.pending, (state) => {
         state.status = "pending";
         state.error = null;
       })
-      .addCase(reiniateSignUpVerification.fulfilled, (state) => {
+      .addCase(reinitiateSignUpVerification.fulfilled, (state) => {
         state.status = "succeeded";
         state.error = null;
       })
-      .addCase(reiniateSignUpVerification.rejected, (state, action) => {
+      .addCase(reinitiateSignUpVerification.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload || null;
       });
@@ -174,5 +179,4 @@ export const signupSlice = createSlice({
 });
 
 export const { resetSignup } = signupSlice.actions;
-
 export default signupSlice.reducer;

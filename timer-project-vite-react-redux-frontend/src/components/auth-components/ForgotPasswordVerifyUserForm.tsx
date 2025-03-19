@@ -14,7 +14,7 @@ import {
 } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
-  reiniateForgotPasswordVerification,
+  reinitiateForgotPasswordVerification,
   ReinitiateForgotPasswordDTO,
   resetForgotPassword,
   verifyForgotPassword,
@@ -35,20 +35,10 @@ function ForgotPasswordUserVerifyForm() {
   const [email, setEmail] = useState<string>("");
   const [newPassword, setNewPassword] = useState<string>("");
   const [confirmNewPassword, setConfirmNewPassword] = useState<string>("");
-  const [refsInitialized, setRefsInitialized] = useState<boolean>(false);
-  const [nonAPIError, setNonAPIError] = useState<ApiErrorResponse | null>(null);
   const [sentReInitiateVerification, setSentReinitiateVerification] =
     useState<boolean>(false);
-
-  // Create a ref array for the verification code inputs
-  const codeInputRefs = useRef<(HTMLInputElement | null)[]>([]);
-
-  // Initialize the refs array
-  useEffect(() => {
-    // Pre-populate with nulls to match the expected length
-    codeInputRefs.current = Array(6).fill(null);
-    setRefsInitialized(true);
-  }, []);
+  const [refsInitialized, setRefsInitialized] = useState<boolean>(false);
+  const [nonAPIError, setNonAPIError] = useState<ApiErrorResponse | null>(null);
 
   useEffect(() => {
     if (
@@ -57,7 +47,6 @@ function ForgotPasswordUserVerifyForm() {
     ) {
       setSentReinitiateVerification(false);
       dispatch(resetForgotPassword());
-      navigate("/signin");
     } else if (
       verifyForgotPasswordState === "succeeded" &&
       !sentReInitiateVerification
@@ -71,6 +60,16 @@ function ForgotPasswordUserVerifyForm() {
     return () => {
       dispatch(resetForgotPassword());
     };
+  }, []);
+
+  // Create a ref array for the verification code inputs
+  const codeInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  // Initialize the refs array
+  useEffect(() => {
+    // Pre-populate with nulls to match the expected length
+    codeInputRefs.current = Array(6).fill(null);
+    setRefsInitialized(true);
   }, []);
 
   // State to hold verification code values
@@ -197,6 +196,9 @@ function ForgotPasswordUserVerifyForm() {
         <form
           onSubmit={(event) => {
             event.preventDefault();
+            if (nonAPIError) {
+              setNonAPIError(null);
+            }
             if (newPassword === confirmNewPassword) {
               setNonAPIError(null);
               const verifyForgotPasswordDTO: VerifyForgotPasswordDTO = {
@@ -338,12 +340,10 @@ function ForgotPasswordUserVerifyForm() {
             </button>
           </div>
         </form>
-
-        {/* Error display positioned relative to the parent motion div */}
         <AnimatePresence mode="wait">
           {nonAPIError !== null ? (
             <motion.div
-              key={`nonAPIVerifyForgotPasswordErrorDiv-${JSON.stringify(nonAPIError)}`}
+              key={`nonAPIErrorVerifyForgotPasswordDiv-${JSON.stringify(nonAPIError)}`}
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
@@ -355,12 +355,51 @@ function ForgotPasswordUserVerifyForm() {
               className="absolute top-[98%] left-1/2 h-fit w-[150px] -translate-x-1/2 rounded-sm border-1 border-black bg-red-400 p-1! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-700 dark:bg-gray-800"
             >
               <h1 className="text-center text-[8px] text-black md:text-[9px] dark:text-white">
-                {nonAPIError.message}
+                {nonAPIError.message ===
+                "Email must be provided for Account Verification." ? (
+                  <>
+                    {nonAPIError.message}
+                    <br />
+                    <span
+                      onClick={() => {
+                        if (email !== "") {
+                          setNonAPIError(null);
+                          const reinitiateForgotPasswordDTO: ReinitiateForgotPasswordDTO =
+                            {
+                              email,
+                              verificationAction:
+                                "forgot password verification",
+                            };
+                          setSentReinitiateVerification(true);
+                          dispatch(
+                            reinitiateForgotPasswordVerification(
+                              reinitiateForgotPasswordDTO,
+                            ),
+                          );
+                        } else {
+                          const error: ApiErrorResponse = {
+                            timestamp: new Date().toISOString(),
+                            path: location.pathname,
+                            message:
+                              "Email must be provided for Account Verification.",
+                            statusCode: 400,
+                          };
+                          setNonAPIError(error);
+                        }
+                      }}
+                      className="text-blue-600 underline underline-offset-2 transition ease-in-out hover:cursor-pointer active:opacity-55 dark:text-yellow-500"
+                    >
+                      Click here to verify again.
+                    </span>
+                  </>
+                ) : (
+                  <>{nonAPIError.message}</>
+                )}
               </h1>
             </motion.div>
           ) : verifyForgotPasswordErrorState !== null ? (
             <motion.div
-              key={`VerifyForgotPasswordAPIErrorDiv-${JSON.stringify(verifyForgotPasswordErrorState)}`}
+              key={`APIErrorVerifyForgotPasswordDiv-${JSON.stringify(verifyForgotPasswordErrorState)}`}
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
@@ -372,64 +411,54 @@ function ForgotPasswordUserVerifyForm() {
               className="absolute top-[98%] left-1/2 h-fit w-[150px] -translate-x-1/2 rounded-sm border-1 border-black bg-red-400 p-1! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-700 dark:bg-gray-800"
             >
               <h1 className="text-center text-[8px] text-black md:text-[9px] dark:text-white">
-                {Array.isArray(verifyForgotPasswordErrorState.message)
-                  ? verifyForgotPasswordErrorState.message.join(" ")
-                  : verifyForgotPasswordErrorState.message}
-                {verifyForgotPasswordErrorState.message ===
-                  `Verification code has expired. Please request a new one.` ||
-                verifyForgotPasswordErrorState.message ===
-                  `Previous verification has expired. You can now proceed.` ? (
+                {Array.isArray(verifyForgotPasswordErrorState.message) ? (
+                  <>{verifyForgotPasswordErrorState.message.join(" ")}</>
+                ) : (
                   <>
-                    {" "}
-                    Please fill out email field on the form and
-                    <br />
-                    <span
-                      onClick={() => {
-                        const reiniateVerificationForgotPasswordDTO: ReinitiateForgotPasswordDTO =
-                          {
-                            email,
-                            verificationAction: "forgot password verification",
-                          };
-                        setSentReinitiateVerification(true);
-                        dispatch(
-                          reiniateForgotPasswordVerification(
-                            reiniateVerificationForgotPasswordDTO,
-                          ),
-                        );
-                      }}
-                      className="text-blue-600 underline underline-offset-2 transition ease-in-out hover:cursor-pointer active:opacity-55 dark:text-yellow-500"
-                    >
-                      {" "}
-                      Click here to generate new code.
-                    </span>
+                    {verifyForgotPasswordErrorState.message ===
+                      `Verification code has expired. Please request a new one.` ||
+                    verifyForgotPasswordErrorState.message ===
+                      `Previous verification has expired. You can now proceed.` ? (
+                      <>
+                        Previous verification code has expired.
+                        <br />
+                        <span
+                          onClick={() => {
+                            if (email !== "") {
+                              setNonAPIError(null);
+                              const reinitiateForgotPasswordDTO: ReinitiateForgotPasswordDTO =
+                                {
+                                  email,
+                                  verificationAction:
+                                    "forgot password verification",
+                                };
+                              setSentReinitiateVerification(true);
+                              dispatch(
+                                reinitiateForgotPasswordVerification(
+                                  reinitiateForgotPasswordDTO,
+                                ),
+                              );
+                            } else {
+                              const error: ApiErrorResponse = {
+                                timestamp: new Date().toISOString(),
+                                path: location.pathname,
+                                message:
+                                  "Email must be provided for Account Verification.",
+                                statusCode: 400,
+                              };
+                              setNonAPIError(error);
+                            }
+                          }}
+                          className="text-blue-600 underline underline-offset-2 transition ease-in-out hover:cursor-pointer active:opacity-55 dark:text-yellow-500"
+                        >
+                          Click here to get new code.
+                        </span>
+                      </>
+                    ) : (
+                      <>{verifyForgotPasswordErrorState.message}</>
+                    )}
                   </>
-                ) : verifyForgotPasswordErrorState.message ===
-                  "Email not found." ? (
-                  <>
-                    {" "}
-                    Please fill out email field correctly and
-                    <br />
-                    <span
-                      onClick={() => {
-                        const reiniateVerificationForgotPasswordDTO: ReinitiateForgotPasswordDTO =
-                          {
-                            email,
-                            verificationAction: "forgot password verification",
-                          };
-                        setSentReinitiateVerification(true);
-                        dispatch(
-                          reiniateForgotPasswordVerification(
-                            reiniateVerificationForgotPasswordDTO,
-                          ),
-                        );
-                      }}
-                      className="text-blue-600 underline underline-offset-2 transition ease-in-out hover:cursor-pointer active:opacity-55 dark:text-yellow-500"
-                    >
-                      {" "}
-                      Click here to generate new code.
-                    </span>
-                  </>
-                ) : null}
+                )}
               </h1>
             </motion.div>
           ) : null}

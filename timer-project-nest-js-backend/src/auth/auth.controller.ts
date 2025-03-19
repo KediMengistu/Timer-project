@@ -35,10 +35,10 @@ export class AuthController {
       await this.authService.verifySignup(verifyUserSignUpDTO);
     response.cookie('jwt', userDetails.access_token, {
       httpOnly: true,
+      secure: false, //set to true later.
+      sameSite: 'Lax', //set to Strict later.
+      maxAge: 3600000,
       path: '/',
-      secure: false,
-      sameSite: 'None',
-      maxAge: 60000,
     });
   }
 
@@ -51,10 +51,10 @@ export class AuthController {
     );
     response.cookie('jwt', userDetails.access_token, {
       httpOnly: true,
+      secure: false, //set to true later.
+      sameSite: 'Lax', //set to Strict later.
+      maxAge: 3600000,
       path: '/',
-      secure: false,
-      sameSite: 'None',
-      maxAge: 60000,
     });
   }
 
@@ -79,9 +79,9 @@ export class AuthController {
   async signout(@Res({ passthrough: true }) response) {
     response.clearCookie('jwt', {
       httpOnly: true,
+      secure: false, //set to true later.
+      sameSite: 'Lax', //set to Strict later.
       path: '/',
-      secure: false,
-      sameSite: 'None',
     });
   }
 }

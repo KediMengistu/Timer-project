@@ -2,17 +2,13 @@ import { AnimatePresence, motion } from "motion/react";
 import { useLocation, useNavigate } from "react-router";
 import { FaCircleArrowLeft } from "react-icons/fa6";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import {
-  setSignedInStatus,
-  clearSignedInStatus,
-  resetClearSignedInStatus,
-} from "../../features/auth/signedinStatusSlice";
+import { setSignedInStatus } from "../../features/auth/signedinStatusSlice";
+import { resetUserEmail } from "../../features/user/retrieveUserEmailSlice";
 
 function SignOutForm() {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const signedInState = useAppSelector((state) => state.signedInStatus.status);
   const signedInErrorState = useAppSelector(
     (state) => state.signedInStatus.error,
   );
@@ -22,9 +18,8 @@ function SignOutForm() {
   };
 
   const handleSignOut = () => {
-    // Set signed in status to false
     dispatch(setSignedInStatus(false));
-    // Navigate to home page
+    dispatch(resetUserEmail());
     navigate("/");
   };
 
@@ -76,8 +71,6 @@ function SignOutForm() {
             </button>
           </div>
         </div>
-
-        {/* Error display positioned relative to the parent motion div */}
         <AnimatePresence mode="wait">
           {signedInErrorState !== null && (
             <motion.div

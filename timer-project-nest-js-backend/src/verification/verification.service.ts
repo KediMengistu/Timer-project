@@ -83,12 +83,14 @@ export class VerificationService {
     );
   }
 
-  async reiniateVerification(
+  async reinitiateVerification(
     reinitiateUserVerificationDTO: ReinitiateUserVerificationDTO,
   ) {
-    let user: User = await this.usersService.retrieveUserViaEmail(
-      reinitiateUserVerificationDTO.email,
-    );
+    // Normalize email before retrieving user
+    const normalizedEmail = reinitiateUserVerificationDTO.email.toLowerCase();
+
+    let user: User =
+      await this.usersService.retrieveUserViaEmail(normalizedEmail);
     if (!user) {
       throw new UnauthorizedException('Email not found.');
     }
@@ -105,9 +107,7 @@ export class VerificationService {
         null,
       );
     }
-    user = await this.usersService.retrieveUserViaEmail(
-      reinitiateUserVerificationDTO.email,
-    );
+    user = await this.usersService.retrieveUserViaEmail(normalizedEmail);
     await this.initiateVerification(
       user,
       reinitiateUserVerificationDTO.verificationAction,

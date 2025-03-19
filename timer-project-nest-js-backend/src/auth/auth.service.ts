@@ -24,13 +24,19 @@ export class AuthService {
 
   async signup(createUserSignUpDto: CreateUserSignUpDto) {
     try {
+      // Normalize email
+      const normalizedDTO = {
+        ...createUserSignUpDto,
+        email: createUserSignUpDto.email.toLowerCase(),
+      };
+
       let salt: string = await bcrypt.genSalt(10);
       const hashedPassword: string = await bcrypt.hash(
-        createUserSignUpDto.password,
+        normalizedDTO.password,
         salt,
       );
       const savedUser: User = await this.usersService.createUser({
-        ...createUserSignUpDto,
+        ...normalizedDTO,
         password: hashedPassword,
       });
       await this.verificationService.initiateVerification(
@@ -49,9 +55,11 @@ export class AuthService {
   async verifySignup(
     verifyUserSignUpDTO: VerifyUserSignUpDTO,
   ): Promise<{ access_token: string }> {
-    const user: User = await this.usersService.retrieveUserViaEmail(
-      verifyUserSignUpDTO.email,
-    );
+    // Normalize email
+    const normalizedEmail = verifyUserSignUpDTO.email.toLowerCase();
+
+    const user: User =
+      await this.usersService.retrieveUserViaEmail(normalizedEmail);
 
     if (!user) {
       throw new UnauthorizedException('Email not found.');
@@ -76,20 +84,6 @@ export class AuthService {
   }
 
   async signin(userId: string): Promise<{ access_token: string }> {
-    const user: User = await this.usersService.retrieveUserViaId(userId);
-    if (
-      user.verificationCode !== null ||
-      user.verificationCodeExpireTime !== null
-    ) {
-      this.usersService.updateUserVerficationProps(
-        userId,
-        null,
-        null,
-        user.isVerified,
-        null,
-      );
-    }
-    await this.usersService.updateSignInAndExpirationTime(userId);
     //input user credentials are valid - generate JWT.
     const payload = { sub: userId };
     return {
@@ -98,7 +92,11 @@ export class AuthService {
   }
 
   async validateUser(email: string, password: string): Promise<User> {
-    const user: User = await this.usersService.retrieveUserViaEmail(email);
+    // Normalize email
+    const normalizedEmail = email.toLowerCase();
+
+    const user: User =
+      await this.usersService.retrieveUserViaEmail(normalizedEmail);
     //user does not exist - exit.
     if (!user) {
       throw new UnauthorizedException('Email not found.');
@@ -118,9 +116,11 @@ export class AuthService {
   }
 
   async forgotPasswordRequest(userForgotPasswordDTO: UserForgotPasswordDTO) {
-    const user: User = await this.usersService.retrieveUserViaEmail(
-      userForgotPasswordDTO.email,
-    );
+    // Normalize email
+    const normalizedEmail = userForgotPasswordDTO.email.toLowerCase();
+
+    const user: User =
+      await this.usersService.retrieveUserViaEmail(normalizedEmail);
     if (!user) {
       throw new UnauthorizedException('Email not found.');
     }
@@ -133,9 +133,11 @@ export class AuthService {
   async forgotPasswordConfirm(
     verifyUserForgotPasswordDTO: VerifyUserForgotPasswordDTO,
   ) {
-    const user: User = await this.usersService.retrieveUserViaEmail(
-      verifyUserForgotPasswordDTO.email,
-    );
+    // Normalize email
+    const normalizedEmail = verifyUserForgotPasswordDTO.email.toLowerCase();
+
+    const user: User =
+      await this.usersService.retrieveUserViaEmail(normalizedEmail);
     if (!user) {
       throw new UnauthorizedException('Email not found.');
     }

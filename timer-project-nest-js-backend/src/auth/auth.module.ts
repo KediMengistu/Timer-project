@@ -19,9 +19,9 @@ import { JwtAuthGuard } from './passport/jwt-auth.gaurd';
       useFactory: (configService: ConfigService) => ({
         global: true,
         secret: configService.get('JWT_SECRET'),
-        signOptions: { expiresIn: '60s' }
-      })
-    })
+        signOptions: { expiresIn: '3600s' },
+      }),
+    }),
   ],
   controllers: [AuthController],
   providers: [
@@ -31,7 +31,7 @@ import { JwtAuthGuard } from './passport/jwt-auth.gaurd';
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
-    }
-  ]
+    },
+  ],
 })
 export class AuthModule {}

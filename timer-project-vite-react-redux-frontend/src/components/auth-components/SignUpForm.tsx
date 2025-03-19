@@ -20,11 +20,11 @@ function SignUpForm() {
   const dispatch = useAppDispatch();
   const submitSignupState = useAppSelector((state) => state.signup.status);
   const submitSignupErrorState = useAppSelector((state) => state.signup.error);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [firstname, setFirstname] = useState("");
-  const [lastname, setLastname] = useState("");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
+  const [firstname, setFirstname] = useState<string>("");
+  const [lastname, setLastname] = useState<string>("");
   const [nonAPIError, setNonAPIError] = useState<ApiErrorResponse | null>(null);
 
   const handleGoHomeClick = () => {
@@ -261,12 +261,10 @@ function SignUpForm() {
             </button>
           </div>
         </form>
-
-        {/* Error display positioned relative to the parent motion div */}
         <AnimatePresence mode="wait">
           {nonAPIError !== null ? (
             <motion.div
-              key={`nonAPISignUpErrorDiv-${JSON.stringify(nonAPIError)}`}
+              key={`nonAPIErrorSignUpDiv-${JSON.stringify(nonAPIError)}`}
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
@@ -283,7 +281,7 @@ function SignUpForm() {
             </motion.div>
           ) : submitSignupErrorState !== null ? (
             <motion.div
-              key={`signupAPIErrorDiv-${JSON.stringify(submitSignupErrorState)}`}
+              key={`APIErrorSignUpDiv-${JSON.stringify(submitSignupErrorState)}`}
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}

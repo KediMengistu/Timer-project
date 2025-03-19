@@ -1,21 +1,21 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AppThunk } from "../../app/store";
 import { ApiErrorResponse, createAppAsyncThunk } from "../../app/appTypes";
-import APP_URL from "../../utils/server/server-info";
 
+// --- Types ---
 export interface SignedInStatusState {
   status: "idle" | "pending" | "succeeded" | "failed";
   value: boolean;
   error: ApiErrorResponse | null;
 }
 
+// --- Thunks ---
 export const fetchAndSetSignedInStatus = (): AppThunk => {
   return (dispatch, getState) => {
-    //stores initial value for signedInStatusState; false.
+    // Current state
     let currentSignedInStatusState: boolean = getState().signedInStatus.value;
 
-    //localStorage has persisted the signedInStatusState key value between app starts so we extract it from localStorage.
-    //true - signed in.
+    // Attempt to load from localStorage
     if (localStorage.getItem("signedInStatus") !== null) {
       if (localStorage.getItem("signedInStatus") === "not signed in") {
         localStorage.removeItem("signedInStatus");
@@ -24,6 +24,7 @@ export const fetchAndSetSignedInStatus = (): AppThunk => {
         currentSignedInStatusState = true;
       }
     }
+
     dispatch(setSignedInStatus(currentSignedInStatusState));
   };
 };
@@ -32,12 +33,13 @@ export const clearSignedInStatus = createAppAsyncThunk<void, void>(
   "signedInStatus/clearSignedInStatus",
   async (_, thunkAPI) => {
     try {
-      const response = await fetch(`${APP_URL}/auth/signout`, {
+      // Replaced `APP_URL` with `/api`
+      const response = await fetch("/api/auth/signout", {
         method: "POST",
         headers: {
           "Content-type": "application/json",
-          credentials: "include",
         },
+        credentials: "include",
       });
 
       if (!response.ok) {
@@ -57,11 +59,12 @@ export const clearSignedInStatus = createAppAsyncThunk<void, void>(
   },
 );
 
-const initialState = {
+// --- Slice ---
+const initialState: SignedInStatusState = {
   status: "idle",
   value: false,
   error: null,
-} as SignedInStatusState;
+};
 
 export const signedInStatusSlice = createSlice({
   name: "signedInStatus",
@@ -72,6 +75,8 @@ export const signedInStatusSlice = createSlice({
     },
     resetClearSignedInStatus: (state) => {
       state.status = "idle";
+      state.value = false;
+      state.error = null;
     },
   },
   extraReducers(builder) {
@@ -105,5 +110,4 @@ export const signedInStatusSlice = createSlice({
 
 export const { setSignedInStatus, resetClearSignedInStatus } =
   signedInStatusSlice.actions;
-
 export default signedInStatusSlice.reducer;

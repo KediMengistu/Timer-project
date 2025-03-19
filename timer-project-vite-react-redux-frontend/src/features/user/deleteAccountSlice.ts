@@ -2,40 +2,60 @@ import { createSlice } from "@reduxjs/toolkit";
 import { ApiErrorResponse, createAppAsyncThunk } from "../../app/appTypes";
 
 // --- Types ---
-export interface ForgotPasswordState {
+export interface DeleteAccountState {
   status: "idle" | "pending" | "succeeded" | "failed";
   error: ApiErrorResponse | null;
 }
 
-export interface ForgotPasswordDTO {
-  email: string;
-}
-
-export interface VerifyForgotPasswordDTO {
-  email: string;
+export interface VerifyDeleteAccountDTO {
   inputVerificationCode: string;
-  newPassword: string;
 }
 
-export interface ReinitiateForgotPasswordDTO {
+export interface ReinitiateDeleteAccountDTO {
   email: string;
   verificationAction: string;
 }
 
 // --- Thunks ---
-export const submitForgotPassword = createAppAsyncThunk<
-  void,
-  ForgotPasswordDTO
->(
-  "forgotPassword/submitForgotPassword",
-  async (forgotPasswordDTO: ForgotPasswordDTO, thunkAPI) => {
+export const submitDeleteAccount = createAppAsyncThunk<void, void>(
+  "deleteAccount/submitDeleteAccount",
+  async (_, thunkAPI) => {
     try {
-      const response = await fetch("/api/auth/forgot-password-request", {
+      const response = await fetch("/api/users/delete-user-request", {
         method: "PATCH",
+        credentials: "include",
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        return thunkAPI.rejectWithValue(errorData);
+      }
+      return;
+    } catch (error) {
+      return thunkAPI.rejectWithValue({
+        timestamp: new Date().toISOString(),
+        path: "/users/delete-user-request",
+        message:
+          error instanceof Error ? error.message : "Network error occurred",
+        statusCode: 500,
+      });
+    }
+  },
+);
+
+export const verifyDeleteAccount = createAppAsyncThunk<
+  void,
+  VerifyDeleteAccountDTO
+>(
+  "deleteAccount/verifyDeleteAccount",
+  async (verifyDeleteAccountDTO: VerifyDeleteAccountDTO, thunkAPI) => {
+    try {
+      const response = await fetch("/api/users/delete-user-confirm", {
+        method: "DELETE",
         headers: {
           "Content-type": "application/json",
         },
-        body: JSON.stringify(forgotPasswordDTO),
+        body: JSON.stringify(verifyDeleteAccountDTO),
+        credentials: "include",
       });
 
       if (!response.ok) {
@@ -46,7 +66,7 @@ export const submitForgotPassword = createAppAsyncThunk<
     } catch (error) {
       return thunkAPI.rejectWithValue({
         timestamp: new Date().toISOString(),
-        path: "/auth/forgot-password-request",
+        path: "/users/delete-user-confirm",
         message:
           error instanceof Error ? error.message : "Network error occurred",
         statusCode: 500,
@@ -55,47 +75,12 @@ export const submitForgotPassword = createAppAsyncThunk<
   },
 );
 
-export const verifyForgotPassword = createAppAsyncThunk<
+export const reinitiateDeleteAccountVerification = createAppAsyncThunk<
   void,
-  VerifyForgotPasswordDTO
+  ReinitiateDeleteAccountDTO
 >(
-  "forgotPassword/verifyForgotPassword",
-  async (verifyForgotPasswordDTO: VerifyForgotPasswordDTO, thunkAPI) => {
-    try {
-      const response = await fetch("/api/auth/forgot-password-confirm", {
-        method: "PATCH",
-        headers: {
-          "Content-type": "application/json",
-        },
-        body: JSON.stringify(verifyForgotPasswordDTO),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        return thunkAPI.rejectWithValue(errorData);
-      }
-      return;
-    } catch (error) {
-      return thunkAPI.rejectWithValue({
-        timestamp: new Date().toISOString(),
-        path: "/auth/forgot-password-confirm",
-        message:
-          error instanceof Error ? error.message : "Network error occurred",
-        statusCode: 500,
-      });
-    }
-  },
-);
-
-export const reinitiateForgotPasswordVerification = createAppAsyncThunk<
-  void,
-  ReinitiateForgotPasswordDTO
->(
-  "forgotPassword/reinitiateVerification",
-  async (
-    reinitiateForgotPasswordDTO: ReinitiateForgotPasswordDTO,
-    thunkAPI,
-  ) => {
+  "deleteAccount/reinitiateVerification",
+  async (reinitiateDeleteAccountDTO: ReinitiateDeleteAccountDTO, thunkAPI) => {
     try {
       const response = await fetch(
         "/api/verification/reinitiate-verification",
@@ -104,7 +89,7 @@ export const reinitiateForgotPasswordVerification = createAppAsyncThunk<
           headers: {
             "Content-type": "application/json",
           },
-          body: JSON.stringify(reinitiateForgotPasswordDTO),
+          body: JSON.stringify(reinitiateDeleteAccountDTO),
         },
       );
 
@@ -126,58 +111,58 @@ export const reinitiateForgotPasswordVerification = createAppAsyncThunk<
 );
 
 // --- Slice ---
-const initialState: ForgotPasswordState = {
+const initialState: DeleteAccountState = {
   status: "idle",
   error: null,
 };
 
-export const forgotPasswordSlice = createSlice({
-  name: "forgotPassword",
+export const deleteAccountSlice = createSlice({
+  name: "deleteAccount",
   initialState,
   reducers: {
-    resetForgotPassword: (state) => {
+    resetDeleteAccount: (state) => {
       state.status = "idle";
       state.error = null;
     },
   },
   extraReducers(builder) {
     builder
-      .addCase(submitForgotPassword.pending, (state) => {
+      .addCase(submitDeleteAccount.pending, (state) => {
         state.status = "pending";
         state.error = null;
       })
-      .addCase(submitForgotPassword.fulfilled, (state) => {
+      .addCase(submitDeleteAccount.fulfilled, (state) => {
         state.status = "succeeded";
         state.error = null;
       })
-      .addCase(submitForgotPassword.rejected, (state, action) => {
+      .addCase(submitDeleteAccount.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload || null;
       })
 
-      .addCase(verifyForgotPassword.pending, (state) => {
+      .addCase(verifyDeleteAccount.pending, (state) => {
         state.status = "pending";
         state.error = null;
       })
-      .addCase(verifyForgotPassword.fulfilled, (state) => {
+      .addCase(verifyDeleteAccount.fulfilled, (state) => {
         state.status = "succeeded";
         state.error = null;
       })
-      .addCase(verifyForgotPassword.rejected, (state, action) => {
+      .addCase(verifyDeleteAccount.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload || null;
       })
 
-      .addCase(reinitiateForgotPasswordVerification.pending, (state) => {
+      .addCase(reinitiateDeleteAccountVerification.pending, (state) => {
         state.status = "pending";
         state.error = null;
       })
-      .addCase(reinitiateForgotPasswordVerification.fulfilled, (state) => {
+      .addCase(reinitiateDeleteAccountVerification.fulfilled, (state) => {
         state.status = "succeeded";
         state.error = null;
       })
       .addCase(
-        reinitiateForgotPasswordVerification.rejected,
+        reinitiateDeleteAccountVerification.rejected,
         (state, action) => {
           state.status = "failed";
           state.error = action.payload || null;
@@ -186,5 +171,5 @@ export const forgotPasswordSlice = createSlice({
   },
 });
 
-export const { resetForgotPassword } = forgotPasswordSlice.actions;
-export default forgotPasswordSlice.reducer;
+export const { resetDeleteAccount } = deleteAccountSlice.actions;
+export default deleteAccountSlice.reducer;

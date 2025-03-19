@@ -1,7 +1,5 @@
 import { AnimatePresence, motion } from "motion/react";
 import { useLocation, useNavigate } from "react-router";
-import { MdEmail } from "react-icons/md";
-import { RiLockPasswordFill } from "react-icons/ri";
 import {
   useState,
   useRef,
@@ -11,54 +9,79 @@ import {
   ClipboardEvent,
   useCallback,
 } from "react";
-import {
-  reinitiateSignInVerification,
-  ReinitiateVerifySignInDTO,
-  resetSignin,
-  verifySignIn,
-  VerifySignInDTO,
-} from "../../features/auth/siginSlice";
-import { setSignedInStatus } from "../../features/auth/signedinStatusSlice";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import {
+  reinitiateDeleteAccountVerification,
+  ReinitiateDeleteAccountDTO,
+  resetDeleteAccount,
+  verifyDeleteAccount,
+  VerifyDeleteAccountDTO,
+} from "../../features/user/deleteAccountSlice";
+import {
+  resetUserEmail,
+  retrieveUserEmail,
+} from "../../features/user/retrieveUserEmailSlice";
+import { setSignedInStatus } from "../../features/auth/signedinStatusSlice";
 import { ApiErrorResponse } from "../../app/appTypes";
 
-function SignInVerifyUserForm() {
+function DeleteAccountVerifyUserForm() {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const verifySigninState = useAppSelector((state) => state.signin.status);
-  const verifySigninErrorState = useAppSelector((state) => state.signin.error);
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [sentReinitiateVerification, setSentReinitiateVerification] =
-    useState<boolean>(false);
+  const verifyDeleteAccountState = useAppSelector(
+    (state) => state.deleteAccount.status,
+  );
+  const verifyDeleteAccountErrorState = useAppSelector(
+    (state) => state.deleteAccount.error,
+  );
+  const emailState = useAppSelector((state) => state.userEmail.email);
+  const emailErrorState = useAppSelector((state) => state.userEmail.error);
   const [refsInitialized, setRefsInitialized] = useState<boolean>(false);
-  const [nonAPIError, setNonAPIError] = useState<ApiErrorResponse | null>(null);
-
-  const handleContinueAsGuestClick = () => {
-    navigate("/");
-  };
+  const [sentReInitiateVerification, setSentReinitiateVerification] =
+    useState<boolean>(false);
+  const [noEmailAPIError, setNoEmailAPIError] =
+    useState<ApiErrorResponse | null>(null);
 
   useEffect(() => {
-    if (verifySigninState === "succeeded" && sentReinitiateVerification) {
-      setSentReinitiateVerification(false);
-      dispatch(resetSignin());
-    } else if (
-      verifySigninState === "succeeded" &&
-      !sentReinitiateVerification
+    if (
+      verifyDeleteAccountState === "succeeded" &&
+      sentReInitiateVerification
     ) {
-      dispatch(resetSignin());
-      dispatch(setSignedInStatus(true));
-      const from = location.state?.from?.pathname || "/manage-timers";
-      navigate(from, { replace: true });
+      setSentReinitiateVerification(false);
+      dispatch(resetDeleteAccount());
+    } else if (
+      verifyDeleteAccountState === "succeeded" &&
+      !sentReInitiateVerification
+    ) {
+      dispatch(resetDeleteAccount());
+      dispatch(setSignedInStatus(false));
+      dispatch(resetUserEmail());
+      navigate("/");
     }
-  }, [verifySigninState]);
+  }, [verifyDeleteAccountState, sentReInitiateVerification]);
+
+  useEffect(() => {
+    if (
+      verifyDeleteAccountErrorState?.message === "Unauthorized" ||
+      emailErrorState?.message === "Unauthorized"
+    ) {
+      dispatch(setSignedInStatus(false));
+      dispatch(resetUserEmail());
+      navigate("/");
+    }
+  }, [verifyDeleteAccountErrorState, emailErrorState]);
+
+  useEffect(() => {
+    if (!emailState) {
+      dispatch(retrieveUserEmail());
+    }
+  }, []);
 
   useEffect(() => {
     return () => {
-      dispatch(resetSignin());
+      dispatch(resetDeleteAccount());
     };
-  }, []);
+  }, [dispatch]);
 
   // Create a ref array for the verification code inputs
   const codeInputRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -184,67 +207,27 @@ function SignInVerifyUserForm() {
         exit={{ opacity: 0, y: -20 }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
         style={{ willChange: "transform", backfaceVisibility: "hidden" }}
-        className="relative grid h-60 w-64 grid-rows-[auto_1fr] gap-1 rounded-2xl border-2 border-black bg-white p-2! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-700 dark:bg-gray-800"
+        className="relative grid h-36 w-64 grid-rows-[auto_1fr] gap-1 rounded-2xl border-2 border-black bg-white p-2! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-700 dark:bg-gray-800"
       >
         <div className="flex items-center justify-center border-b-2 border-black p-2! dark:border-gray-700">
           <h1 className="text-center text-xs text-black italic dark:text-white">
-            Account Verification &#183; Via Sign In
+            Account Verification &#183; Delete Account
           </h1>
         </div>
         <form
           onSubmit={(event) => {
             event.preventDefault();
-            if (nonAPIError) {
-              setNonAPIError(null);
+            if (noEmailAPIError) {
+              setNoEmailAPIError(null);
             }
-            const verifySignInDTO: VerifySignInDTO = {
-              email,
-              password,
+            const verifyDeleteAccountDTO: VerifyDeleteAccountDTO = {
               inputVerificationCode: codeValues.join(""),
             };
-            dispatch(verifySignIn(verifySignInDTO));
+            dispatch(verifyDeleteAccount(verifyDeleteAccountDTO));
           }}
           className="grid grid-rows-[1fr_auto] gap-1"
         >
-          <div className="grid grid-rows-3 gap-1">
-            <div className="grid grid-cols-[auto_1fr] gap-1">
-              <label
-                htmlFor="email"
-                className="flex items-center justify-center p-2! hover:cursor-pointer"
-              >
-                <MdEmail />
-              </label>
-              <input
-                type="text"
-                name="email"
-                id="email"
-                placeholder="Email"
-                autoComplete="off"
-                value={email}
-                required
-                onChange={(event) => setEmail(event.target.value)}
-                className="border-b-2 border-black text-xs outline-0 dark:border-gray-700"
-              />
-            </div>
-            <div className="grid grid-cols-[auto_1fr] gap-1">
-              <label
-                htmlFor="password"
-                className="flex items-center justify-center p-2! hover:cursor-pointer"
-              >
-                <RiLockPasswordFill />
-              </label>
-              <input
-                type="password"
-                name="password"
-                id="password"
-                placeholder="Password"
-                autoComplete="off"
-                value={password}
-                required
-                onChange={(event) => setPassword(event.target.value)}
-                className="border-b-2 border-black text-xs outline-0 dark:border-gray-700"
-              />
-            </div>
+          <div className="grid grid-rows-1 gap-1">
             <div className="grid grid-cols-[auto_1fr] border-black p-1! dark:border-gray-700">
               <label
                 htmlFor="code-0"
@@ -281,37 +264,21 @@ function SignInVerifyUserForm() {
               </div>
             </div>
           </div>
-          <div className="flex-rows flex items-center justify-evenly gap-1 pb-1!">
-            <div className="relative">
-              <button
-                type="button"
-                onClick={handleContinueAsGuestClick}
-                className="peer flex w-full flex-row items-center justify-center rounded-sm border-2 border-black bg-black p-2! shadow-[0px_0px_0px_1px_rgba(0,0,0,0.06),0px_1px_1px_-0.5px_rgba(0,0,0,0.06),0px_3px_3px_-1.5px_rgba(0,0,0,0.06),_0px_6px_6px_-3px_rgba(0,0,0,0.06),0px_12px_12px_-6px_rgba(0,0,0,0.06),0px_24px_24px_-12px_rgba(0,0,0,0.06)] transition ease-in-out hover:cursor-pointer active:opacity-55 dark:border-gray-600 dark:bg-gray-700"
-              >
-                <h1 className="text-center text-[10px] text-white">
-                  Continue as Guest &rarr;
-                </h1>
-              </button>
-              <div className="pointer-events-none absolute top-1/2 right-[101.5%] flex w-[60px] -translate-y-1/2 flex-row items-center justify-center rounded-tr-full rounded-br-full border-2 border-black bg-white p-1! opacity-0 shadow-[-2.25px_3px_0_2px_rgba(0,0,0,0.516)] transition duration-200 ease-in-out peer-hover:opacity-100 md:w-[80px] dark:border-gray-700 dark:bg-gray-800">
-                <h1 className="text-center text-[8px] text-black md:text-[9px] dark:text-white">
-                  Must Verify Later at Sign In.
-                </h1>
-              </div>
-            </div>
+          <div className="flex flex-row items-center justify-center p-1!">
             <button
               type="submit"
-              className="group flex flex-row items-center justify-center rounded-full border-2 border-white bg-white p-2! shadow-[0px_0px_0px_1px_rgba(0,0,0,0.06),0px_1px_1px_-0.5px_rgba(0,0,0,0.06),0px_3px_3px_-1.5px_rgba(0,0,0,0.06),_0px_6px_6px_-3px_rgba(0,0,0,0.06),0px_12px_12px_-6px_rgba(0,0,0,0.06),0px_24px_24px_-12px_rgba(0,0,0,0.06)] transition ease-in-out hover:cursor-pointer hover:border-black hover:bg-black active:opacity-55 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-gray-600 dark:hover:bg-gray-800"
+              className="group flex flex-row items-center justify-center rounded-full border-2 border-white bg-white p-2! shadow-[0px_0px_0px_1px_rgba(0,0,0,0.06),0px_1px_1px_-0.5px_rgba(0,0,0,0.06),0px_3px_3px_-1.5px_rgba(0,0,0,0.06),_0px_6px_6px_-3px_rgba(0,0,0,0.06),0px_12px_12px_-6px_rgba(0,0,0,0.06),0px_24px_24px_-12px_rgba(0,0,0,0.06)] transition ease-in-out hover:cursor-pointer hover:border-red-500 hover:bg-red-500 active:opacity-55 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-red-500 dark:hover:bg-red-500"
             >
               <h1 className="text-center text-xs text-black group-hover:text-white dark:text-white">
-                Verify Account
+                Delete Account
               </h1>
             </button>
           </div>
         </form>
         <AnimatePresence mode="wait">
-          {nonAPIError !== null ? (
+          {noEmailAPIError !== null ? (
             <motion.div
-              key={`nonAPIErrorVerifySignInDiv-${JSON.stringify(nonAPIError)}`}
+              key={`noEmailAPIErrorVerifyDeleteAccountDiv-${JSON.stringify(noEmailAPIError)}`}
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
@@ -323,41 +290,16 @@ function SignInVerifyUserForm() {
               className="absolute top-[98%] left-1/2 h-fit w-[150px] -translate-x-1/2 rounded-sm border-1 border-black bg-red-400 p-1! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-700 dark:bg-gray-800"
             >
               <h1 className="text-center text-[8px] text-black md:text-[9px] dark:text-white">
-                {nonAPIError.message}
+                {noEmailAPIError.message}
                 <br />
-                <span
-                  onClick={() => {
-                    if (email !== "") {
-                      setNonAPIError(null);
-                      const reinitiateVerifySignInDTO: ReinitiateVerifySignInDTO =
-                        {
-                          email,
-                          verificationAction: "sign up verification",
-                        };
-                      setSentReinitiateVerification(true);
-                      dispatch(
-                        reinitiateSignInVerification(reinitiateVerifySignInDTO),
-                      );
-                    } else {
-                      const error: ApiErrorResponse = {
-                        timestamp: new Date().toISOString(),
-                        path: location.pathname,
-                        message:
-                          "Email must be provided for Account Verification.",
-                        statusCode: 400,
-                      };
-                      setNonAPIError(error);
-                    }
-                  }}
-                  className="text-blue-600 underline underline-offset-2 transition ease-in-out hover:cursor-pointer active:opacity-55 dark:text-yellow-500"
-                >
-                  Click here to verify again.
+                <span className="text-blue-600 underline underline-offset-2 transition ease-in-out hover:cursor-pointer active:opacity-55 dark:text-yellow-500">
+                  Refresh browser or sign out, in and retry.
                 </span>
               </h1>
             </motion.div>
-          ) : verifySigninErrorState !== null ? (
+          ) : verifyDeleteAccountErrorState !== null ? (
             <motion.div
-              key={`APIErrorVerifySignInDiv-${JSON.stringify(verifySigninErrorState)}`}
+              key={`APIErrorVerifyDeleteAccountDiv-${JSON.stringify(verifyDeleteAccountErrorState)}`}
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
@@ -369,41 +311,41 @@ function SignInVerifyUserForm() {
               className="absolute top-[98%] left-1/2 h-fit w-[150px] -translate-x-1/2 rounded-sm border-1 border-black bg-red-400 p-1! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-700 dark:bg-gray-800"
             >
               <h1 className="text-center text-[8px] text-black md:text-[9px] dark:text-white">
-                {Array.isArray(verifySigninErrorState.message) ? (
-                  <>{verifySigninErrorState.message.join(" ")}</>
+                {Array.isArray(verifyDeleteAccountErrorState.message) ? (
+                  <>{verifyDeleteAccountErrorState.message.join(" ")}</>
                 ) : (
                   <>
-                    {verifySigninErrorState.message ===
+                    {verifyDeleteAccountErrorState.message ===
                       `Verification code has expired. Please request a new one.` ||
-                    verifySigninErrorState.message ===
+                    verifyDeleteAccountErrorState.message ===
                       `Previous verification has expired. You can now proceed.` ? (
                       <>
                         Previous verification code has expired.
                         <br />
                         <span
                           onClick={() => {
-                            if (email !== "") {
-                              setNonAPIError(null);
-                              const reinitiateVerifySignInDTO: ReinitiateVerifySignInDTO =
+                            if (emailState !== null) {
+                              setNoEmailAPIError(null);
+                              const reinitiateDeleteAccountVerificationDTO: ReinitiateDeleteAccountDTO =
                                 {
-                                  email,
-                                  verificationAction: "sign up verification",
+                                  email: emailState,
+                                  verificationAction:
+                                    "account deletion verification",
                                 };
                               setSentReinitiateVerification(true);
                               dispatch(
-                                reinitiateSignInVerification(
-                                  reinitiateVerifySignInDTO,
+                                reinitiateDeleteAccountVerification(
+                                  reinitiateDeleteAccountVerificationDTO,
                                 ),
                               );
                             } else {
                               const error: ApiErrorResponse = {
                                 timestamp: new Date().toISOString(),
                                 path: location.pathname,
-                                message:
-                                  "Email must be provided for Account Verification.",
+                                message: "Insufficient browser data.",
                                 statusCode: 400,
                               };
-                              setNonAPIError(error);
+                              setNoEmailAPIError(error);
                             }
                           }}
                           className="text-blue-600 underline underline-offset-2 transition ease-in-out hover:cursor-pointer active:opacity-55 dark:text-yellow-500"
@@ -412,7 +354,7 @@ function SignInVerifyUserForm() {
                         </span>
                       </>
                     ) : (
-                      <>{verifySigninErrorState.message}</>
+                      <>{verifyDeleteAccountErrorState.message}</>
                     )}
                   </>
                 )}
@@ -425,4 +367,4 @@ function SignInVerifyUserForm() {
   );
 }
 
-export default SignInVerifyUserForm;
+export default DeleteAccountVerifyUserForm;

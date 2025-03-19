@@ -15,6 +15,10 @@ import TimerHome from "./components/timer-components/users/TimerHome.tsx";
 import SignInVerifyUserForm from "./components/auth-components/SignInVerifyUserForm.tsx";
 import ForgotPasswordUserVerifyForm from "./components/auth-components/ForgotPasswordVerifyUserForm.tsx";
 import SignOutForm from "./components/auth-components/SignOutForm.tsx";
+import DeleteAccountForm from "./components/auth-components/DeleteAccountForm.tsx";
+import DeleteAccountVerifyUserForm from "./components/auth-components/DeleteAccountVerifyUserForm.tsx";
+import RequireAuthGuard from "./components/guard-components/RequireAuthGuard.tsx";
+import RequireNoAuthGuard from "./components/guard-components/RequireNoAuthGuard.tsx";
 
 const router = createBrowserRouter([
   {
@@ -33,37 +37,57 @@ const router = createBrowserRouter([
                 index: true,
                 element: <DefaultMainContentContainer />,
               },
+              // Routes that require NO authentication
               {
-                path: "signup",
-                element: <SignUpForm />,
+                element: <RequireNoAuthGuard />,
+                children: [
+                  {
+                    path: "signup",
+                    element: <SignUpForm />,
+                  },
+                  {
+                    path: "verify-user-from-signup",
+                    element: <SignUpVerifyUserForm />,
+                  },
+                  {
+                    path: "verify-user-from-signin",
+                    element: <SignInVerifyUserForm />,
+                  },
+                  {
+                    path: "signin",
+                    element: <SignInForm />,
+                  },
+                  {
+                    path: "forgotpassword",
+                    element: <ForgotPasswordForm />,
+                  },
+                  {
+                    path: "verify-user-forgot-password",
+                    element: <ForgotPasswordUserVerifyForm />,
+                  },
+                ],
               },
+              // Routes that require authentication
               {
-                path: "verify-user-from-signup",
-                element: <SignUpVerifyUserForm />,
-              },
-              {
-                path: "verify-user-from-signin",
-                element: <SignInVerifyUserForm />,
-              },
-              {
-                path: "signin",
-                element: <SignInForm />,
-              },
-              {
-                path: "signout",
-                element: <SignOutForm />,
-              },
-              {
-                path: "forgotpassword",
-                element: <ForgotPasswordForm />,
-              },
-              {
-                path: "verify-user-forgot-password",
-                element: <ForgotPasswordUserVerifyForm />,
-              },
-              {
-                path: "manage-timers",
-                element: <TimerHome />,
+                element: <RequireAuthGuard />,
+                children: [
+                  {
+                    path: "signout",
+                    element: <SignOutForm />,
+                  },
+                  {
+                    path: "manage-timers",
+                    element: <TimerHome />,
+                  },
+                  {
+                    path: "delete-account",
+                    element: <DeleteAccountForm />,
+                  },
+                  {
+                    path: "verify-delete-account",
+                    element: <DeleteAccountVerifyUserForm />,
+                  },
+                ],
               },
             ],
           },

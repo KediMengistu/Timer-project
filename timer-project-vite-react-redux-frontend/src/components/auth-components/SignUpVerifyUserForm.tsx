@@ -11,15 +11,16 @@ import {
   ClipboardEvent,
   useCallback,
 } from "react";
-import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
-  reiniateSignUpVerification,
+  reinitiateSignUpVerification,
   ReinitiateVerifySignUpDTO,
   resetSignup,
   verifySignUp,
   VerifySignUpDTO,
 } from "../../features/auth/signupSlice";
 import { setSignedInStatus } from "../../features/auth/signedinStatusSlice";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { ApiErrorResponse } from "../../app/appTypes";
 
 function SignUpVerifyUserForm() {
   const location = useLocation();
@@ -29,27 +30,22 @@ function SignUpVerifyUserForm() {
   const verifySignupErrorState = useAppSelector((state) => state.signup.error);
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [refsInitialized, setRefsInitialized] = useState<boolean>(false);
-  const [sentReInitiateVerification, setSentReinitiateVerification] =
+  const [sentReinitiateVerification, setSentReinitiateVerification] =
     useState<boolean>(false);
+  const [refsInitialized, setRefsInitialized] = useState<boolean>(false);
+  const [nonAPIError, setNonAPIError] = useState<ApiErrorResponse | null>(null);
 
-  // Create a ref array for the verification code inputs
-  const codeInputRefs = useRef<(HTMLInputElement | null)[]>([]);
-
-  // Initialize the refs array
-  useEffect(() => {
-    // Pre-populate with nulls to match the expected length
-    codeInputRefs.current = Array(6).fill(null);
-    setRefsInitialized(true);
-  }, []);
+  const handleContinueAsGuestClick = () => {
+    navigate("/");
+  };
 
   useEffect(() => {
-    if (verifySignupState === "succeeded" && sentReInitiateVerification) {
+    if (verifySignupState === "succeeded" && sentReinitiateVerification) {
       setSentReinitiateVerification(false);
       dispatch(resetSignup());
     } else if (
       verifySignupState === "succeeded" &&
-      !sentReInitiateVerification
+      !sentReinitiateVerification
     ) {
       dispatch(resetSignup());
       dispatch(setSignedInStatus(true));
@@ -61,6 +57,16 @@ function SignUpVerifyUserForm() {
     return () => {
       dispatch(resetSignup());
     };
+  }, []);
+
+  // Create a ref array for the verification code inputs
+  const codeInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  // Initialize the refs array
+  useEffect(() => {
+    // Pre-populate with nulls to match the expected length
+    codeInputRefs.current = Array(6).fill(null);
+    setRefsInitialized(true);
   }, []);
 
   // State to hold verification code values
@@ -80,10 +86,6 @@ function SignUpVerifyUserForm() {
     },
     [],
   );
-
-  const handleContinueAsGuestClick = () => {
-    navigate("/");
-  };
 
   // Function to handle label click to focus on the first empty input
   const handleCodeLabelClick = (): void => {
@@ -191,6 +193,9 @@ function SignUpVerifyUserForm() {
         <form
           onSubmit={(event) => {
             event.preventDefault();
+            if (nonAPIError) {
+              setNonAPIError(null);
+            }
             const verifySignUpDTO: VerifySignUpDTO = {
               email,
               password,
@@ -302,12 +307,10 @@ function SignUpVerifyUserForm() {
             </button>
           </div>
         </form>
-
-        {/* Error display positioned relative to the parent motion div */}
         <AnimatePresence mode="wait">
-          {verifySignupErrorState !== null && (
+          {nonAPIError !== null ? (
             <motion.div
-              key={`verifySignupAPIErrorDiv-${JSON.stringify(verifySignupErrorState)}`}
+              key={`nonAPIErrorVerifySignUpDiv-${JSON.stringify(nonAPIError)}`}
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
@@ -319,66 +322,102 @@ function SignUpVerifyUserForm() {
               className="absolute top-[98%] left-1/2 h-fit w-[150px] -translate-x-1/2 rounded-sm border-1 border-black bg-red-400 p-1! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-700 dark:bg-gray-800"
             >
               <h1 className="text-center text-[8px] text-black md:text-[9px] dark:text-white">
-                {Array.isArray(verifySignupErrorState.message)
-                  ? verifySignupErrorState.message.join(" ")
-                  : verifySignupErrorState.message}
-                {verifySignupErrorState.message ===
-                  `Verification code has expired. Please request a new one.` ||
-                verifySignupErrorState.message ===
-                  `Previous verification has expired. You can now proceed.` ? (
-                  <>
-                    {" "}
-                    Please fill out email field on the form and
-                    <br />
-                    <span
-                      onClick={() => {
-                        const reiniateVerificationSignUpDTO: ReinitiateVerifySignUpDTO =
-                          {
-                            email,
-                            verificationAction: "sign up verification",
-                          };
-                        setSentReinitiateVerification(true);
-                        dispatch(
-                          reiniateSignUpVerification(
-                            reiniateVerificationSignUpDTO,
-                          ),
-                        );
-                      }}
-                      className="text-blue-600 underline underline-offset-2 transition ease-in-out hover:cursor-pointer active:opacity-55 dark:text-yellow-500"
-                    >
-                      {" "}
-                      Click here to generate new code.
-                    </span>
-                  </>
-                ) : verifySignupErrorState.message === "Email not found." ? (
-                  <>
-                    {" "}
-                    Please fill out email field correctly and
-                    <br />
-                    <span
-                      onClick={() => {
-                        const reiniateVerificationSignUpDTO: ReinitiateVerifySignUpDTO =
-                          {
-                            email,
-                            verificationAction: "sign up verification",
-                          };
-                        setSentReinitiateVerification(true);
-                        dispatch(
-                          reiniateSignUpVerification(
-                            reiniateVerificationSignUpDTO,
-                          ),
-                        );
-                      }}
-                      className="text-blue-600 underline underline-offset-2 transition ease-in-out hover:cursor-pointer active:opacity-55 dark:text-yellow-500"
-                    >
-                      {" "}
-                      Click here to generate new code.
-                    </span>
-                  </>
-                ) : null}
+                {nonAPIError.message}
+                <br />
+                <span
+                  onClick={() => {
+                    if (email !== "") {
+                      setNonAPIError(null);
+                      const reinitiateVerifySignUpDTO: ReinitiateVerifySignUpDTO =
+                        {
+                          email,
+                          verificationAction: "sign up verification",
+                        };
+                      setSentReinitiateVerification(true);
+                      dispatch(
+                        reinitiateSignUpVerification(reinitiateVerifySignUpDTO),
+                      );
+                    } else {
+                      const error: ApiErrorResponse = {
+                        timestamp: new Date().toISOString(),
+                        path: location.pathname,
+                        message:
+                          "Email must be provided for Account Verification.",
+                        statusCode: 400,
+                      };
+                      setNonAPIError(error);
+                    }
+                  }}
+                  className="text-blue-600 underline underline-offset-2 transition ease-in-out hover:cursor-pointer active:opacity-55 dark:text-yellow-500"
+                >
+                  Click here to verify again.
+                </span>
               </h1>
             </motion.div>
-          )}
+          ) : verifySignupErrorState !== null ? (
+            <motion.div
+              key={`APIErrorVerifySignUpDiv-${JSON.stringify(verifySignupErrorState)}`}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.35, ease: "easeInOut" }}
+              style={{
+                willChange: "transform",
+                backfaceVisibility: "hidden",
+              }}
+              className="absolute top-[98%] left-1/2 h-fit w-[150px] -translate-x-1/2 rounded-sm border-1 border-black bg-red-400 p-1! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-700 dark:bg-gray-800"
+            >
+              <h1 className="text-center text-[8px] text-black md:text-[9px] dark:text-white">
+                {Array.isArray(verifySignupErrorState.message) ? (
+                  <>{verifySignupErrorState.message.join(" ")}</>
+                ) : (
+                  <>
+                    {verifySignupErrorState.message ===
+                      `Verification code has expired. Please request a new one.` ||
+                    verifySignupErrorState.message ===
+                      `Previous verification has expired. You can now proceed.` ? (
+                      <>
+                        Previous verification code has expired.
+                        <br />
+                        <span
+                          onClick={() => {
+                            if (email !== "") {
+                              setNonAPIError(null);
+                              const reinitiateVerifySignUpDTO: ReinitiateVerifySignUpDTO =
+                                {
+                                  email,
+                                  verificationAction: "sign up verification",
+                                };
+                              setSentReinitiateVerification(true);
+                              dispatch(
+                                reinitiateSignUpVerification(
+                                  reinitiateVerifySignUpDTO,
+                                ),
+                              );
+                            } else {
+                              const error: ApiErrorResponse = {
+                                timestamp: new Date().toISOString(),
+                                path: location.pathname,
+                                message:
+                                  "Email must be provided for Account Verification.",
+                                statusCode: 400,
+                              };
+                              setNonAPIError(error);
+                            }
+                          }}
+                          className="text-blue-600 underline underline-offset-2 transition ease-in-out hover:cursor-pointer active:opacity-55 dark:text-yellow-500"
+                        >
+                          Click here to get new code.
+                        </span>
+                      </>
+                    ) : (
+                      <>{verifySignupErrorState.message}</>
+                    )}
+                  </>
+                )}
+              </h1>
+            </motion.div>
+          ) : null}
         </AnimatePresence>
       </motion.div>
     </AnimatePresence>

@@ -6,13 +6,9 @@ import { Request } from 'express';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(
-    configService: ConfigService
-  ) {
+  constructor(configService: ConfigService) {
     super({
-      jwtFromRequest: ExtractJwt.fromExtractors([
-        cookieExtractor
-      ]),
+      jwtFromRequest: ExtractJwt.fromExtractors([JwtStrategy.extractJWT]),
       ignoreExpiration: false,
       secretOrKey: configService.get('JWT_SECRET'),
     });
@@ -21,8 +17,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   async validate(payload: any) {
     return { userId: payload.sub };
   }
-}
 
-const cookieExtractor = (req: Request): string | null => {
-  return req?.cookies?.jwt ?? null;
-};
+  private static extractJWT(req: Request): string | null {
+    console.log('Request headers:', req.headers);
+    console.log('Cookies received:', req?.cookies);
+    const token = req?.cookies?.jwt ?? null;
+    console.log('JWT token extracted:', token);
+    return token;
+  }
+}
