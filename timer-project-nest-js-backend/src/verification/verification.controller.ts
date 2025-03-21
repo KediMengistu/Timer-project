@@ -11,7 +11,7 @@ export class VerificationController {
   async reinitiateVerification(
     @Body() reinitiateUserVerificationDTO: ReinitiateUserVerificationDTO,
   ) {
-    return this.verificationService.reinitiateVerification(
+    await this.verificationService.reinitiateVerification(
       reinitiateUserVerificationDTO,
     );
   }

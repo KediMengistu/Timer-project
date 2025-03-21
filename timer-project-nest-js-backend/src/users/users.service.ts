@@ -7,6 +7,10 @@ import { VerificationService } from '../verification/verification.service';
 import { VerificationActions } from '../verification/enums/verification-actions.enums';
 import { VerifyUserDeleteDTO } from './dto/verify-user-delete.dto';
 import { UnauthorizedException } from 'src/exception/unauthorized.exception';
+import { VerifyUserForgotPasswordDTO } from './dto/verify-user-forgot-password.dto';
+import { UserForgotPasswordDTO } from './dto/user-forgot-password.dto';
+import { BadRequestException } from 'src/exception/bad-request.exception';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -104,6 +108,52 @@ export class UsersService {
       { id: userId },
       { password: newPassword },
     );
+  }
+
+  async forgotPasswordRequest(userForgotPasswordDTO: UserForgotPasswordDTO) {
+    // Normalize email
+    const normalizedEmail = userForgotPasswordDTO.email.toLowerCase();
+
+    const user: User = await this.retrieveUserViaEmail(normalizedEmail);
+    if (!user) {
+      throw new UnauthorizedException('Email not found.');
+    }
+    await this.verificationService.initiateVerification(
+      user,
+      VerificationActions.INITIATE_FORGOT_PASSWORD,
+    );
+  }
+
+  async forgotPasswordConfirm(
+    verifyUserForgotPasswordDTO: VerifyUserForgotPasswordDTO,
+  ) {
+    // Normalize email
+    const normalizedEmail = verifyUserForgotPasswordDTO.email.toLowerCase();
+
+    const user: User = await this.retrieveUserViaEmail(normalizedEmail);
+    if (!user) {
+      throw new UnauthorizedException('Email not found.');
+    }
+    const isMatching: boolean = await bcrypt.compare(
+      verifyUserForgotPasswordDTO.newPassword,
+      user.password,
+    );
+    if (isMatching) {
+      throw new BadRequestException(
+        'Password was previously used. Please provide a different one.',
+      );
+    }
+    await this.verificationService.completeVerification(
+      user,
+      verifyUserForgotPasswordDTO.inputVerificationCode,
+      VerificationActions.INITIATE_FORGOT_PASSWORD,
+    );
+    let salt: string = await bcrypt.genSalt(10);
+    const hashedPassword: string = await bcrypt.hash(
+      verifyUserForgotPasswordDTO.newPassword,
+      salt,
+    );
+    await this.updateUserPassword(user.id, hashedPassword);
   }
 
   async deleteUserRequest(userId: string) {

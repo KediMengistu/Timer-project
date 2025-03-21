@@ -11,8 +11,6 @@ import { BadRequestException } from '../exception/bad-request.exception';
 import { UnauthorizedException } from '../exception/unauthorized.exception';
 import { QueryFailedError } from 'typeorm';
 import { VerifyUserSignUpDTO } from '../users/dto/verify-user-sign-up.dto';
-import { UserForgotPasswordDTO } from 'src/users/dto/user-forgot-password.dto';
-import { VerifyUserForgotPasswordDTO } from '../users/dto/verify-user-forgot-password.dto';
 
 @Injectable()
 export class AuthService {
@@ -84,6 +82,11 @@ export class AuthService {
   }
 
   async signin(userId: string): Promise<{ access_token: string }> {
+    const user: User = await this.usersService.retrieveUserViaId(userId);
+    if (!user) {
+      throw new UnauthorizedException('Email not found.');
+    }
+    await this.usersService.updateSignInAndExpirationTime(user.id);
     //input user credentials are valid - generate JWT.
     const payload = { sub: userId };
     return {
@@ -113,53 +116,5 @@ export class AuthService {
       );
     }
     return user;
-  }
-
-  async forgotPasswordRequest(userForgotPasswordDTO: UserForgotPasswordDTO) {
-    // Normalize email
-    const normalizedEmail = userForgotPasswordDTO.email.toLowerCase();
-
-    const user: User =
-      await this.usersService.retrieveUserViaEmail(normalizedEmail);
-    if (!user) {
-      throw new UnauthorizedException('Email not found.');
-    }
-    await this.verificationService.initiateVerification(
-      user,
-      VerificationActions.INITIATE_FORGOT_PASSWORD,
-    );
-  }
-
-  async forgotPasswordConfirm(
-    verifyUserForgotPasswordDTO: VerifyUserForgotPasswordDTO,
-  ) {
-    // Normalize email
-    const normalizedEmail = verifyUserForgotPasswordDTO.email.toLowerCase();
-
-    const user: User =
-      await this.usersService.retrieveUserViaEmail(normalizedEmail);
-    if (!user) {
-      throw new UnauthorizedException('Email not found.');
-    }
-    const isMatching: boolean = await bcrypt.compare(
-      verifyUserForgotPasswordDTO.newPassword,
-      user.password,
-    );
-    if (isMatching) {
-      throw new BadRequestException(
-        'Password was previously used. Please provide a different one.',
-      );
-    }
-    await this.verificationService.completeVerification(
-      user,
-      verifyUserForgotPasswordDTO.inputVerificationCode,
-      VerificationActions.INITIATE_FORGOT_PASSWORD,
-    );
-    let salt: string = await bcrypt.genSalt(10);
-    const hashedPassword: string = await bcrypt.hash(
-      verifyUserForgotPasswordDTO.newPassword,
-      salt,
-    );
-    await this.usersService.updateUserPassword(user.id, hashedPassword);
   }
 }

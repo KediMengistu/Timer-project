@@ -12,8 +12,6 @@ import { Public } from './auth.decorator.factory';
 import { LocalAuthGuard } from './passport/local-auth.guard';
 import { CreateUserSignUpDto } from '../users/dto/create-user-sign-up.dto';
 import { VerifyUserSignUpDTO } from '../users/dto/verify-user-sign-up.dto';
-import { UserForgotPasswordDTO } from 'src/users/dto/user-forgot-password.dto';
-import { VerifyUserForgotPasswordDTO } from '../users/dto/verify-user-forgot-password.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -22,7 +20,7 @@ export class AuthController {
   @Public()
   @Post('signup')
   async signup(@Body() createUserSignUpDto: CreateUserSignUpDto) {
-    return this.authService.signup(createUserSignUpDto);
+    await this.authService.signup(createUserSignUpDto);
   }
 
   @Public()
@@ -59,24 +57,8 @@ export class AuthController {
   }
 
   @Public()
-  @Patch('forgot-password-request')
-  async forgotPasswordRequest(
-    @Body() userForgotPasswordDTO: UserForgotPasswordDTO,
-  ) {
-    await this.authService.forgotPasswordRequest(userForgotPasswordDTO);
-  }
-
-  @Public()
-  @Patch('forgot-password-confirm')
-  async forgotPasswordConfirm(
-    @Body() verifyUserForgotPasswordDTO: VerifyUserForgotPasswordDTO,
-  ) {
-    await this.authService.forgotPasswordConfirm(verifyUserForgotPasswordDTO);
-  }
-
-  @Public()
   @Post('signout')
-  async signout(@Res({ passthrough: true }) response) {
+  signout(@Res({ passthrough: true }) response) {
     response.clearCookie('jwt', {
       httpOnly: true,
       secure: false, //set to true later.

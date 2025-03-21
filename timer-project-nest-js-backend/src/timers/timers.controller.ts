@@ -1,4 +1,13 @@
-import { Controller, Post, Req, Body, Get, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Req,
+  Body,
+  Get,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { TimersService } from './timers.service';
 import { CreateTimerDTO } from './dto/create-timer.dto';
 import { Public } from '../auth/auth.decorator.factory';
@@ -10,7 +19,7 @@ export class TimersController {
 
   @Post('create-timer')
   async createTimer(@Req() request, @Body() createTimerDTO: CreateTimerDTO) {
-    return this.timerService.createTimer(request.user.userId, createTimerDTO);
+    await this.timerService.createTimer(request.user.userId, createTimerDTO);
   }
 
   @Public()
@@ -21,17 +30,17 @@ export class TimersController {
 
   @Get('get-timer/:id')
   async getTimer(@Param() params: any) {
-    return this.timerService.retrieveTimer(params.id);
+    await this.timerService.retrieveTimer(params.id);
   }
 
   @Get('get-all-timers')
   async getAllTimers(@Req() request) {
-    return this.timerService.retrieveAllTimers(request.user.userId);
+    await this.timerService.retrieveAllTimers(request.user.userId);
   }
 
   @Patch('pause-timer/:id')
   async pauseTimer(@Param() params: any) {
-    return this.timerService.pauseTimer(params.id);
+    await this.timerService.pauseTimer(params.id);
   }
 
   @Public()
@@ -42,7 +51,7 @@ export class TimersController {
 
   @Patch('play-timer/:id')
   async playTimer(@Param() params: any) {
-    return this.timerService.playTimer(params.id);
+    await this.timerService.playTimer(params.id);
   }
 
   @Public()
@@ -53,6 +62,6 @@ export class TimersController {
 
   @Delete('delete-timer/:id')
   async deleteTimer(@Req() request, @Param() params: any) {
-    return this.timerService.removeTimer(request.user.userId, params.id);
+    await this.timerService.removeTimer(request.user.userId, params.id);
   }
 }

@@ -1,23 +1,45 @@
 import { Controller, Get, Req, Patch, Delete, Body } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { VerifyUserDeleteDTO } from './dto/verify-user-delete.dto';
+import { Public } from '../auth/auth.decorator.factory';
 import { User } from './entities/user.entity';
+import { VerifyUserDeleteDTO } from './dto/verify-user-delete.dto';
+import { UserForgotPasswordDTO } from 'src/users/dto/user-forgot-password.dto';
+import { VerifyUserForgotPasswordDTO } from '../users/dto/verify-user-forgot-password.dto';
 
 @Controller('users')
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
-  @Get('test-auth-user-request')
-  testAuthUserRequest(@Req() request) {
-    return this.usersService.retrieveUserViaId(request.user.userId);
-  }
-
-  @Get('retrieve-user-email')
-  async retrieveUserEmail(@Req() request) {
+  @Get('retrieve-user')
+  async retrieveUser(@Req() request) {
     const user: User = await this.usersService.retrieveUserViaId(
       request.user.userId,
     );
-    return user.email;
+    const {
+      id,
+      password,
+      verificationCode,
+      verificationCodeExpireTime,
+      verificationAction,
+      ...result
+    } = user;
+    return result;
+  }
+
+  @Public()
+  @Patch('forgot-password-request')
+  async forgotPasswordRequest(
+    @Body() userForgotPasswordDTO: UserForgotPasswordDTO,
+  ) {
+    await this.usersService.forgotPasswordRequest(userForgotPasswordDTO);
+  }
+
+  @Public()
+  @Patch('forgot-password-confirm')
+  async forgotPasswordConfirm(
+    @Body() verifyUserForgotPasswordDTO: VerifyUserForgotPasswordDTO,
+  ) {
+    await this.usersService.forgotPasswordConfirm(verifyUserForgotPasswordDTO);
   }
 
   @Patch('delete-user-request')
