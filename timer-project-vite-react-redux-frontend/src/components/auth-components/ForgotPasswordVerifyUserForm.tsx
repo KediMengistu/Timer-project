@@ -15,22 +15,25 @@ import {
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
   reinitiateForgotPasswordVerification,
-  ReinitiateForgotPasswordDTO,
-  resetForgotPassword,
+  resetUserError,
+  resetUserStatus,
   verifyForgotPassword,
-  VerifyForgotPasswordDTO,
-} from "../../features/user/forgotPasswordSlice";
-import { ApiErrorResponse } from "../../app/appTypes";
+} from "../../features/user/userSlice";
+import { VerifyForgotPasswordDTO } from "../../features/user/userDTO";
+import {
+  ApiErrorResponse,
+  ReinitiateVerificationDTO,
+} from "../../app/appTypes";
 
 function ForgotPasswordUserVerifyForm() {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const verifyForgotPasswordState = useAppSelector(
-    (state) => state.forgotPassword.status,
+    (state) => state.user.status,
   );
   const verifyForgotPasswordErrorState = useAppSelector(
-    (state) => state.forgotPassword.error,
+    (state) => state.user.error,
   );
   const [email, setEmail] = useState<string>("");
   const [newPassword, setNewPassword] = useState<string>("");
@@ -46,19 +49,26 @@ function ForgotPasswordUserVerifyForm() {
       sentReInitiateVerification
     ) {
       setSentReinitiateVerification(false);
-      dispatch(resetForgotPassword());
+      dispatch(resetUserStatus());
+      dispatch(resetUserError());
     } else if (
       verifyForgotPasswordState === "succeeded" &&
       !sentReInitiateVerification
     ) {
-      dispatch(resetForgotPassword());
+      dispatch(resetUserStatus());
+      dispatch(resetUserError());
       navigate("/signin");
     }
   }, [verifyForgotPasswordState]);
 
   useEffect(() => {
     return () => {
-      dispatch(resetForgotPassword());
+      if (verifyForgotPasswordState !== "idle") {
+        dispatch(resetUserStatus());
+      }
+      if (verifyForgotPasswordState !== null) {
+        dispatch(resetUserError());
+      }
     };
   }, []);
 
@@ -364,7 +374,7 @@ function ForgotPasswordUserVerifyForm() {
                       onClick={() => {
                         if (email !== "") {
                           setNonAPIError(null);
-                          const reinitiateForgotPasswordDTO: ReinitiateForgotPasswordDTO =
+                          const reinitiateForgotPasswordDTO: ReinitiateVerificationDTO =
                             {
                               email,
                               verificationAction:
@@ -426,7 +436,7 @@ function ForgotPasswordUserVerifyForm() {
                           onClick={() => {
                             if (email !== "") {
                               setNonAPIError(null);
-                              const reinitiateForgotPasswordDTO: ReinitiateForgotPasswordDTO =
+                              const reinitiateForgotPasswordDTO: ReinitiateVerificationDTO =
                                 {
                                   email,
                                   verificationAction:

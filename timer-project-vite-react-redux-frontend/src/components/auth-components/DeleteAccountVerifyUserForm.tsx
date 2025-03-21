@@ -41,6 +41,12 @@ function DeleteAccountVerifyUserForm() {
     useState<ApiErrorResponse | null>(null);
 
   useEffect(() => {
+    if (!userState) {
+      dispatch(retrieveUser());
+    }
+  }, []);
+
+  useEffect(() => {
     if (
       verifyDeleteAccountState === "succeeded" &&
       sentReInitiateVerification
@@ -65,12 +71,6 @@ function DeleteAccountVerifyUserForm() {
       navigate("/");
     }
   }, [verifyDeleteAccountErrorState]);
-
-  useEffect(() => {
-    if (!userState) {
-      dispatch(retrieveUser());
-    }
-  }, []);
 
   useEffect(() => {
     return () => {

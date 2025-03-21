@@ -5,23 +5,26 @@ import { FaCircleArrowLeft } from "react-icons/fa6";
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
-  ForgotPasswordDTO,
-  resetForgotPassword,
-  submitForgotPassword,
+  ApiErrorResponse,
+  ReinitiateVerificationDTO,
+} from "../../app/appTypes";
+import {
   reinitiateForgotPasswordVerification,
-  ReinitiateForgotPasswordDTO,
-} from "../../features/user/forgotPasswordSlice";
-import { ApiErrorResponse } from "../../app/appTypes";
+  resetUserError,
+  resetUserStatus,
+  submitForgotPassword,
+} from "../../features/user/userSlice";
+import { ForgotPasswordDTO } from "../../features/user/userDTO";
 
 function ForgotPasswordForm() {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const submitForgotPasswordState = useAppSelector(
-    (state) => state.forgotPassword.status,
+    (state) => state.user.status,
   );
   const submitForgotPasswordErrorState = useAppSelector(
-    (state) => state.forgotPassword.error,
+    (state) => state.user.error,
   );
   const [email, setEmail] = useState("");
   const [nonAPIError, setNonAPIError] = useState<ApiErrorResponse | null>(null);
@@ -36,16 +39,22 @@ function ForgotPasswordForm() {
       submitForgotPasswordErrorState?.message ===
         "A verification code has already been sent. Please check your email."
     ) {
-      dispatch(resetForgotPassword());
+      dispatch(resetUserStatus());
+      dispatch(resetUserError());
       navigate("/verify-user-forgot-password");
     }
   }, [submitForgotPasswordState, submitForgotPasswordErrorState]);
 
   useEffect(() => {
     return () => {
-      dispatch(resetForgotPassword());
+      if (submitForgotPasswordState !== "idle") {
+        dispatch(resetUserStatus());
+      }
+      if (submitForgotPasswordErrorState !== null) {
+        dispatch(resetUserError());
+      }
     };
-  }, [dispatch]);
+  }, []);
 
   return (
     <AnimatePresence mode="wait">
@@ -145,7 +154,7 @@ function ForgotPasswordForm() {
                   onClick={() => {
                     if (email !== "") {
                       setNonAPIError(null);
-                      const reinitiateVerificationForgotPasswordDTO: ReinitiateForgotPasswordDTO =
+                      const reinitiateVerificationForgotPasswordDTO: ReinitiateVerificationDTO =
                         {
                           email,
                           verificationAction: "forgot password verification",
@@ -200,7 +209,7 @@ function ForgotPasswordForm() {
                           onClick={() => {
                             if (email !== "") {
                               setNonAPIError(null);
-                              const reinitiateVerificationForgotPasswordDTO: ReinitiateForgotPasswordDTO =
+                              const reinitiateVerificationForgotPasswordDTO: ReinitiateVerificationDTO =
                                 {
                                   email,
                                   verificationAction:

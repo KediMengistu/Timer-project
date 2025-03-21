@@ -5,11 +5,17 @@ import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { setIsSignedIn } from "../../features/auth/authSlice";
 import {
+  reinitiateDeleteAccountVerification,
+  resetUser,
   resetUserError,
   resetUserStatus,
   retrieveUser,
+  submitDeleteAccount,
 } from "../../features/user/userSlice";
-import { ApiErrorResponse } from "../../app/appTypes";
+import {
+  ApiErrorResponse,
+  ReinitiateVerificationDTO,
+} from "../../app/appTypes";
 
 function DeleteAccountForm() {
   const location = useLocation();
@@ -26,6 +32,12 @@ function DeleteAccountForm() {
   };
 
   useEffect(() => {
+    if (!userState) {
+      dispatch(retrieveUser());
+    }
+  }, []);
+
+  useEffect(() => {
     if (
       deleteAccountState === "succeeded" ||
       deleteAccountErrorState?.message ===
@@ -38,15 +50,9 @@ function DeleteAccountForm() {
   }, [deleteAccountState, deleteAccountErrorState]);
 
   useEffect(() => {
-    if (!userState) {
-      dispatch(retrieveUser());
-    }
-  }, []);
-
-  useEffect(() => {
     if (deleteAccountErrorState?.message === "Unauthorized") {
+      dispatch(resetUser());
       dispatch(setIsSignedIn(false));
-      dispatch(resetUserEmail());
       navigate("/");
     }
   }, [deleteAccountErrorState]);
@@ -160,10 +166,10 @@ function DeleteAccountForm() {
                           <br />
                           <span
                             onClick={() => {
-                              if (emailState !== null) {
-                                const reinitiateDeleteAccountVerificationDTO: ReinitiateDeleteAccountDTO =
+                              if (userState !== null) {
+                                const reinitiateDeleteAccountVerificationDTO: ReinitiateVerificationDTO =
                                   {
-                                    email: emailState,
+                                    email: userState.emailState,
                                     verificationAction:
                                       "account deletion verification",
                                   };
