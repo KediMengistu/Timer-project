@@ -1,15 +1,12 @@
 import { Outlet } from "react-router";
 import { useAppSelector, useAppDispatch } from "../app/hooks";
 import { useEffect } from "react";
-import {
-  clearSignedInStatus,
-  resetClearSignedInStatus,
-} from "../features/auth/signedinStatusSlice";
+import { resetAuth, submitSignOut } from "../features/auth/authSlice";
 
 function App() {
   const darkModeState = useAppSelector((state) => state.theme.darkMode);
   const timezoneState = useAppSelector((state) => state.time.timezone);
-  const signedInState = useAppSelector((state) => state.signedInStatus.value);
+  const signedInState = useAppSelector((state) => state.auth.isSignedIn);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -39,13 +36,9 @@ function App() {
   }, [timezoneState]);
 
   useEffect(() => {
-    if (signedInState) {
-      if (localStorage.getItem("signedInStatus") !== "signed in") {
-        localStorage.setItem("signedInStatus", "signed in");
-      }
-    } else {
-      dispatch(clearSignedInStatus()).then(() => {
-        dispatch(resetClearSignedInStatus());
+    if (signedInState === false) {
+      dispatch(submitSignOut()).then(() => {
+        dispatch(resetAuth());
       });
     }
   }, [signedInState]);

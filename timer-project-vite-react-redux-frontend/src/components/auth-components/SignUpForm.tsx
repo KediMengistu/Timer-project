@@ -6,20 +6,17 @@ import { RiLockPasswordFill } from "react-icons/ri";
 import { FaCircleArrowLeft } from "react-icons/fa6";
 import { IoIosInformationCircleOutline } from "react-icons/io";
 import { useEffect, useState } from "react";
-import {
-  resetSignup,
-  SignUpDTO,
-  submitSignUp,
-} from "../../features/auth/signupSlice";
+import { resetAuth, submitSignUp } from "../../features/auth/authSlice";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { ApiErrorResponse } from "../../app/appTypes";
+import { SignUpDTO } from "../../features/auth/authDTO";
 
 function SignUpForm() {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const submitSignupState = useAppSelector((state) => state.signup.status);
-  const submitSignupErrorState = useAppSelector((state) => state.signup.error);
+  const submitSignupState = useAppSelector((state) => state.auth.status);
+  const submitSignupErrorState = useAppSelector((state) => state.auth.error);
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
@@ -33,14 +30,14 @@ function SignUpForm() {
 
   useEffect(() => {
     if (submitSignupState === "succeeded") {
-      dispatch(resetSignup());
+      dispatch(resetAuth());
       navigate("/verify-user-from-signup");
     }
   }, [submitSignupState]);
 
   useEffect(() => {
     return () => {
-      dispatch(resetSignup());
+      dispatch(resetAuth());
     };
   }, []);
 

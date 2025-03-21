@@ -10,7 +10,7 @@ import {
   submitForgotPassword,
   reinitiateForgotPasswordVerification,
   ReinitiateForgotPasswordDTO,
-} from "../../features/auth/forgotPasswordSlice";
+} from "../../features/user/forgotPasswordSlice";
 import { ApiErrorResponse } from "../../app/appTypes";
 
 function ForgotPasswordForm() {

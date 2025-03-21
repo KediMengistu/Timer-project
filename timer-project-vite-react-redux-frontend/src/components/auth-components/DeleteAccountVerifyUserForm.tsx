@@ -10,32 +10,30 @@ import {
   useCallback,
 } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { setIsSignedIn } from "../../features/auth/authSlice";
 import {
   reinitiateDeleteAccountVerification,
-  ReinitiateDeleteAccountDTO,
-  resetDeleteAccount,
+  resetUser,
+  resetUserError,
+  resetUserStatus,
+  retrieveUser,
   verifyDeleteAccount,
-  VerifyDeleteAccountDTO,
-} from "../../features/user/deleteAccountSlice";
+} from "../../features/user/userSlice";
+import { VerifyDeleteAccountDTO } from "../../features/user/userDTO";
 import {
-  resetUserEmail,
-  retrieveUserEmail,
-} from "../../features/user/retrieveUserEmailSlice";
-import { setSignedInStatus } from "../../features/auth/signedinStatusSlice";
-import { ApiErrorResponse } from "../../app/appTypes";
+  ApiErrorResponse,
+  ReinitiateVerificationDTO,
+} from "../../app/appTypes";
 
 function DeleteAccountVerifyUserForm() {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const verifyDeleteAccountState = useAppSelector(
-    (state) => state.deleteAccount.status,
-  );
+  const verifyDeleteAccountState = useAppSelector((state) => state.user.status);
   const verifyDeleteAccountErrorState = useAppSelector(
-    (state) => state.deleteAccount.error,
+    (state) => state.user.error,
   );
-  const emailState = useAppSelector((state) => state.userEmail.email);
-  const emailErrorState = useAppSelector((state) => state.userEmail.error);
+  const userState = useAppSelector((state) => state.user.user);
   const [refsInitialized, setRefsInitialized] = useState<boolean>(false);
   const [sentReInitiateVerification, setSentReinitiateVerification] =
     useState<boolean>(false);
@@ -48,40 +46,42 @@ function DeleteAccountVerifyUserForm() {
       sentReInitiateVerification
     ) {
       setSentReinitiateVerification(false);
-      dispatch(resetDeleteAccount());
+      dispatch(resetUserStatus());
+      dispatch(resetUserError());
     } else if (
       verifyDeleteAccountState === "succeeded" &&
       !sentReInitiateVerification
     ) {
-      dispatch(resetDeleteAccount());
-      dispatch(setSignedInStatus(false));
-      dispatch(resetUserEmail());
+      dispatch(resetUser());
+      dispatch(setIsSignedIn(false));
       navigate("/");
     }
   }, [verifyDeleteAccountState, sentReInitiateVerification]);
 
   useEffect(() => {
-    if (
-      verifyDeleteAccountErrorState?.message === "Unauthorized" ||
-      emailErrorState?.message === "Unauthorized"
-    ) {
-      dispatch(setSignedInStatus(false));
-      dispatch(resetUserEmail());
+    if (verifyDeleteAccountErrorState?.message === "Unauthorized") {
+      dispatch(resetUser());
+      dispatch(setIsSignedIn(false));
       navigate("/");
     }
-  }, [verifyDeleteAccountErrorState, emailErrorState]);
+  }, [verifyDeleteAccountErrorState]);
 
   useEffect(() => {
-    if (!emailState) {
-      dispatch(retrieveUserEmail());
+    if (!userState) {
+      dispatch(retrieveUser());
     }
   }, []);
 
   useEffect(() => {
     return () => {
-      dispatch(resetDeleteAccount());
+      if (verifyDeleteAccountState !== "idle") {
+        dispatch(resetUserStatus());
+      }
+      if (verifyDeleteAccountErrorState !== null) {
+        dispatch(resetUserError());
+      }
     };
-  }, [dispatch]);
+  }, []);
 
   // Create a ref array for the verification code inputs
   const codeInputRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -324,11 +324,11 @@ function DeleteAccountVerifyUserForm() {
                         <br />
                         <span
                           onClick={() => {
-                            if (emailState !== null) {
+                            if (userState !== null) {
                               setNoEmailAPIError(null);
-                              const reinitiateDeleteAccountVerificationDTO: ReinitiateDeleteAccountDTO =
+                              const reinitiateDeleteAccountVerificationDTO: ReinitiateVerificationDTO =
                                 {
-                                  email: emailState,
+                                  email: userState.email,
                                   verificationAction:
                                     "account deletion verification",
                                 };

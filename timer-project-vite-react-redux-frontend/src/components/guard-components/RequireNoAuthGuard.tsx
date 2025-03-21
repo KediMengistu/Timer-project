@@ -2,9 +2,9 @@ import { Navigate, Outlet } from "react-router";
 import { useAppSelector } from "../../app/hooks";
 
 function RequireNoAuthGuard() {
-  const signedInStatus = useAppSelector((state) => state.signedInStatus.value);
+  const signedInState = useAppSelector((state) => state.auth.isSignedIn);
 
-  if (signedInStatus === false) {
+  if (signedInState === false) {
     return <Outlet />;
   } else {
     return <Navigate to="/manage-timers" replace />;

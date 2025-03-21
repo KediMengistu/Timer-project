@@ -5,22 +5,26 @@ import { RiLockPasswordFill } from "react-icons/ri";
 import { FaCircleArrowLeft } from "react-icons/fa6";
 import { useState, useEffect } from "react";
 import {
-  reinitiateSignInVerification,
-  ReinitiateVerifySignInDTO,
-  resetSignin,
-  SignInDTO,
+  reinitiateSignUpVerification,
+  resetAuth,
+  resetAuthError,
+  resetAuthStatus,
+  setIsSignedIn,
   submitSignIn,
-} from "../../features/auth/siginSlice";
-import { setSignedInStatus } from "../../features/auth/signedinStatusSlice";
+} from "../../features/auth/authSlice";
+import { SignInDTO } from "../../features/auth/authDTO";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { ApiErrorResponse } from "../../app/appTypes";
+import {
+  ApiErrorResponse,
+  ReinitiateVerificationDTO,
+} from "../../app/appTypes";
 
 function SignInForm() {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const submitSigninState = useAppSelector((state) => state.signin.status);
-  const submitSigninErrorState = useAppSelector((state) => state.signin.error);
+  const submitSigninState = useAppSelector((state) => state.auth.status);
+  const submitSigninErrorState = useAppSelector((state) => state.auth.error);
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [nonAPIError, setNonAPIError] = useState<ApiErrorResponse | null>(null);
@@ -35,22 +39,28 @@ function SignInForm() {
 
   useEffect(() => {
     if (submitSigninState === "succeeded") {
-      dispatch(resetSignin());
-      dispatch(setSignedInStatus(true));
+      dispatch(resetAuthStatus());
+      dispatch(resetAuthError());
+      dispatch(setIsSignedIn(true));
       const from = location.state?.from?.pathname || "/manage-timers";
       navigate(from, { replace: true });
     } else if (
       submitSigninErrorState?.message ===
       "A verification code has already been sent. Please check your email."
     ) {
-      dispatch(resetSignin());
+      dispatch(resetAuth());
       navigate("/verify-user-from-signin");
     }
   }, [submitSigninState, submitSigninErrorState]);
 
   useEffect(() => {
     return () => {
-      dispatch(resetSignin());
+      if (submitSigninState !== "idle") {
+        dispatch(resetAuthStatus());
+      }
+      if (submitSigninErrorState !== null) {
+        dispatch(resetAuthError());
+      }
     };
   }, []);
 
@@ -183,13 +193,13 @@ function SignInForm() {
                   onClick={() => {
                     if (email !== "") {
                       setNonAPIError(null);
-                      const reinitiateVerifySignInDTO: ReinitiateVerifySignInDTO =
+                      const reinitiateVerifySignInDTO: ReinitiateVerificationDTO =
                         {
                           email,
                           verificationAction: "sign up verification",
                         };
                       dispatch(
-                        reinitiateSignInVerification(reinitiateVerifySignInDTO),
+                        reinitiateSignUpVerification(reinitiateVerifySignInDTO),
                       );
                     } else {
                       const error: ApiErrorResponse = {
@@ -235,13 +245,13 @@ function SignInForm() {
                           onClick={() => {
                             if (email !== "") {
                               setNonAPIError(null);
-                              const reinitiateVerifySignInDTO: ReinitiateVerifySignInDTO =
+                              const reinitiateVerifySignInDTO: ReinitiateVerificationDTO =
                                 {
                                   email,
                                   verificationAction: "sign up verification",
                                 };
                               dispatch(
-                                reinitiateSignInVerification(
+                                reinitiateSignUpVerification(
                                   reinitiateVerifySignInDTO,
                                 ),
                               );

@@ -13,21 +13,25 @@ import {
 } from "react";
 import {
   reinitiateSignUpVerification,
-  ReinitiateVerifySignUpDTO,
-  resetSignup,
-  verifySignUp,
-  VerifySignUpDTO,
-} from "../../features/auth/signupSlice";
-import { setSignedInStatus } from "../../features/auth/signedinStatusSlice";
+  resetAuth,
+  resetAuthError,
+  resetAuthStatus,
+  setIsSignedIn,
+  verifySignUpOrIn,
+} from "../../features/auth/authSlice";
+import { VerifyAccountDTO } from "../../features/auth/authDTO";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { ApiErrorResponse } from "../../app/appTypes";
+import {
+  ApiErrorResponse,
+  ReinitiateVerificationDTO,
+} from "../../app/appTypes";
 
 function SignUpVerifyUserForm() {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const verifySignupState = useAppSelector((state) => state.signup.status);
-  const verifySignupErrorState = useAppSelector((state) => state.signup.error);
+  const verifySignupState = useAppSelector((state) => state.auth.status);
+  const verifySignupErrorState = useAppSelector((state) => state.auth.error);
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [sentReinitiateVerification, setSentReinitiateVerification] =
@@ -42,20 +46,26 @@ function SignUpVerifyUserForm() {
   useEffect(() => {
     if (verifySignupState === "succeeded" && sentReinitiateVerification) {
       setSentReinitiateVerification(false);
-      dispatch(resetSignup());
+      dispatch(resetAuth());
     } else if (
       verifySignupState === "succeeded" &&
       !sentReinitiateVerification
     ) {
-      dispatch(resetSignup());
-      dispatch(setSignedInStatus(true));
+      dispatch(resetAuthStatus());
+      dispatch(resetAuthError());
+      dispatch(setIsSignedIn(true));
       navigate("/manage-timers");
     }
   }, [verifySignupState]);
 
   useEffect(() => {
     return () => {
-      dispatch(resetSignup());
+      if (verifySignupState !== "idle") {
+        dispatch(resetAuthStatus());
+      }
+      if (verifySignupErrorState !== null) {
+        dispatch(resetAuthError());
+      }
     };
   }, []);
 
@@ -196,12 +206,12 @@ function SignUpVerifyUserForm() {
             if (nonAPIError) {
               setNonAPIError(null);
             }
-            const verifySignUpDTO: VerifySignUpDTO = {
+            const verifySignUpDTO: VerifyAccountDTO = {
               email,
               password,
               inputVerificationCode: codeValues.join(""),
             };
-            dispatch(verifySignUp(verifySignUpDTO));
+            dispatch(verifySignUpOrIn(verifySignUpDTO));
           }}
           className="grid grid-rows-[1fr_auto] gap-1"
         >
@@ -328,7 +338,7 @@ function SignUpVerifyUserForm() {
                   onClick={() => {
                     if (email !== "") {
                       setNonAPIError(null);
-                      const reinitiateVerifySignUpDTO: ReinitiateVerifySignUpDTO =
+                      const reinitiateVerifySignUpDTO: ReinitiateVerificationDTO =
                         {
                           email,
                           verificationAction: "sign up verification",
@@ -383,7 +393,7 @@ function SignUpVerifyUserForm() {
                           onClick={() => {
                             if (email !== "") {
                               setNonAPIError(null);
-                              const reinitiateVerifySignUpDTO: ReinitiateVerifySignUpDTO =
+                              const reinitiateVerifySignUpDTO: ReinitiateVerificationDTO =
                                 {
                                   email,
                                   verificationAction: "sign up verification",

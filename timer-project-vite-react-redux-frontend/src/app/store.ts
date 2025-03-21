@@ -1,31 +1,21 @@
 import { configureStore } from "@reduxjs/toolkit";
 import themeReducer, { fetchAndSetTheme } from "../features/theme/themeSlice";
 import timeReducer, { fetchAndSetTimezone } from "../features/time/timeSlice";
-import signupReducer from "../features/auth/signupSlice";
-import signedInStatusReducer, {
-  fetchAndSetSignedInStatus,
-} from "../features/auth/signedinStatusSlice";
-import signinReducer from "../features/auth/siginSlice";
-import forgotPasswordReducer from "../features/auth/forgotPasswordSlice";
-import deleteAccountReducer from "../features/user/deleteAccountSlice";
-import userEmailReducer from "../features/user/retrieveUserEmailSlice";
+import authReducer, { fetchAndSetIsSignedIn } from "../features/auth/authSlice";
+import userReducer from "../features/user/userSlice";
 
 export const store = configureStore({
   reducer: {
     theme: themeReducer,
     time: timeReducer,
-    signup: signupReducer,
-    signedInStatus: signedInStatusReducer,
-    signin: signinReducer,
-    forgotPassword: forgotPasswordReducer,
-    deleteAccount: deleteAccountReducer,
-    userEmail: userEmailReducer,
+    auth: authReducer,
+    user: userReducer,
   },
 });
 
 store.dispatch(fetchAndSetTheme());
 store.dispatch(fetchAndSetTimezone());
-store.dispatch(fetchAndSetSignedInStatus());
+store.dispatch(fetchAndSetIsSignedIn());
 
 export type AppStore = typeof store;
 export type AppDispatch = typeof store.dispatch;

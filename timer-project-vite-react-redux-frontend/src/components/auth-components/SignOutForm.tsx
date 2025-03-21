@@ -2,24 +2,22 @@ import { AnimatePresence, motion } from "motion/react";
 import { useLocation, useNavigate } from "react-router";
 import { FaCircleArrowLeft } from "react-icons/fa6";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { setSignedInStatus } from "../../features/auth/signedinStatusSlice";
-import { resetUserEmail } from "../../features/user/retrieveUserEmailSlice";
+import { setIsSignedIn } from "../../features/auth/authSlice";
+import { resetUser } from "../../features/user/userSlice";
 
 function SignOutForm() {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const signedInErrorState = useAppSelector(
-    (state) => state.signedInStatus.error,
-  );
+  const signedInErrorState = useAppSelector((state) => state.auth.error);
 
   const handleGoHomeClick = () => {
     navigate("/");
   };
 
   const handleSignOut = () => {
-    dispatch(setSignedInStatus(false));
-    dispatch(resetUserEmail());
+    dispatch(resetUser());
+    dispatch(setIsSignedIn(false));
     navigate("/");
   };
 

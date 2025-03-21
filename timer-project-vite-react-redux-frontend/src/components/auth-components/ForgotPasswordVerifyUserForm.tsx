@@ -19,7 +19,7 @@ import {
   resetForgotPassword,
   verifyForgotPassword,
   VerifyForgotPasswordDTO,
-} from "../../features/auth/forgotPasswordSlice";
+} from "../../features/user/forgotPasswordSlice";
 import { ApiErrorResponse } from "../../app/appTypes";
 
 function ForgotPasswordUserVerifyForm() {

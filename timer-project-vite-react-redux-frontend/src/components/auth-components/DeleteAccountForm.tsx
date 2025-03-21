@@ -3,31 +3,21 @@ import { useLocation, useNavigate } from "react-router";
 import { FaCircleArrowLeft } from "react-icons/fa6";
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { setIsSignedIn } from "../../features/auth/authSlice";
 import {
-  submitDeleteAccount,
-  resetDeleteAccount,
-  reinitiateDeleteAccountVerification,
-  ReinitiateDeleteAccountDTO,
-} from "../../features/user/deleteAccountSlice";
-import {
-  resetUserEmail,
-  retrieveUserEmail,
-} from "../../features/user/retrieveUserEmailSlice";
-import { setSignedInStatus } from "../../features/auth/signedinStatusSlice";
+  resetUserError,
+  resetUserStatus,
+  retrieveUser,
+} from "../../features/user/userSlice";
 import { ApiErrorResponse } from "../../app/appTypes";
 
 function DeleteAccountForm() {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const deleteAccountState = useAppSelector(
-    (state) => state.deleteAccount.status,
-  );
-  const deleteAccountErrorState = useAppSelector(
-    (state) => state.deleteAccount.error,
-  );
-  const emailState = useAppSelector((state) => state.userEmail.email);
-  const emailErrorState = useAppSelector((state) => state.userEmail.error);
+  const deleteAccountState = useAppSelector((state) => state.user.status);
+  const deleteAccountErrorState = useAppSelector((state) => state.user.error);
+  const userState = useAppSelector((state) => state.user.user);
   const [noEmailAPIError, setNoEmailAPIError] =
     useState<ApiErrorResponse | null>(null);
 
@@ -41,31 +31,34 @@ function DeleteAccountForm() {
       deleteAccountErrorState?.message ===
         "A verification code has already been sent. Please check your email."
     ) {
-      dispatch(resetDeleteAccount());
+      dispatch(resetUserStatus());
+      dispatch(resetUserError());
       navigate("/verify-delete-account");
     }
   }, [deleteAccountState, deleteAccountErrorState]);
 
   useEffect(() => {
-    if (!emailState) {
-      dispatch(retrieveUserEmail());
+    if (!userState) {
+      dispatch(retrieveUser());
     }
   }, []);
 
   useEffect(() => {
-    if (
-      deleteAccountErrorState?.message === "Unauthorized" ||
-      emailErrorState?.message === "Unauthorized"
-    ) {
-      dispatch(setSignedInStatus(false));
+    if (deleteAccountErrorState?.message === "Unauthorized") {
+      dispatch(setIsSignedIn(false));
       dispatch(resetUserEmail());
       navigate("/");
     }
-  }, [deleteAccountErrorState, emailErrorState]);
+  }, [deleteAccountErrorState]);
 
   useEffect(() => {
     return () => {
-      dispatch(resetDeleteAccount());
+      if (deleteAccountState !== "idle") {
+        dispatch(resetUserStatus());
+      }
+      if (deleteAccountErrorState !== null) {
+        dispatch(resetUserError());
+      }
     };
   }, []);
 

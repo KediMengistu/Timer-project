@@ -16,7 +16,7 @@ function Navbar() {
   const [aboutOptionState, setAboutOptionsState] = useState(false);
   const darkModeState = useAppSelector((state) => state.theme.darkMode);
   const timezoneState = useAppSelector((state) => state.time.timezone);
-  const signedInState = useAppSelector((state) => state.signedInStatus.value);
+  const signedInState = useAppSelector((state) => state.auth.isSignedIn);
   const location = useLocation();
   const dispatch = useAppDispatch();
 

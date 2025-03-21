@@ -7,6 +7,16 @@ export interface ApiErrorResponse {
   statusCode: number;
 }
 
+export interface DefaultState {
+  status: "idle" | "pending" | "succeeded" | "failed";
+  error: ApiErrorResponse | null;
+}
+
+export interface ReinitiateVerificationDTO {
+  email: string;
+  verificationAction: string;
+}
+
 export type RootState = any;
 export type AppDispatch = any;
 

@@ -3,9 +3,9 @@ import { useAppSelector } from "../../app/hooks";
 
 function RequireAuthGuard() {
   const location = useLocation();
-  const signedInStatus = useAppSelector((state) => state.signedInStatus.value);
+  const signedInState = useAppSelector((state) => state.auth.isSignedIn);
 
-  if (signedInStatus === true) {
+  if (signedInState === true) {
     return <Outlet />;
   } else {
     return <Navigate to="/" state={{ from: location }} replace />;

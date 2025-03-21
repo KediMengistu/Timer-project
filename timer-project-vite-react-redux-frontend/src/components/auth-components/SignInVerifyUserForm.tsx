@@ -12,22 +12,26 @@ import {
   useCallback,
 } from "react";
 import {
-  reinitiateSignInVerification,
-  ReinitiateVerifySignInDTO,
-  resetSignin,
-  verifySignIn,
-  VerifySignInDTO,
-} from "../../features/auth/siginSlice";
-import { setSignedInStatus } from "../../features/auth/signedinStatusSlice";
+  reinitiateSignUpVerification,
+  resetAuth,
+  resetAuthError,
+  resetAuthStatus,
+  setIsSignedIn,
+  verifySignUpOrIn,
+} from "../../features/auth/authSlice";
+import { VerifyAccountDTO } from "../../features/auth/authDTO";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { ApiErrorResponse } from "../../app/appTypes";
+import {
+  ApiErrorResponse,
+  ReinitiateVerificationDTO,
+} from "../../app/appTypes";
 
 function SignInVerifyUserForm() {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const verifySigninState = useAppSelector((state) => state.signin.status);
-  const verifySigninErrorState = useAppSelector((state) => state.signin.error);
+  const verifySigninState = useAppSelector((state) => state.auth.status);
+  const verifySigninErrorState = useAppSelector((state) => state.auth.error);
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [sentReinitiateVerification, setSentReinitiateVerification] =
@@ -42,13 +46,14 @@ function SignInVerifyUserForm() {
   useEffect(() => {
     if (verifySigninState === "succeeded" && sentReinitiateVerification) {
       setSentReinitiateVerification(false);
-      dispatch(resetSignin());
+      dispatch(resetAuth());
     } else if (
       verifySigninState === "succeeded" &&
       !sentReinitiateVerification
     ) {
-      dispatch(resetSignin());
-      dispatch(setSignedInStatus(true));
+      dispatch(resetAuthStatus());
+      dispatch(resetAuthError());
+      dispatch(setIsSignedIn(true));
       const from = location.state?.from?.pathname || "/manage-timers";
       navigate(from, { replace: true });
     }
@@ -56,7 +61,12 @@ function SignInVerifyUserForm() {
 
   useEffect(() => {
     return () => {
-      dispatch(resetSignin());
+      if (verifySigninState !== "idle") {
+        dispatch(resetAuthStatus());
+      }
+      if (verifySigninErrorState !== null) {
+        dispatch(resetAuthError());
+      }
     };
   }, []);
 
@@ -197,12 +207,12 @@ function SignInVerifyUserForm() {
             if (nonAPIError) {
               setNonAPIError(null);
             }
-            const verifySignInDTO: VerifySignInDTO = {
+            const verifySignInDTO: VerifyAccountDTO = {
               email,
               password,
               inputVerificationCode: codeValues.join(""),
             };
-            dispatch(verifySignIn(verifySignInDTO));
+            dispatch(verifySignUpOrIn(verifySignInDTO));
           }}
           className="grid grid-rows-[1fr_auto] gap-1"
         >
@@ -329,14 +339,14 @@ function SignInVerifyUserForm() {
                   onClick={() => {
                     if (email !== "") {
                       setNonAPIError(null);
-                      const reinitiateVerifySignInDTO: ReinitiateVerifySignInDTO =
+                      const reinitiateVerifySignInDTO: ReinitiateVerificationDTO =
                         {
                           email,
                           verificationAction: "sign up verification",
                         };
                       setSentReinitiateVerification(true);
                       dispatch(
-                        reinitiateSignInVerification(reinitiateVerifySignInDTO),
+                        reinitiateSignUpVerification(reinitiateVerifySignInDTO),
                       );
                     } else {
                       const error: ApiErrorResponse = {
@@ -384,14 +394,14 @@ function SignInVerifyUserForm() {
                           onClick={() => {
                             if (email !== "") {
                               setNonAPIError(null);
-                              const reinitiateVerifySignInDTO: ReinitiateVerifySignInDTO =
+                              const reinitiateVerifySignInDTO: ReinitiateVerificationDTO =
                                 {
                                   email,
                                   verificationAction: "sign up verification",
                                 };
                               setSentReinitiateVerification(true);
                               dispatch(
-                                reinitiateSignInVerification(
+                                reinitiateSignUpVerification(
                                   reinitiateVerifySignInDTO,
                                 ),
                               );
