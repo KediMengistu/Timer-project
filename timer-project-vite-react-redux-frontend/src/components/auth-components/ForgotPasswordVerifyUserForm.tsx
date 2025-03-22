@@ -15,8 +15,7 @@ import {
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
   reinitiateForgotPasswordVerification,
-  resetUserError,
-  resetUserStatus,
+  resetUser,
   verifyForgotPassword,
 } from "../../features/user/userSlice";
 import { VerifyForgotPasswordDTO } from "../../features/user/userDTO";
@@ -49,26 +48,19 @@ function ForgotPasswordUserVerifyForm() {
       sentReInitiateVerification
     ) {
       setSentReinitiateVerification(false);
-      dispatch(resetUserStatus());
-      dispatch(resetUserError());
+      dispatch(resetUser());
     } else if (
       verifyForgotPasswordState === "succeeded" &&
       !sentReInitiateVerification
     ) {
-      dispatch(resetUserStatus());
-      dispatch(resetUserError());
-      navigate("/signin");
+      dispatch(resetUser());
+      navigate("/signin", { replace: true });
     }
-  }, [verifyForgotPasswordState]);
+  }, [verifyForgotPasswordState, sentReInitiateVerification]);
 
   useEffect(() => {
     return () => {
-      if (verifyForgotPasswordState !== "idle") {
-        dispatch(resetUserStatus());
-      }
-      if (verifyForgotPasswordState !== null) {
-        dispatch(resetUserError());
-      }
+      dispatch(resetUser());
     };
   }, []);
 
@@ -210,7 +202,6 @@ function ForgotPasswordUserVerifyForm() {
               setNonAPIError(null);
             }
             if (newPassword === confirmNewPassword) {
-              setNonAPIError(null);
               const verifyForgotPasswordDTO: VerifyForgotPasswordDTO = {
                 email,
                 inputVerificationCode: codeValues.join(""),
@@ -435,7 +426,6 @@ function ForgotPasswordUserVerifyForm() {
                         <span
                           onClick={() => {
                             if (email !== "") {
-                              setNonAPIError(null);
                               const reinitiateForgotPasswordDTO: ReinitiateVerificationDTO =
                                 {
                                   email,

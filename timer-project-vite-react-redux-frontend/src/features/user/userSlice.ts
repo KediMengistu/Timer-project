@@ -21,7 +21,7 @@ export const submitForgotPassword = createAppAsyncThunk<
   "user/submitForgotPassword",
   async (forgotPasswordDTO: ForgotPasswordDTO, thunkAPI) => {
     try {
-      const response = await fetch("/api/user/forgot-password-request", {
+      const response = await fetch("/api/users/forgot-password-request", {
         method: "PATCH",
         headers: {
           "Content-type": "application/json",
@@ -53,7 +53,7 @@ export const verifyForgotPassword = createAppAsyncThunk<
   "user/verifyForgotPassword",
   async (verifyForgotPasswordDTO: VerifyForgotPasswordDTO, thunkAPI) => {
     try {
-      const response = await fetch("/api/user/forgot-password-confirm", {
+      const response = await fetch("/api/users/forgot-password-confirm", {
         method: "PATCH",
         headers: {
           "Content-type": "application/json",
@@ -298,13 +298,13 @@ export const userSlice = createSlice({
           state.error = action.payload || null;
         },
       )
-      .addCase(retrieveUser.pending, (state, action) => {
+      .addCase(retrieveUser.pending, (state) => {
         state.status = "pending";
-        state.user = action.payload;
         state.error = null;
       })
-      .addCase(retrieveUser.fulfilled, (state) => {
+      .addCase(retrieveUser.fulfilled, (state, action) => {
         state.status = "succeeded";
+        state.user = action.payload;
         state.error = null;
       })
       .addCase(retrieveUser.rejected, (state, action) => {

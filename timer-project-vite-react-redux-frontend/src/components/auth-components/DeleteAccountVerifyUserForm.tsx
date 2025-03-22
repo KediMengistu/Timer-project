@@ -42,7 +42,10 @@ function DeleteAccountVerifyUserForm() {
 
   useEffect(() => {
     if (!userState) {
-      dispatch(retrieveUser());
+      dispatch(retrieveUser()).then(() => {
+        dispatch(resetUserStatus());
+        dispatch(resetUserError());
+      });
     }
   }, []);
 
@@ -60,26 +63,25 @@ function DeleteAccountVerifyUserForm() {
     ) {
       dispatch(resetUser());
       dispatch(setIsSignedIn(false));
-      navigate("/");
+      navigate("/", { replace: true });
     }
   }, [verifyDeleteAccountState, sentReInitiateVerification]);
 
   useEffect(() => {
-    if (verifyDeleteAccountErrorState?.message === "Unauthorized") {
+    if (
+      verifyDeleteAccountErrorState !== null &&
+      verifyDeleteAccountErrorState.message === "Unauthorized"
+    ) {
       dispatch(resetUser());
       dispatch(setIsSignedIn(false));
-      navigate("/");
+      navigate("/", { replace: true });
     }
   }, [verifyDeleteAccountErrorState]);
 
   useEffect(() => {
     return () => {
-      if (verifyDeleteAccountState !== "idle") {
-        dispatch(resetUserStatus());
-      }
-      if (verifyDeleteAccountErrorState !== null) {
-        dispatch(resetUserError());
-      }
+      dispatch(resetUserStatus());
+      dispatch(resetUserError());
     };
   }, []);
 

@@ -31,7 +31,7 @@ function SignUpForm() {
   useEffect(() => {
     if (submitSignupState === "succeeded") {
       dispatch(resetAuth());
-      navigate("/verify-user-from-signup");
+      navigate("/verify-user-from-signup", { replace: true });
     }
   }, [submitSignupState]);
 

@@ -54,19 +54,14 @@ function SignInVerifyUserForm() {
       dispatch(resetAuthStatus());
       dispatch(resetAuthError());
       dispatch(setIsSignedIn(true));
-      const from = location.state?.from?.pathname || "/manage-timers";
-      navigate(from, { replace: true });
+      navigate("/manage-timers", { replace: true });
     }
-  }, [verifySigninState]);
+  }, [verifySigninState, sentReinitiateVerification]);
 
   useEffect(() => {
     return () => {
-      if (verifySigninState !== "idle") {
-        dispatch(resetAuthStatus());
-      }
-      if (verifySigninErrorState !== null) {
-        dispatch(resetAuthError());
-      }
+      dispatch(resetAuthStatus());
+      dispatch(resetAuthError());
     };
   }, []);
 
@@ -393,7 +388,6 @@ function SignInVerifyUserForm() {
                         <span
                           onClick={() => {
                             if (email !== "") {
-                              setNonAPIError(null);
                               const reinitiateVerifySignInDTO: ReinitiateVerificationDTO =
                                 {
                                   email,

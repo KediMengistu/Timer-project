@@ -54,18 +54,14 @@ function SignUpVerifyUserForm() {
       dispatch(resetAuthStatus());
       dispatch(resetAuthError());
       dispatch(setIsSignedIn(true));
-      navigate("/manage-timers");
+      navigate("/manage-timers", { replace: true });
     }
-  }, [verifySignupState]);
+  }, [verifySignupState, sentReinitiateVerification]);
 
   useEffect(() => {
     return () => {
-      if (verifySignupState !== "idle") {
-        dispatch(resetAuthStatus());
-      }
-      if (verifySignupErrorState !== null) {
-        dispatch(resetAuthError());
-      }
+      dispatch(resetAuthStatus());
+      dispatch(resetAuthError());
     };
   }, []);
 
@@ -392,7 +388,6 @@ function SignUpVerifyUserForm() {
                         <span
                           onClick={() => {
                             if (email !== "") {
-                              setNonAPIError(null);
                               const reinitiateVerifySignUpDTO: ReinitiateVerificationDTO =
                                 {
                                   email,

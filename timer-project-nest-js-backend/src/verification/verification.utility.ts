@@ -14,4 +14,11 @@ export class VerificationUtitliy {
     }
     return code;
   }
+  capitalizeVerificationAction(verificationAction: string): string {
+    // Split the string by spaces to get individual words
+    return verificationAction
+      .split(' ')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  }
 }

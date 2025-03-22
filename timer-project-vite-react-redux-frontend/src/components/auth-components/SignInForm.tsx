@@ -27,6 +27,8 @@ function SignInForm() {
   const submitSigninErrorState = useAppSelector((state) => state.auth.error);
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [sentReinitiateVerification, setSentReinitiateVerification] =
+    useState<boolean>(false);
   const [nonAPIError, setNonAPIError] = useState<ApiErrorResponse | null>(null);
 
   const handleGoHomeClick = () => {
@@ -38,29 +40,29 @@ function SignInForm() {
   };
 
   useEffect(() => {
-    if (submitSigninState === "succeeded") {
+    if (submitSigninState === "succeeded" && !sentReinitiateVerification) {
       dispatch(resetAuthStatus());
       dispatch(resetAuthError());
       dispatch(setIsSignedIn(true));
-      const from = location.state?.from?.pathname || "/manage-timers";
-      navigate(from, { replace: true });
+      navigate("/manage-timers", { replace: true });
     } else if (
-      submitSigninErrorState?.message ===
-      "A verification code has already been sent. Please check your email."
+      (submitSigninState === "succeeded" && sentReinitiateVerification) ||
+      (submitSigninErrorState !== null &&
+        submitSigninErrorState.message ===
+          "A verification code has already been sent. Please check your email.")
     ) {
+      if (sentReinitiateVerification) {
+        setSentReinitiateVerification(false);
+      }
       dispatch(resetAuth());
-      navigate("/verify-user-from-signin");
+      navigate("/verify-user-from-signin", { replace: true });
     }
-  }, [submitSigninState, submitSigninErrorState]);
+  }, [submitSigninState, submitSigninErrorState, sentReinitiateVerification]);
 
   useEffect(() => {
     return () => {
-      if (submitSigninState !== "idle") {
-        dispatch(resetAuthStatus());
-      }
-      if (submitSigninErrorState !== null) {
-        dispatch(resetAuthError());
-      }
+      dispatch(resetAuthStatus());
+      dispatch(resetAuthError());
     };
   }, []);
 
@@ -198,6 +200,7 @@ function SignInForm() {
                           email,
                           verificationAction: "sign up verification",
                         };
+                      setSentReinitiateVerification(true);
                       dispatch(
                         reinitiateSignUpVerification(reinitiateVerifySignInDTO),
                       );
@@ -244,12 +247,12 @@ function SignInForm() {
                         <span
                           onClick={() => {
                             if (email !== "") {
-                              setNonAPIError(null);
                               const reinitiateVerifySignInDTO: ReinitiateVerificationDTO =
                                 {
                                   email,
                                   verificationAction: "sign up verification",
                                 };
+                              setSentReinitiateVerification(true);
                               dispatch(
                                 reinitiateSignUpVerification(
                                   reinitiateVerifySignInDTO,

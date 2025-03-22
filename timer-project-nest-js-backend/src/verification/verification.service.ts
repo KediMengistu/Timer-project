@@ -56,11 +56,11 @@ export class VerificationService {
     await this.emailsService.createAndSendEmail(
       user.email,
       user.email,
-      `Timer Application: ${verificationAction}`,
-      `Code for ${verificationAction} is as follows: ${verificationCode}.`,
+      `Timer Application: ${this.verificationUtility.capitalizeVerificationAction(verificationAction)}`,
+      `The copy & paste code for ${verificationAction} is as follows: ${verificationCode}.`,
       `
           <p>
-            Code for ${verificationAction} is as follows: ${verificationCode}.
+            The copy & paste code for ${verificationAction} is as follows: ${verificationCode}.
           </p>
         `,
     );

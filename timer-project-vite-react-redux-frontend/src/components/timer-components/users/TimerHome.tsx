@@ -1,6 +1,23 @@
 import { AnimatePresence, motion } from "motion/react";
+import { useEffect } from "react";
+import { useAppDispatch, useAppSelector } from "../../../app/hooks";
+import {
+  resetUserError,
+  resetUserStatus,
+  retrieveUser,
+} from "../../../features/user/userSlice";
 
 function TimerHome() {
+  const dispatch = useAppDispatch();
+  const userState = useAppSelector((state) => state.user.user);
+  useEffect(() => {
+    if (!userState) {
+      dispatch(retrieveUser()).then(() => {
+        dispatch(resetUserStatus());
+        dispatch(resetUserError());
+      });
+    }
+  }, []);
   return (
     <AnimatePresence mode="wait">
       <motion.div

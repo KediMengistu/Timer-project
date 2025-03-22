@@ -10,8 +10,7 @@ import {
 } from "../../app/appTypes";
 import {
   reinitiateForgotPasswordVerification,
-  resetUserError,
-  resetUserStatus,
+  resetUser,
   submitForgotPassword,
 } from "../../features/user/userSlice";
 import { ForgotPasswordDTO } from "../../features/user/userDTO";
@@ -36,23 +35,18 @@ function ForgotPasswordForm() {
   useEffect(() => {
     if (
       submitForgotPasswordState === "succeeded" ||
-      submitForgotPasswordErrorState?.message ===
-        "A verification code has already been sent. Please check your email."
+      (submitForgotPasswordErrorState !== null &&
+        submitForgotPasswordErrorState.message ===
+          "A verification code has already been sent. Please check your email.")
     ) {
-      dispatch(resetUserStatus());
-      dispatch(resetUserError());
-      navigate("/verify-user-forgot-password");
+      dispatch(resetUser());
+      navigate("/verify-user-forgot-password", { replace: true });
     }
   }, [submitForgotPasswordState, submitForgotPasswordErrorState]);
 
   useEffect(() => {
     return () => {
-      if (submitForgotPasswordState !== "idle") {
-        dispatch(resetUserStatus());
-      }
-      if (submitForgotPasswordErrorState !== null) {
-        dispatch(resetUserError());
-      }
+      dispatch(resetUser());
     };
   }, []);
 
@@ -208,7 +202,6 @@ function ForgotPasswordForm() {
                         <span
                           onClick={() => {
                             if (email !== "") {
-                              setNonAPIError(null);
                               const reinitiateVerificationForgotPasswordDTO: ReinitiateVerificationDTO =
                                 {
                                   email,

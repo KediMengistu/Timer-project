@@ -106,7 +106,7 @@ export const verifySignUpOrIn = createAppAsyncThunk<void, VerifyAccountDTO>(
     } catch (error) {
       return thunkAPI.rejectWithValue({
         timestamp: new Date().toISOString(),
-        path: "/auth/verify-signup",
+        path: "/auth/verifySignUpOrIn",
         message:
           error instanceof Error ? error.message : "Network error occurred",
         statusCode: 500,
@@ -233,6 +233,18 @@ export const authSlice = createSlice({
         }
       })
       .addCase(verifySignUpOrIn.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload || null;
+      })
+      .addCase(reinitiateSignUpVerification.pending, (state) => {
+        state.status = "pending";
+        state.error = null;
+      })
+      .addCase(reinitiateSignUpVerification.fulfilled, (state) => {
+        state.status = "succeeded";
+        state.error = null;
+      })
+      .addCase(reinitiateSignUpVerification.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload || null;
       })
