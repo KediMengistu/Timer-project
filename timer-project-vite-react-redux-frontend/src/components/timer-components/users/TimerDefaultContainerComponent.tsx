@@ -1,4 +1,5 @@
 import { AnimatePresence, motion } from "motion/react";
+import { Outlet } from "react-router";
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../../app/hooks";
 import {
@@ -6,10 +7,16 @@ import {
   resetUserStatus,
   retrieveUser,
 } from "../../../features/user/userSlice";
+import {
+  resetTimersError,
+  resetTimersStatus,
+  retrieveAllTimers,
+} from "../../../features/timers/timersSlice";
 
-function TimerHome() {
+function TimerDefaultContainerComponent() {
   const dispatch = useAppDispatch();
   const userState = useAppSelector((state) => state.user.user);
+  const timersState = useAppSelector((state) => state.timers.allTimers);
   useEffect(() => {
     if (!userState) {
       dispatch(retrieveUser()).then(() => {
@@ -17,7 +24,14 @@ function TimerHome() {
         dispatch(resetUserError());
       });
     }
+    if (JSON.stringify(timersState.entities) === "{}") {
+      dispatch(retrieveAllTimers()).then(() => {
+        dispatch(resetTimersStatus());
+        dispatch(resetTimersError());
+      });
+    }
   }, []);
+
   return (
     <AnimatePresence mode="wait">
       <motion.div
@@ -27,16 +41,12 @@ function TimerHome() {
         exit={{ opacity: 0 }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
         style={{ willChange: "transform", backfaceVisibility: "hidden" }}
-        className="grid h-full w-full flex-1 grid-rows-1 rounded-lg border-2 border-black bg-white dark:border-gray-700 dark:bg-gray-800"
+        className="grid h-full w-full flex-1 grid-rows-1 rounded-lg border-2 border-black bg-white pt-4! pb-4! dark:border-gray-700 dark:bg-gray-800"
       >
-        <div className="flex items-center justify-center">
-          <h1 className="text-md text-center text-black dark:text-white">
-            Timer Home
-          </h1>
-        </div>
+        <Outlet />
       </motion.div>
     </AnimatePresence>
   );
 }
 
-export default TimerHome;
+export default TimerDefaultContainerComponent;

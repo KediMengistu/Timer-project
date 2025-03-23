@@ -3,6 +3,7 @@ import themeReducer, { fetchAndSetTheme } from "../features/theme/themeSlice";
 import timeReducer, { fetchAndSetTimezone } from "../features/time/timeSlice";
 import authReducer, { fetchAndSetIsSignedIn } from "../features/auth/authSlice";
 import userReducer from "../features/user/userSlice";
+import timersReducer from "../features/timers/timersSlice";
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
     time: timeReducer,
     auth: authReducer,
     user: userReducer,
+    timers: timersReducer,
   },
 });
 

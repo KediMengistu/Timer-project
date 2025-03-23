@@ -30,12 +30,12 @@ export class TimersController {
 
   @Get('get-timer/:id')
   async getTimer(@Param() params: any) {
-    await this.timerService.retrieveTimer(params.id);
+    return this.timerService.retrieveTimer(params.id);
   }
 
   @Get('get-all-timers')
   async getAllTimers(@Req() request) {
-    await this.timerService.retrieveAllTimers(request.user.userId);
+    return this.timerService.retrieveAllTimers(request.user.userId);
   }
 
   @Patch('pause-timer/:id')

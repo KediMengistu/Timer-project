@@ -113,7 +113,7 @@ export const reinitiateForgotPasswordVerification = createAppAsyncThunk<
   },
 );
 
-export const retrieveUser = createAppAsyncThunk<string, void>(
+export const retrieveUser = createAppAsyncThunk<any, void>(
   "user/retrieveUser",
   async (_, thunkAPI) => {
     try {
