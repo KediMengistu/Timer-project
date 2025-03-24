@@ -203,7 +203,7 @@ function DeleteAccountVerifyUserForm() {
   return (
     <AnimatePresence mode="wait">
       <motion.div
-        key={location.pathname}
+        key={`${location.pathname}-DeleteAccountVerifyFormComponent`}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}

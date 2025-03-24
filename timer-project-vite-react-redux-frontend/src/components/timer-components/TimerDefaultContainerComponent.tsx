@@ -1,17 +1,17 @@
 import { AnimatePresence, motion } from "motion/react";
 import { Outlet } from "react-router";
 import { useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "../../../app/hooks";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
   resetUserError,
   resetUserStatus,
   retrieveUser,
-} from "../../../features/user/userSlice";
+} from "../../features/user/userSlice";
 import {
   resetTimersError,
   resetTimersStatus,
   retrieveAllTimers,
-} from "../../../features/timers/timersSlice";
+} from "../../features/timers/timersSlice";
 
 function TimerDefaultContainerComponent() {
   const dispatch = useAppDispatch();
@@ -35,7 +35,7 @@ function TimerDefaultContainerComponent() {
   return (
     <AnimatePresence mode="wait">
       <motion.div
-        key={`${location.pathname}-backgroundDiv`}
+        key={`${location.pathname}-TimerDefaultContainerComponent`}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
