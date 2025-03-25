@@ -1,22 +1,30 @@
 import { AnimatePresence, motion } from "motion/react";
+import { useNavigate } from "react-router";
 import { Outlet } from "react-router";
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
+  resetUser,
   resetUserError,
   resetUserStatus,
   retrieveUser,
 } from "../../features/user/userSlice";
 import {
+  resetTimers,
   resetTimersError,
   resetTimersStatus,
   retrieveAllTimers,
 } from "../../features/timers/timersSlice";
+import { setIsSignedIn } from "../../features/auth/authSlice";
 
 function TimerDefaultContainerComponent() {
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const userState = useAppSelector((state) => state.user.user);
+  const userErrorState = useAppSelector((state) => state.user.error);
   const timersState = useAppSelector((state) => state.timers.allTimers);
+  const timerErrorState = useAppSelector((state) => state.timers.error);
+
   useEffect(() => {
     if (!userState) {
       dispatch(retrieveUser()).then(() => {
@@ -31,6 +39,18 @@ function TimerDefaultContainerComponent() {
       });
     }
   }, []);
+
+  useEffect(() => {
+    if (
+      (userErrorState !== null && userErrorState.message === "Unauthorized") ||
+      (timerErrorState !== null && timerErrorState.message === "Unauthorized")
+    ) {
+      dispatch(resetUser());
+      dispatch(resetTimers());
+      dispatch(setIsSignedIn(false));
+      navigate("/");
+    }
+  }, [userErrorState, timerErrorState]);
 
   return (
     <AnimatePresence mode="wait">

@@ -4,6 +4,7 @@ import { FaCircleArrowLeft } from "react-icons/fa6";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { setIsSignedIn } from "../../features/auth/authSlice";
 import { resetUser } from "../../features/user/userSlice";
+import { resetTimers } from "../../features/timers/timersSlice";
 
 function SignOutForm() {
   const location = useLocation();
@@ -17,6 +18,7 @@ function SignOutForm() {
 
   const handleSignOut = () => {
     dispatch(resetUser());
+    dispatch(resetTimers());
     dispatch(setIsSignedIn(false));
     navigate("/");
   };

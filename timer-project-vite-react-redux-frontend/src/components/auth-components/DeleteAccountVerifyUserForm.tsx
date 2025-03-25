@@ -20,6 +20,7 @@ import {
   verifyDeleteAccount,
 } from "../../features/user/userSlice";
 import { VerifyDeleteAccountDTO } from "../../features/user/userDTO";
+import { resetTimers } from "../../features/timers/timersSlice";
 import {
   ApiErrorResponse,
   ReinitiateVerificationDTO,
@@ -73,6 +74,7 @@ function DeleteAccountVerifyUserForm() {
       verifyDeleteAccountErrorState.message === "Unauthorized"
     ) {
       dispatch(resetUser());
+      dispatch(resetTimers());
       dispatch(setIsSignedIn(false));
       navigate("/", { replace: true });
     }
