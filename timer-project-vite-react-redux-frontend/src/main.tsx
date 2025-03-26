@@ -11,7 +11,7 @@ import SignUpForm from "./components/auth-components/SignUpForm.tsx";
 import SignInForm from "./components/auth-components/SignInForm.tsx";
 import ForgotPasswordForm from "./components/auth-components/ForgotPasswordForm.tsx";
 import SignUpVerifyUserForm from "./components/auth-components/SignUpVerifyUserForm.tsx";
-import TimerDefaultContainerComponent from "./components/timer-components/TimerDefaultContainerComponent.tsx";
+import TimerDefaultContainerComponent from "./components/timer-components/timer-default-components/TimerDefaultContainerComponent.tsx";
 import SignInVerifyUserForm from "./components/auth-components/SignInVerifyUserForm.tsx";
 import ForgotPasswordUserVerifyForm from "./components/auth-components/ForgotPasswordVerifyUserForm.tsx";
 import SignOutForm from "./components/auth-components/SignOutForm.tsx";
@@ -19,7 +19,8 @@ import DeleteAccountForm from "./components/auth-components/DeleteAccountForm.ts
 import DeleteAccountVerifyUserForm from "./components/auth-components/DeleteAccountVerifyUserForm.tsx";
 import RequireAuthGuard from "./components/guard-components/RequireAuthGuard.tsx";
 import RequireNoAuthGuard from "./components/guard-components/RequireNoAuthGuard.tsx";
-import TimerSelectScrollComponent from "./components/timer-components/TimerSelectScrollComponent.tsx";
+import TimerSelectScrollComponent from "./components/timer-components/timer-select-components/TimerSelectScrollComponent.tsx";
+import AddTimerForm from "./components/timer-components/timer-add-components/AddTimerForm.tsx";
 
 const router = createBrowserRouter([
   {
@@ -83,6 +84,10 @@ const router = createBrowserRouter([
                       {
                         index: true,
                         element: <TimerSelectScrollComponent />,
+                      },
+                      {
+                        path: "add-timer",
+                        element: <AddTimerForm />,
                       },
                     ],
                   },

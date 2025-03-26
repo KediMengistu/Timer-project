@@ -84,9 +84,9 @@ function TimerSelectScrollComponent() {
         >
           <button
             onClick={scrollLeft}
-            className="absolute top-1/2 left-4 z-10 flex h-8 w-8 -translate-y-1/2 flex-row items-center justify-center rounded-full text-center opacity-50 transition duration-300 ease-in-out hover:-translate-y-[65%] hover:cursor-pointer hover:opacity-100 active:opacity-75"
+            className="absolute top-1/2 left-4 z-10 flex h-8 w-8 -translate-y-1/2 flex-row items-center justify-center rounded-full text-center transition duration-300 ease-in-out hover:-translate-y-[65%] hover:cursor-pointer"
           >
-            <span className="text-4xl text-white dark:text-gray-400">
+            <span className="text-4xl text-black dark:text-gray-500">
               &larr;
             </span>
           </button>
@@ -105,7 +105,7 @@ function TimerSelectScrollComponent() {
                 onClick={() => scrollToIndex(index)}
                 className={`h-2 w-2 cursor-pointer rounded-full shadow-[0px_0px_0px_1px_rgba(0,0,0,0.06),0px_1px_1px_-0.5px_rgba(0,0,0,0.06),0px_3px_3px_-1.5px_rgba(0,0,0,0.06),_0px_6px_6px_-3px_rgba(0,0,0,0.06),0px_12px_12px_-6px_rgba(0,0,0,0.06),0px_24px_24px_-12px_rgba(0,0,0,0.06)] transition-colors duration-300 ${
                   index === activeIndex
-                    ? "bg-white dark:bg-white"
+                    ? "bg-black dark:bg-gray-900"
                     : "bg-gray-500 dark:bg-gray-600"
                 }`}
               ></div>
@@ -113,9 +113,9 @@ function TimerSelectScrollComponent() {
           </div>
           <button
             onClick={scrollRight}
-            className="absolute top-1/2 right-4 z-10 flex h-8 w-8 -translate-y-1/2 flex-row items-center justify-center rounded-full text-center opacity-50 transition duration-300 ease-in-out hover:-translate-y-[65%] hover:cursor-pointer hover:opacity-100 active:opacity-75"
+            className="absolute top-1/2 right-4 z-10 flex h-8 w-8 -translate-y-1/2 flex-row items-center justify-center rounded-full text-center transition duration-300 ease-in-out hover:-translate-y-[65%] hover:cursor-pointer"
           >
-            <span className="text-4xl text-white dark:text-gray-400">
+            <span className="text-4xl text-black dark:text-gray-500">
               &rarr;
             </span>
           </button>

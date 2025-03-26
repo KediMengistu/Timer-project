@@ -2,27 +2,27 @@ import { AnimatePresence, motion } from "motion/react";
 import { useNavigate } from "react-router";
 import { Outlet } from "react-router";
 import { useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { useAppDispatch, useAppSelector } from "../../../app/hooks";
 import {
   resetUser,
   resetUserError,
   resetUserStatus,
   retrieveUser,
-} from "../../features/user/userSlice";
+} from "../../../features/user/userSlice";
 import {
   resetTimers,
   resetTimersError,
   resetTimersStatus,
   retrieveAllTimers,
-} from "../../features/timers/timersSlice";
-import { setIsSignedIn } from "../../features/auth/authSlice";
+} from "../../../features/timers/timersSlice";
+import { setIsSignedIn } from "../../../features/auth/authSlice";
 
 function TimerDefaultContainerComponent() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const userState = useAppSelector((state) => state.user.user);
   const userErrorState = useAppSelector((state) => state.user.error);
-  const timersState = useAppSelector((state) => state.timers.allTimers);
+  const timersState = useAppSelector((state) => state.timers);
   const timerErrorState = useAppSelector((state) => state.timers.error);
 
   useEffect(() => {
@@ -61,7 +61,7 @@ function TimerDefaultContainerComponent() {
         exit={{ opacity: 0 }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
         style={{ willChange: "transform", backfaceVisibility: "hidden" }}
-        className="grid h-full w-full flex-1 grid-rows-1 rounded-lg border-2 border-black bg-white pt-4! pb-4! dark:border-gray-700 dark:bg-gray-800"
+        className="relative grid h-full w-full flex-1 grid-rows-1 rounded-lg border-2 border-black bg-white pt-4! pb-4! dark:border-gray-700 dark:bg-gray-800"
       >
         <Outlet />
       </motion.div>

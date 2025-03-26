@@ -1,14 +1,27 @@
-import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
+import {
+  createEntityAdapter,
+  createSlice,
+  EntityState,
+} from "@reduxjs/toolkit";
 import { createAppAsyncThunk, DefaultState } from "../../app/appTypes";
-import { normalize, schema } from "normalizr";
+import { Timer } from "./timerDTO";
 
-export interface TimerState extends DefaultState {
-  allTimers: any;
-}
+export interface TimerState extends DefaultState, EntityState<Timer, string> {}
 
-export const timerEntity = new schema.Entity("timers");
+/*
+  TimerState = {
+    status: "idle" | "pending" | "succeeded" | "failed";
+    ids: [];
+    entities: {
+      id: {},
+      id: {},
+      id: {}
+    }
+    error: ApiErrorResponse | null;
+  }
+*/
 
-export const retrieveAllTimers = createAppAsyncThunk<any, void>(
+export const retrieveAllTimers = createAppAsyncThunk<Timer[], void>(
   "timer/retrieveAllTimers",
   async (_, thunkAPI) => {
     try {
@@ -25,8 +38,7 @@ export const retrieveAllTimers = createAppAsyncThunk<any, void>(
         return thunkAPI.rejectWithValue(errorData);
       }
       const data = await response.json();
-      const normalized = normalize(data, [timerEntity]);
-      return normalized.entities;
+      return data;
     } catch (error) {
       return thunkAPI.rejectWithValue({
         timestamp: new Date().toISOString(),
@@ -39,13 +51,12 @@ export const retrieveAllTimers = createAppAsyncThunk<any, void>(
   },
 );
 
-const timersAdapter = createEntityAdapter();
+const timersAdapter = createEntityAdapter<Timer>();
 
-const initialState: TimerState = {
+const initialState: TimerState = timersAdapter.getInitialState({
   status: "idle",
-  allTimers: timersAdapter.getInitialState(),
   error: null,
-};
+});
 
 export const timersSlice = createSlice({
   name: "timers",
@@ -59,7 +70,8 @@ export const timersSlice = createSlice({
     },
     resetTimers: (state) => {
       state.status = "idle";
-      state.allTimers = timersAdapter.getInitialState();
+      state.ids = timersAdapter.getInitialState().ids;
+      state.entities = timersAdapter.getInitialState().entities;
       state.error = null;
     },
   },
@@ -71,7 +83,7 @@ export const timersSlice = createSlice({
       })
       .addCase(retrieveAllTimers.fulfilled, (state, action) => {
         state.status = "succeeded";
-        timersAdapter.upsertMany(state.allTimers, action.payload.timers);
+        timersAdapter.setAll(state, action.payload);
       })
       .addCase(retrieveAllTimers.rejected, (state, action) => {
         state.status = "failed";

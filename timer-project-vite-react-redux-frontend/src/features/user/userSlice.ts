@@ -8,10 +8,11 @@ import {
   ForgotPasswordDTO,
   VerifyForgotPasswordDTO,
   VerifyDeleteAccountDTO,
+  User,
 } from "./userDTO";
 
 export interface UserState extends DefaultState {
-  user: any;
+  user: User | null;
 }
 
 export const submitForgotPassword = createAppAsyncThunk<
@@ -113,11 +114,10 @@ export const reinitiateForgotPasswordVerification = createAppAsyncThunk<
   },
 );
 
-export const retrieveUser = createAppAsyncThunk<any, void>(
+export const retrieveUser = createAppAsyncThunk<User, void>(
   "user/retrieveUser",
   async (_, thunkAPI) => {
     try {
-      // Using a relative path: /api/users/retrieve-user-email
       const response = await fetch("/api/users/retrieve-user", {
         method: "GET",
         credentials: "include",
