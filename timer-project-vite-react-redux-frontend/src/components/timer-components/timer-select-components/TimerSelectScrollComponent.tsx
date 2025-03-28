@@ -12,12 +12,15 @@ function TimerSelectScrollComponent() {
 
     const container = scrollContainerRef.current;
     const scrollLeft = container.scrollLeft;
-    const itemWidth = container.children[0].clientWidth + 8; // width + margin
+    const itemWidth = container.children[0]?.clientWidth + 8 || 0; // Add fallback for initial render
 
-    // Calculate active index based on scroll position
-    const newIndex = Math.round(scrollLeft / itemWidth);
-    if (newIndex !== activeIndex) {
-      setActiveIndex(newIndex);
+    // Only update if we have a valid width
+    if (itemWidth > 0) {
+      // Calculate active index based on scroll position
+      const newIndex = Math.round(scrollLeft / itemWidth);
+      if (newIndex !== activeIndex) {
+        setActiveIndex(newIndex);
+      }
     }
   };
 
@@ -29,6 +32,43 @@ function TimerSelectScrollComponent() {
       return () => container.removeEventListener("scroll", handleScroll);
     }
   }, [activeIndex]);
+
+  // Set initial scroll position to show first item
+  useEffect(() => {
+    // This will ensure children have rendered
+    const initializeScroll = () => {
+      if (
+        scrollContainerRef.current &&
+        scrollContainerRef.current.children.length > 0
+      ) {
+        // Set scroll position to the beginning (left)
+        scrollContainerRef.current.scrollTo({
+          left: 0,
+          behavior: "auto",
+        });
+
+        // Force an active index update
+        setActiveIndex(0);
+
+        // Also trigger the handleScroll to ensure everything is in sync
+        handleScroll();
+      } else {
+        // If children aren't ready yet, try again in a short moment
+        setTimeout(initializeScroll, 50);
+      }
+    };
+
+    // Start the initialization process
+    initializeScroll();
+
+    // Also add a window load event handler as a fallback
+    const handleWindowLoad = () => {
+      initializeScroll();
+    };
+
+    window.addEventListener("load", handleWindowLoad);
+    return () => window.removeEventListener("load", handleWindowLoad);
+  }, []); // Empty dependency array means this runs once on mount
 
   const scrollLeft = () => {
     if (!scrollContainerRef.current) return;
@@ -105,8 +145,8 @@ function TimerSelectScrollComponent() {
                 onClick={() => scrollToIndex(index)}
                 className={`h-2 w-2 cursor-pointer rounded-full shadow-[0px_0px_0px_1px_rgba(0,0,0,0.06),0px_1px_1px_-0.5px_rgba(0,0,0,0.06),0px_3px_3px_-1.5px_rgba(0,0,0,0.06),_0px_6px_6px_-3px_rgba(0,0,0,0.06),0px_12px_12px_-6px_rgba(0,0,0,0.06),0px_24px_24px_-12px_rgba(0,0,0,0.06)] transition-colors duration-300 ${
                   index === activeIndex
-                    ? "bg-black dark:bg-gray-900"
-                    : "bg-gray-500 dark:bg-gray-600"
+                    ? "bg-gray-600"
+                    : "bg-gray-400 dark:bg-gray-400"
                 }`}
               ></div>
             ))}

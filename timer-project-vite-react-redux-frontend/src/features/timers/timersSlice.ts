@@ -4,7 +4,7 @@ import {
   EntityState,
 } from "@reduxjs/toolkit";
 import { createAppAsyncThunk, DefaultState } from "../../app/appTypes";
-import { Timer } from "./timerDTO";
+import { CreateTimerDTO, Timer } from "./timerDTO";
 
 export interface TimerState extends DefaultState, EntityState<Timer, string> {}
 
@@ -51,6 +51,37 @@ export const retrieveAllTimers = createAppAsyncThunk<Timer[], void>(
   },
 );
 
+export const createTimer = createAppAsyncThunk<Timer, CreateTimerDTO>(
+  "timer/createTimer",
+  async (createTimerDTO: CreateTimerDTO, thunkAPI) => {
+    try {
+      const response = await fetch("/api/timers/create-timer", {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify(createTimerDTO),
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return thunkAPI.rejectWithValue(errorData);
+      }
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue({
+        timestamp: new Date().toISOString(),
+        path: "/timers/create-timer",
+        message:
+          error instanceof Error ? error.message : "Network error occurred",
+        statusCode: 500,
+      });
+    }
+  },
+);
+
 const timersAdapter = createEntityAdapter<Timer>();
 
 const initialState: TimerState = timersAdapter.getInitialState({
@@ -86,6 +117,19 @@ export const timersSlice = createSlice({
         timersAdapter.setAll(state, action.payload);
       })
       .addCase(retrieveAllTimers.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload || null;
+      })
+      .addCase(createTimer.pending, (state) => {
+        state.status = "pending";
+        state.error = null;
+      })
+      .addCase(createTimer.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        timersAdapter.addOne(state, action.payload);
+        state.error = null;
+      })
+      .addCase(createTimer.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload || null;
       });

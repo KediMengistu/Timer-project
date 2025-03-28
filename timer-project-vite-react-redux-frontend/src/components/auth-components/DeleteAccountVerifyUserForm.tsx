@@ -63,6 +63,7 @@ function DeleteAccountVerifyUserForm() {
       !sentReInitiateVerification
     ) {
       dispatch(resetUser());
+      dispatch(resetTimers());
       dispatch(setIsSignedIn(false));
       navigate("/", { replace: true });
     }

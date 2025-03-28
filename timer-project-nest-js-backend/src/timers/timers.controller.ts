@@ -19,7 +19,7 @@ export class TimersController {
 
   @Post('create-timer')
   async createTimer(@Req() request, @Body() createTimerDTO: CreateTimerDTO) {
-    await this.timerService.createTimer(request.user.userId, createTimerDTO);
+    return this.timerService.createTimer(request.user.userId, createTimerDTO);
   }
 
   @Public()

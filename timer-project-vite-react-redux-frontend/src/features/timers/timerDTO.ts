@@ -1,3 +1,11 @@
+export interface CreateTimerDTO {
+  title: string;
+  durationHours: number;
+  durationMinutes: number;
+  durationSeconds: number;
+  breakDuration: number;
+}
+
 export interface Timer {
   id: string;
   title: string;

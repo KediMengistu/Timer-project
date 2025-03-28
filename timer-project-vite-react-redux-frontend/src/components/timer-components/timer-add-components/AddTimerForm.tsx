@@ -1,16 +1,25 @@
 import { AnimatePresence, motion } from "motion/react";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import { FaCircleArrowLeft } from "react-icons/fa6";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useAppDispatch, useAppSelector } from "../../../app/hooks";
+import { CreateTimerDTO } from "../../../features/timers/timerDTO";
+import {
+  createTimer,
+  resetTimersError,
+  resetTimersStatus,
+} from "../../../features/timers/timersSlice";
 
 function AddTimerForm() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const timersState = useAppSelector((state) => state.timers);
   const [title, setTitle] = useState<string>("");
   const [durationHours, setDurationHours] = useState<string>("01");
   const [durationMinutes, setDurationMinutes] = useState<string>("00");
   const [durationSeconds, setDurationSeconds] = useState<string>("00");
   const [breakDuration, setBreakDuration] = useState<string>("10");
-
-  const navigate = useNavigate();
 
   // Formatting function
   const formatTimeValue = (value: string): string => {
@@ -37,7 +46,7 @@ function AddTimerForm() {
 
   const incrementHours = () => {
     const currentHours = parseInt(durationHours);
-    if (currentHours < 24) {
+    if (currentHours < 23) {
       setFormattedHours((currentHours + 1).toString());
     }
   };
@@ -81,6 +90,21 @@ function AddTimerForm() {
     setBreakDuration(value);
   };
 
+  useEffect(() => {
+    if (timersState.status === "succeeded") {
+      dispatch(resetTimersStatus());
+      dispatch(resetTimersError());
+      navigate("/manage-timers");
+    }
+  }, [timersState]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(resetTimersStatus());
+      dispatch(resetTimersError());
+    };
+  }, []);
+
   return (
     <AnimatePresence mode="wait">
       <motion.div
@@ -112,7 +136,20 @@ function AddTimerForm() {
               Timer Creation &#183; Build Your Timer
             </h1>
           </div>
-          <form className="grid grid-rows-[1fr_auto] gap-1">
+          <form
+            onSubmit={(event) => {
+              event.preventDefault();
+              const createTimerDTO: CreateTimerDTO = {
+                title,
+                durationHours: parseInt(durationHours),
+                durationMinutes: parseInt(durationMinutes),
+                durationSeconds: parseInt(durationSeconds),
+                breakDuration: parseInt(breakDuration),
+              };
+              dispatch(createTimer(createTimerDTO));
+            }}
+            className="grid grid-rows-[1fr_auto] gap-1"
+          >
             <div className="grid grid-rows-5 gap-1">
               <div className="grid grid-cols-[27.5%_72.5%] pl-2!">
                 <label
@@ -125,7 +162,9 @@ function AddTimerForm() {
                   id="title"
                   type="text"
                   placeholder="Timer name"
+                  autoComplete="off"
                   value={title}
+                  required
                   onChange={(e) => setTitle(e.target.value)}
                   className="w-full border-2 border-black pl-1! text-xs text-black outline-0 dark:border-gray-700 dark:text-white"
                 />
@@ -251,7 +290,7 @@ function AddTimerForm() {
                     onClick={() => handleBreakChange("10")}
                   >
                     <div
-                      className={`h-4 w-4 rounded-full border-1 border-black dark:border-gray-700 ${breakDuration === "10" ? "bg-black dark:bg-gray-700" : "bg-white dark:bg-gray-800"} transition duration-300 ease-in-out`}
+                      className={`h-4 w-4 border-2 border-black dark:border-gray-700 ${breakDuration === "10" ? "bg-black dark:bg-gray-700" : "bg-white dark:bg-gray-800"} rounded-full transition duration-300 ease-in-out`}
                     ></div>
                     <div className="flex flex-1 items-center justify-center">
                       <h1 className="text-center text-[10px] text-black dark:text-white">
@@ -264,7 +303,7 @@ function AddTimerForm() {
                     onClick={() => handleBreakChange("15")}
                   >
                     <div
-                      className={`h-4 w-4 rounded-full border-1 border-black dark:border-gray-700 ${breakDuration === "15" ? "bg-black dark:bg-gray-700" : "bg-white dark:bg-gray-800"} transition duration-300 ease-in-out`}
+                      className={`h-4 w-4 border-2 border-black dark:border-gray-700 ${breakDuration === "15" ? "bg-black dark:bg-gray-700" : "bg-white dark:bg-gray-800"} rounded-full transition duration-300 ease-in-out`}
                     ></div>
                     <div className="flex flex-1 items-center justify-center">
                       <h1 className="text-center text-[10px] text-black dark:text-white">
@@ -277,7 +316,7 @@ function AddTimerForm() {
                     onClick={() => handleBreakChange("20")}
                   >
                     <div
-                      className={`h-4 w-4 rounded-full border-1 border-black dark:border-gray-700 ${breakDuration === "20" ? "bg-black dark:bg-gray-700" : "bg-white dark:bg-gray-800"} transition duration-300 ease-in-out`}
+                      className={`h-4 w-4 border-2 border-black dark:border-gray-700 ${breakDuration === "20" ? "bg-black dark:bg-gray-700" : "bg-white dark:bg-gray-800"} rounded-full transition duration-300 ease-in-out`}
                     ></div>
                     <div className="flex flex-1 items-center justify-center">
                       <h1 className="text-center text-[9px] text-black dark:text-white">
@@ -299,6 +338,31 @@ function AddTimerForm() {
               </button>
             </div>
           </form>
+          <AnimatePresence mode="wait">
+            {timersState.error !== null && (
+              <motion.div
+                key={`APIErrorAddTimerDiv-${JSON.stringify(timersState.error)}`}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.35, ease: "easeInOut" }}
+                style={{
+                  willChange: "transform",
+                  backfaceVisibility: "hidden",
+                }}
+                className="absolute top-[98%] left-1/2 h-fit w-[150px] -translate-x-1/2 rounded-sm border-1 border-black bg-red-400 p-1! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-700 dark:bg-gray-800"
+              >
+                <h1 className="text-center text-[8px] text-black md:text-[9px] dark:text-white">
+                  {timersState.error.message ===
+                  `duplicate key value violates unique constraint "UQ_0aa5554b9dfb27791ba51b95efa"` ? (
+                    <>Timer with title {title} already exists.</>
+                  ) : (
+                    timersState.error.message
+                  )}
+                </h1>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </motion.div>
     </AnimatePresence>
