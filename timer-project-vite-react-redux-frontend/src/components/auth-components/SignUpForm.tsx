@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion } from "framer-motion";
 import { useLocation, useNavigate } from "react-router";
 import { RiUser3Fill } from "react-icons/ri";
 import { MdEmail } from "react-icons/md";

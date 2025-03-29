@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
 import TimerSelectScrollListComponent from "./TimerSelectScrollListComponent";
 

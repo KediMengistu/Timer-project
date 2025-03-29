@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion } from "framer-motion";
 import { useLocation, useNavigate } from "react-router";
 import { FaCircleArrowLeft } from "react-icons/fa6";
 import { useEffect, useState } from "react";
@@ -9,6 +9,7 @@ import {
   resetTimersError,
   resetTimersStatus,
 } from "../../../features/timers/timersSlice";
+import { ApiErrorResponse } from "../../../app/appTypes";
 
 function AddTimerForm() {
   const location = useLocation();
@@ -20,6 +21,22 @@ function AddTimerForm() {
   const [durationMinutes, setDurationMinutes] = useState<string>("00");
   const [durationSeconds, setDurationSeconds] = useState<string>("00");
   const [breakDuration, setBreakDuration] = useState<string>("10");
+  const [nonAPIError, setNonAPIError] = useState<ApiErrorResponse | null>(null);
+
+  useEffect(() => {
+    if (timersState.status === "succeeded") {
+      dispatch(resetTimersStatus());
+      dispatch(resetTimersError());
+      navigate("/manage-timers");
+    }
+  }, [timersState]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(resetTimersStatus());
+      dispatch(resetTimersError());
+    };
+  }, []);
 
   // Formatting function
   const formatTimeValue = (value: string): string => {
@@ -90,20 +107,42 @@ function AddTimerForm() {
     setBreakDuration(value);
   };
 
-  useEffect(() => {
-    if (timersState.status === "succeeded") {
-      dispatch(resetTimersStatus());
-      dispatch(resetTimersError());
-      navigate("/manage-timers");
-    }
-  }, [timersState]);
+  // Title validation function
+  const validateTitle = (title: string): boolean => {
+    // Check if title is <= 8 characters and contains only alphanumeric characters
+    const alphanumericRegex = /^[a-zA-Z0-9]+$/;
+    return title.length <= 8 && alphanumericRegex.test(title);
+  };
 
-  useEffect(() => {
-    return () => {
-      dispatch(resetTimersStatus());
-      dispatch(resetTimersError());
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+
+    // Clear any existing non-API errors first
+    setNonAPIError(null);
+
+    // Validate the title
+    if (!validateTitle(title)) {
+      const error: ApiErrorResponse = {
+        timestamp: new Date().toISOString(),
+        path: location.pathname,
+        message:
+          "Title must be max 8 characters and contain only letters and numbers.",
+        statusCode: 400,
+      };
+      setNonAPIError(error);
+      return;
+    }
+
+    // If validation passes, create the timer
+    const createTimerDTO: CreateTimerDTO = {
+      title,
+      durationHours: parseInt(durationHours),
+      durationMinutes: parseInt(durationMinutes),
+      durationSeconds: parseInt(durationSeconds),
+      breakDuration: parseInt(breakDuration),
     };
-  }, []);
+    dispatch(createTimer(createTimerDTO));
+  };
 
   return (
     <AnimatePresence mode="wait">
@@ -137,17 +176,7 @@ function AddTimerForm() {
             </h1>
           </div>
           <form
-            onSubmit={(event) => {
-              event.preventDefault();
-              const createTimerDTO: CreateTimerDTO = {
-                title,
-                durationHours: parseInt(durationHours),
-                durationMinutes: parseInt(durationMinutes),
-                durationSeconds: parseInt(durationSeconds),
-                breakDuration: parseInt(breakDuration),
-              };
-              dispatch(createTimer(createTimerDTO));
-            }}
+            onSubmit={handleSubmit}
             className="grid grid-rows-[1fr_auto] gap-1"
           >
             <div className="grid grid-rows-5 gap-1">
@@ -339,7 +368,24 @@ function AddTimerForm() {
             </div>
           </form>
           <AnimatePresence mode="wait">
-            {timersState.error !== null && (
+            {nonAPIError !== null ? (
+              <motion.div
+                key={`nonAPIErrorTimerDiv-${JSON.stringify(nonAPIError)}`}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.35, ease: "easeInOut" }}
+                style={{
+                  willChange: "transform",
+                  backfaceVisibility: "hidden",
+                }}
+                className="absolute top-[98%] left-1/2 h-fit w-[150px] -translate-x-1/2 rounded-sm border-1 border-black bg-red-400 p-1! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-700 dark:bg-gray-800"
+              >
+                <h1 className="text-center text-[8px] text-black md:text-[9px] dark:text-white">
+                  {nonAPIError.message}
+                </h1>
+              </motion.div>
+            ) : timersState.error !== null ? (
               <motion.div
                 key={`APIErrorAddTimerDiv-${JSON.stringify(timersState.error)}`}
                 initial={{ opacity: 0, x: 20 }}
@@ -361,7 +407,7 @@ function AddTimerForm() {
                   )}
                 </h1>
               </motion.div>
-            )}
+            ) : null}
           </AnimatePresence>
         </div>
       </motion.div>

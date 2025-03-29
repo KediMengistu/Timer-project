@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate } from "react-router";
 import { Outlet } from "react-router";
 import { useEffect } from "react";

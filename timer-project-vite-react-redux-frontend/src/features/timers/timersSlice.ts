@@ -22,7 +22,7 @@ export interface TimerState extends DefaultState, EntityState<Timer, string> {}
 */
 
 export const retrieveAllTimers = createAppAsyncThunk<Timer[], void>(
-  "timer/retrieveAllTimers",
+  "timers/retrieveAllTimers",
   async (_, thunkAPI) => {
     try {
       const response = await fetch("/api/timers/get-all-timers", {
@@ -52,7 +52,7 @@ export const retrieveAllTimers = createAppAsyncThunk<Timer[], void>(
 );
 
 export const createTimer = createAppAsyncThunk<Timer, CreateTimerDTO>(
-  "timer/createTimer",
+  "timers/createTimer",
   async (createTimerDTO: CreateTimerDTO, thunkAPI) => {
     try {
       const response = await fetch("/api/timers/create-timer", {
@@ -74,6 +74,36 @@ export const createTimer = createAppAsyncThunk<Timer, CreateTimerDTO>(
       return thunkAPI.rejectWithValue({
         timestamp: new Date().toISOString(),
         path: "/timers/create-timer",
+        message:
+          error instanceof Error ? error.message : "Network error occurred",
+        statusCode: 500,
+      });
+    }
+  },
+);
+
+export const deleteTimer = createAppAsyncThunk<string, string>(
+  "timers/deleteTimer",
+  async (timerId: string, thunkAPI) => {
+    try {
+      const response = await fetch(`/api/timers/delete-timer/${timerId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-type": "application/json",
+        },
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return thunkAPI.rejectWithValue(errorData);
+      }
+
+      return timerId;
+    } catch (error) {
+      return thunkAPI.rejectWithValue({
+        timestamp: new Date().toISOString(),
+        path: `/timers/delete-timer/${timerId}`,
         message:
           error instanceof Error ? error.message : "Network error occurred",
         statusCode: 500,
@@ -130,6 +160,19 @@ export const timersSlice = createSlice({
         state.error = null;
       })
       .addCase(createTimer.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload || null;
+      })
+      .addCase(deleteTimer.pending, (state) => {
+        state.status = "pending";
+        state.error = null;
+      })
+      .addCase(deleteTimer.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        timersAdapter.removeOne(state, action.payload);
+        state.error = null;
+      })
+      .addCase(deleteTimer.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload || null;
       });

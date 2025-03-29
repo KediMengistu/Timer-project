@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion } from "framer-motion";
 import { useLocation, useNavigate } from "react-router";
 import { FaCircleArrowLeft } from "react-icons/fa6";
 import { useEffect, useState } from "react";

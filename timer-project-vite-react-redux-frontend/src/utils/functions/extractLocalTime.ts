@@ -1,4 +1,4 @@
-export function extractTime(timestamp: string): string {
+export function extractLocalTime(timestamp: string): string {
   try {
     const date = new Date(timestamp);
 
@@ -6,9 +6,9 @@ export function extractTime(timestamp: string): string {
       throw new Error("Invalid timestamp format");
     }
 
-    const hours = String(date.getUTCHours()).padStart(2, "0");
-    const minutes = String(date.getUTCMinutes()).padStart(2, "0");
-    const seconds = String(date.getUTCSeconds()).padStart(2, "0");
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const seconds = String(date.getSeconds()).padStart(2, "0");
 
     return `${hours}:${minutes}:${seconds}`;
   } catch (error) {

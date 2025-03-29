@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion } from "framer-motion";
 import { useLocation } from "react-router";
 import DefaultMainContentTime from "./DefaultMainContentTime";
 import styles from "../../styles/Globe.module.css";

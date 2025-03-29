@@ -21,6 +21,7 @@ import RequireAuthGuard from "./components/guard-components/RequireAuthGuard.tsx
 import RequireNoAuthGuard from "./components/guard-components/RequireNoAuthGuard.tsx";
 import TimerSelectScrollComponent from "./components/timer-components/timer-select-components/TimerSelectScrollComponent.tsx";
 import AddTimerForm from "./components/timer-components/timer-add-components/AddTimerForm.tsx";
+import Timer from "./components/timer-components/timer-display-components/Timer.tsx";
 
 const router = createBrowserRouter([
   {
@@ -88,6 +89,10 @@ const router = createBrowserRouter([
                       {
                         path: "add-timer",
                         element: <AddTimerForm />,
+                      },
+                      {
+                        path: ":id",
+                        element: <Timer />,
                       },
                     ],
                   },
