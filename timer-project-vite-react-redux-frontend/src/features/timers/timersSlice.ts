@@ -3,11 +3,7 @@ import {
   createSlice,
   EntityState,
 } from "@reduxjs/toolkit";
-import {
-  AppThunk,
-  createAppAsyncThunk,
-  DefaultState,
-} from "../../app/appTypes";
+import { createAppAsyncThunk, DefaultState } from "../../app/appTypes";
 import { CreateTimerDTO, Timer } from "./timerDTO";
 
 export interface TimerState extends DefaultState, EntityState<Timer, string> {}
@@ -24,16 +20,6 @@ export interface TimerState extends DefaultState, EntityState<Timer, string> {}
     error: ApiErrorResponse | null;
   }
 */
-
-export const fetchAndSetTimers = (): AppThunk => {
-  return (dispatch, getState) => {
-    let isSignedIn: boolean = getState().auth.isSignedIn;
-    if (isSignedIn) {
-      console.log(`isSignedIn(fetchAndSetTimers):${isSignedIn}`);
-      dispatch(retrieveAllTimers());
-    }
-  };
-};
 
 export const retrieveAllTimers = createAppAsyncThunk<Timer[], void>(
   "timers/retrieveAllTimers",

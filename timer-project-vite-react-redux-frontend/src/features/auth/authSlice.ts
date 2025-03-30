@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AppThunk } from "../../app/store";
 import {
   createAppAsyncThunk,
   DefaultState,
@@ -10,23 +9,6 @@ import { SignInDTO, SignUpDTO, VerifyAccountDTO } from "./authDTO";
 export interface AuthState extends DefaultState {
   isSignedIn: boolean;
 }
-
-export const fetchAndSetIsSignedIn = (): AppThunk => {
-  return (dispatch, getState) => {
-    let isSignedIn: boolean = getState().auth.isSignedIn;
-    if (localStorage.getItem("signedInStatus") !== null) {
-      if (localStorage.getItem("signedInStatus") === "not signed in") {
-        localStorage.removeItem("signedInStatus");
-      }
-      if (localStorage.getItem("signedInStatus") === "signed in") {
-        isSignedIn = true;
-      }
-    }
-    if (isSignedIn !== false) {
-      dispatch(setIsSignedIn(isSignedIn));
-    }
-  };
-};
 
 export const submitSignUp = createAppAsyncThunk<void, SignUpDTO>(
   "auth/submitSignUp",

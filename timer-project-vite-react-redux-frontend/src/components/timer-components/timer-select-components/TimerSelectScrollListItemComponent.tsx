@@ -8,7 +8,6 @@ import { extractLocalTime } from "../../../utils/functions/extractLocalTime";
 import { useEffect } from "react";
 import { useAppSelector, useAppDispatch } from "../../../app/hooks";
 import {
-  deleteTimer,
   resetTimersError,
   resetTimersStatus,
 } from "../../../features/timers/timersSlice";
@@ -35,6 +34,10 @@ function TimerSelectScrollListItemComponent({ item }: { item: Timer }) {
 
   const handleGoToTimer = () => {
     navigate(`/manage-timers/${item.id}`);
+  };
+
+  const handleGoToDeleteTimer = () => {
+    navigate(`/manage-timers/delete-timer/${item.id}`);
   };
 
   return (
@@ -109,7 +112,7 @@ function TimerSelectScrollListItemComponent({ item }: { item: Timer }) {
               <div className="grid grid-cols-2 gap-1 p-2!">
                 <button
                   onClick={() => {
-                    dispatch(deleteTimer(item.id));
+                    handleGoToDeleteTimer();
                   }}
                   className="group flex flex-row items-center justify-center rounded-full border-2 border-white bg-white p-2! shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)] transition ease-in-out hover:cursor-pointer hover:border-red-500 hover:bg-red-500 active:opacity-55 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-red-500 dark:hover:bg-red-500"
                 >
@@ -199,7 +202,7 @@ function TimerSelectScrollListItemComponent({ item }: { item: Timer }) {
               <div className="grid grid-cols-2 gap-1 p-2!">
                 <button
                   onClick={() => {
-                    dispatch(deleteTimer(item.id));
+                    handleGoToDeleteTimer();
                   }}
                   className="group flex flex-row items-center justify-center rounded-full border-2 border-white bg-white p-2! shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)] transition ease-in-out hover:cursor-pointer hover:border-red-500 hover:bg-red-500 active:opacity-55 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-red-500 dark:hover:bg-red-500"
                 >

@@ -1,6 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
-  AppThunk,
   createAppAsyncThunk,
   DefaultState,
   ReinitiateVerificationDTO,
@@ -11,20 +10,12 @@ import {
   VerifyDeleteAccountDTO,
   User,
 } from "./userDTO";
+import { createTimer, deleteTimer } from "../timers/timersSlice";
 
 export interface UserState extends DefaultState {
   user: User | null;
+  updateUser: boolean;
 }
-
-export const fetchAndSetUser = (): AppThunk => {
-  return (dispatch, getState) => {
-    let isSignedIn: boolean = getState().auth.isSignedIn;
-    console.log(`isSignedIn(fetchAndSetUser):${isSignedIn}`);
-    if (isSignedIn) {
-      dispatch(retrieveUser());
-    }
-  };
-};
 
 export const submitForgotPassword = createAppAsyncThunk<
   void,
@@ -249,6 +240,7 @@ export const reinitiateDeleteAccountVerification = createAppAsyncThunk<
 const initialState: UserState = {
   status: "idle",
   user: null,
+  updateUser: false,
   error: null,
 };
 
@@ -262,9 +254,13 @@ export const userSlice = createSlice({
     resetUserError: (state) => {
       state.error = null;
     },
+    resetUpdateUser: (state) => {
+      state.updateUser = false;
+    },
     resetUser: (state) => {
       state.status = "idle";
       state.user = null;
+      state.updateUser = false;
       state.error = null;
     },
   },
@@ -360,9 +356,16 @@ export const userSlice = createSlice({
           state.status = "failed";
           state.error = action.payload || null;
         },
-      );
+      )
+      .addCase(createTimer.fulfilled, (state) => {
+        state.updateUser = true;
+      })
+      .addCase(deleteTimer.fulfilled, (state) => {
+        state.updateUser = true;
+      });
   },
 });
 
-export const { resetUserStatus, resetUserError, resetUser } = userSlice.actions;
+export const { resetUserStatus, resetUserError, resetUpdateUser, resetUser } =
+  userSlice.actions;
 export default userSlice.reducer;

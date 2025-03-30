@@ -12,9 +12,14 @@ function TimerItemComponent() {
   useEffect(() => {
     if (id) {
       setTimer(timersState.entities[id]);
-      console.log(timersState.entities[id]);
     }
   }, []);
+
+  // Helper function for padding - doesn't rely on truthy/falsy evaluation
+  const formatTime = (value: number | undefined) => {
+    if (value === undefined || value === null) return "00";
+    return value < 10 ? `0${value}` : `${value}`;
+  };
 
   return (
     <AnimatePresence mode="wait">
@@ -29,21 +34,15 @@ function TimerItemComponent() {
       >
         <div className="flex flex-row items-center justify-center gap-2 p-1!">
           <span className="text-center text-9xl">
-            {timer?.durationHours && timer?.durationHours < 10
-              ? `0${timer?.durationHours}`
-              : timer?.durationHours}
+            {formatTime(timer?.durationHours)}
             <span className="text-center text-4xl">hrs</span>
           </span>
           <span className="text-center text-9xl">
-            {timer?.durationMinutes && timer?.durationMinutes < 10
-              ? `0${timer?.durationMinutes}`
-              : timer?.durationMinutes}
+            {formatTime(timer?.durationMinutes)}
             <span className="text-center text-4xl">min</span>
           </span>
           <span className="text-center text-9xl">
-            {timer?.durationSeconds && timer?.durationSeconds < 10
-              ? `0${timer?.durationSeconds}`
-              : timer?.durationSeconds}
+            {formatTime(timer?.durationSeconds)}
             <span className="text-center text-4xl">s</span>
           </span>
         </div>
