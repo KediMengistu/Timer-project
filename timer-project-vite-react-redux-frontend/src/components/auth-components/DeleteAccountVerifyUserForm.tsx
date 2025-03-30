@@ -42,15 +42,6 @@ function DeleteAccountVerifyUserForm() {
     useState<ApiErrorResponse | null>(null);
 
   useEffect(() => {
-    if (!userState) {
-      dispatch(retrieveUser()).then(() => {
-        dispatch(resetUserStatus());
-        dispatch(resetUserError());
-      });
-    }
-  }, []);
-
-  useEffect(() => {
     if (
       verifyDeleteAccountState === "succeeded" &&
       sentReInitiateVerification

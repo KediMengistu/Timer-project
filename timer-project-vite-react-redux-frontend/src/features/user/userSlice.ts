@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
+  AppThunk,
   createAppAsyncThunk,
   DefaultState,
   ReinitiateVerificationDTO,
@@ -14,6 +15,16 @@ import {
 export interface UserState extends DefaultState {
   user: User | null;
 }
+
+export const fetchAndSetUser = (): AppThunk => {
+  return (dispatch, getState) => {
+    let isSignedIn: boolean = getState().auth.isSignedIn;
+    console.log(`isSignedIn(fetchAndSetUser):${isSignedIn}`);
+    if (isSignedIn) {
+      dispatch(retrieveUser());
+    }
+  };
+};
 
 export const submitForgotPassword = createAppAsyncThunk<
   void,

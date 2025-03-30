@@ -2,11 +2,23 @@ import { Outlet } from "react-router";
 import { useAppSelector, useAppDispatch } from "../app/hooks";
 import { useEffect } from "react";
 import { resetAuth, submitSignOut } from "../features/auth/authSlice";
+import {
+  resetUserError,
+  resetUserStatus,
+  retrieveUser,
+} from "../features/user/userSlice";
+import {
+  resetTimersError,
+  resetTimersStatus,
+  retrieveAllTimers,
+} from "../features/timers/timersSlice";
 
 function App() {
   const darkModeState = useAppSelector((state) => state.theme.darkMode);
   const timezoneState = useAppSelector((state) => state.time.timezone);
   const signedInState = useAppSelector((state) => state.auth.isSignedIn);
+  const userState = useAppSelector((state) => state.user.user);
+  const timersState = useAppSelector((state) => state.timers);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -36,6 +48,22 @@ function App() {
   }, [timezoneState]);
 
   useEffect(() => {
+    if (signedInState === true) {
+      if (!userState) {
+        dispatch(retrieveUser()).then(() => {
+          dispatch(resetUserStatus());
+          dispatch(resetUserError());
+          console.log("hello");
+        });
+      }
+      if (JSON.stringify(timersState.entities) === "{}") {
+        dispatch(retrieveAllTimers()).then(() => {
+          dispatch(resetTimersStatus());
+          dispatch(resetTimersError());
+          console.log("hello1");
+        });
+      }
+    }
     if (signedInState === false) {
       dispatch(submitSignOut()).then(() => {
         dispatch(resetAuth());

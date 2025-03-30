@@ -38,7 +38,7 @@ function TimerSelectScrollListItemComponent({ item }: { item: Timer }) {
   };
 
   return (
-    <div className="relative ml-2! inline h-[85%] w-full shrink-0 grow-0 snap-center snap-always rounded-sm border-2 border-black bg-white align-middle whitespace-normal shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)] md:h-full dark:border-gray-700 dark:bg-gray-800">
+    <div className="relative ml-2! inline h-[85%] w-full shrink-0 grow-0 snap-center snap-always rounded-sm border-2 border-black bg-white align-middle whitespace-normal shadow-[0_3px_10px_rgb(0,0,0,0.2)] md:h-full dark:border-gray-700 dark:bg-gray-800 dark:shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)]">
       <AnimatePresence mode="wait">
         {timezoneState ? (
           <motion.div
@@ -48,7 +48,7 @@ function TimerSelectScrollListItemComponent({ item }: { item: Timer }) {
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
             style={{ willChange: "transform", backfaceVisibility: "hidden" }}
-            className="absolute top-[50%] left-[50%] grid h-60 w-48 -translate-x-1/2 -translate-y-1/2 grid-rows-[auto_1fr] rounded-2xl bg-white p-1! shadow-[0_3px_10px_rgb(0,0,0,0.2)] dark:border-1 dark:border-gray-700 dark:bg-gray-800"
+            className="absolute top-[50%] left-[50%] grid h-60 w-48 -translate-x-1/2 -translate-y-1/2 grid-rows-[auto_1fr] rounded-2xl bg-white p-1! shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)] dark:border-1 dark:border-gray-700 dark:bg-gray-800"
           >
             <div className="border-b-1 border-b-black p-1! dark:border-b-gray-700">
               <h1 className="text-center text-xs text-black italic dark:text-white">

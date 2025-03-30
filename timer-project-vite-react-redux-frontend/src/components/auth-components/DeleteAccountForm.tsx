@@ -27,34 +27,23 @@ function DeleteAccountForm() {
   const userState = useAppSelector((state) => state.user.user);
   const [noEmailAPIError, setNoEmailAPIError] =
     useState<ApiErrorResponse | null>(null);
-  const [sentDelete, setSentDelete] = useState<boolean>(false);
 
   const handleGoHomeClick = () => {
     navigate("/");
   };
 
   useEffect(() => {
-    if (!userState) {
-      dispatch(retrieveUser()).then(() => {
-        dispatch(resetUserStatus());
-        dispatch(resetUserError());
-      });
-    }
-  }, []);
-
-  useEffect(() => {
     if (
-      sentDelete &&
-      (deleteAccountState === "succeeded" ||
-        (deleteAccountErrorState !== null &&
-          deleteAccountErrorState?.message ===
-            "A verification code has already been sent. Please check your email."))
+      deleteAccountState === "succeeded" ||
+      (deleteAccountErrorState !== null &&
+        deleteAccountErrorState?.message ===
+          "A verification code has already been sent. Please check your email.")
     ) {
       dispatch(resetUserStatus());
       dispatch(resetUserError());
       navigate("/verify-delete-account", { replace: true });
     }
-  }, [deleteAccountState, deleteAccountErrorState, sentDelete]);
+  }, [deleteAccountState, deleteAccountErrorState]);
 
   useEffect(() => {
     if (
@@ -113,7 +102,6 @@ function DeleteAccountForm() {
                 if (noEmailAPIError) {
                   setNoEmailAPIError(null);
                 }
-                setSentDelete(true);
                 dispatch(submitDeleteAccount());
               }}
               className="group flex flex-row items-center justify-center rounded-full border-2 border-white bg-white p-2! shadow-[0px_0px_0px_1px_rgba(0,0,0,0.06),0px_1px_1px_-0.5px_rgba(0,0,0,0.06),0px_3px_3px_-1.5px_rgba(0,0,0,0.06),_0px_6px_6px_-3px_rgba(0,0,0,0.06),0px_12px_12px_-6px_rgba(0,0,0,0.06),0px_24px_24px_-12px_rgba(0,0,0,0.06)] transition ease-in-out hover:cursor-pointer hover:border-red-500 hover:bg-red-500 active:opacity-55 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-red-500 dark:hover:bg-red-500"
@@ -181,7 +169,6 @@ function DeleteAccountForm() {
                                     verificationAction:
                                       "account deletion verification",
                                   };
-                                setSentDelete(true);
                                 dispatch(
                                   reinitiateDeleteAccountVerification(
                                     reinitiateDeleteAccountVerificationDTO,
