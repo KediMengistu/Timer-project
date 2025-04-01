@@ -12,6 +12,8 @@ import { TimersService } from './timers.service';
 import { CreateTimerDTO } from './dto/create-timer.dto';
 import { Public } from '../auth/auth.decorator.factory';
 import { GuestTimerDTO } from './dto/guest-timer.dto';
+import { PauseTimerDTO } from './dto/pause-timer.dto';
+import { PlayTimerDTO } from './dto/play-timer.dto';
 
 @Controller('timers')
 export class TimersController {
@@ -39,8 +41,8 @@ export class TimersController {
   }
 
   @Patch('pause-timer/:id')
-  async pauseTimer(@Param() params: any) {
-    return this.timerService.pauseTimer(params.id);
+  async pauseTimer(@Param() params: any, @Body() pauseTimerDTO: PauseTimerDTO) {
+    return this.timerService.pauseTimer(params.id, pauseTimerDTO);
   }
 
   @Public()
@@ -50,8 +52,8 @@ export class TimersController {
   }
 
   @Patch('play-timer/:id')
-  async playTimer(@Param() params: any) {
-    return this.timerService.playTimer(params.id);
+  async playTimer(@Param() params: any, @Body() playTimerDTO: PlayTimerDTO) {
+    return this.timerService.playTimer(params.id, playTimerDTO);
   }
 
   @Public()

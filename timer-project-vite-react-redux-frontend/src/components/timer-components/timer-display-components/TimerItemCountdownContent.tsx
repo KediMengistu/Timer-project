@@ -12,9 +12,10 @@ function TimerItemCountdownContent({
   const [timeLeft, setTimeLeft] = useState(() => extractRemainingTime(item));
 
   useEffect(() => {
-    let timer: number;
+    let intervalId: number;
     if (!pauseStatus) {
-      timer = setInterval(() => {
+      setTimeLeft(extractRemainingTime(item));
+      intervalId = setInterval(() => {
         const remaining = extractRemainingTime(item);
         setTimeLeft(remaining);
         if (
@@ -22,11 +23,11 @@ function TimerItemCountdownContent({
           remaining.minutes === 0 &&
           remaining.seconds === 0
         ) {
-          clearInterval(timer);
+          clearInterval(intervalId);
         }
       }, 1000);
     }
-    return () => clearInterval(timer);
+    return () => clearInterval(intervalId);
   }, [pauseStatus]);
 
   return (

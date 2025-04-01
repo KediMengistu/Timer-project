@@ -2,40 +2,62 @@ import { AnimatePresence, motion } from "framer-motion";
 import { FaPause, FaPlay } from "react-icons/fa6";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
-import { Timer } from "../../../features/timers/timerDTO";
+import { PausePlayTimerDTO, Timer } from "../../../features/timers/timerDTO";
 import { extractPauseStatus } from "../../../utils/functions/extractPauseStatus";
 import { useAppDispatch, useAppSelector } from "../../../app/hooks";
 import TimerItemCountdownContent from "./TimerItemCountdownContent";
-import { pauseTimer, playTimer } from "../../../features/timers/timersSlice";
+import {
+  pauseTimer,
+  playTimer,
+  resetTimersError,
+  resetTimersStatus,
+} from "../../../features/timers/timersSlice";
 
 function TimerItemComponent() {
   const { id } = useParams<{ id: string }>();
   const timerId = id as string;
   const dispatch = useAppDispatch();
   const timersState = useAppSelector((state) => state.timers);
-  const [timer, setTimer] = useState<Timer>(timersState.entities[timerId]);
+  const [timer, setTimer] = useState<Timer>(
+    () => timersState.entities[timerId],
+  );
   const [pauseStatus, setPauseStatus] = useState<boolean>(() =>
     extractPauseStatus(timer),
   );
 
   useEffect(() => {
-    if (!timer) {
-      setTimer(timersState.entities[timerId]);
-    }
-  }, []);
-
-  useEffect(() => {
     if (timersState.status === "succeeded") {
-      setPauseStatus(!pauseStatus);
+      const updatedTimer = timersState.entities[timerId];
+      if (updatedTimer) {
+        setTimer(updatedTimer);
+        setPauseStatus(extractPauseStatus(updatedTimer));
+      }
+      dispatch(resetTimersStatus());
+      dispatch(resetTimersError());
     }
   }, [timersState]);
 
+  useEffect(() => {
+    return () => {
+      dispatch(resetTimersStatus());
+      dispatch(resetTimersError());
+    };
+  }, []);
+
   const handlePause = () => {
-    dispatch(pauseTimer(timer.id));
+    const pausePlayTimerDTO: PausePlayTimerDTO = {
+      timerId: timer.id,
+      pausePlayTime: new Date(),
+    };
+    dispatch(pauseTimer(pausePlayTimerDTO));
   };
 
   const handlePlay = () => {
-    dispatch(playTimer(timer.id));
+    const pausePlayTimerDTO: PausePlayTimerDTO = {
+      timerId: timer.id,
+      pausePlayTime: new Date(),
+    };
+    dispatch(playTimer(pausePlayTimerDTO));
   };
 
   return (

@@ -4,7 +4,13 @@ import {
   EntityState,
 } from "@reduxjs/toolkit";
 import { createAppAsyncThunk, DefaultState } from "../../app/appTypes";
-import { CreateTimerDTO, Timer } from "./timerDTO";
+import {
+  CreateTimerDTO,
+  PausePlayTimerDTO,
+  PauseTimerDTO,
+  PlayTimerDTO,
+  Timer,
+} from "./timerDTO";
 
 export interface TimerState extends DefaultState, EntityState<Timer, string> {}
 
@@ -112,15 +118,20 @@ export const deleteTimer = createAppAsyncThunk<string, string>(
   },
 );
 
-export const pauseTimer = createAppAsyncThunk<Timer, string>(
+export const pauseTimer = createAppAsyncThunk<Timer, PausePlayTimerDTO>(
   "timers/pauseTimer",
-  async (timerId: string, thunkAPI) => {
+  async (pausePlayTimerDTO: PausePlayTimerDTO, thunkAPI) => {
+    const timerId: string = pausePlayTimerDTO.timerId;
+    const pauseTimerDTO: PauseTimerDTO = {
+      pauseTime: pausePlayTimerDTO.pausePlayTime,
+    };
     try {
       const response = await fetch(`/api/timers/pause-timer/${timerId}`, {
         method: "PATCH",
         headers: {
           "Content-type": "application/json",
         },
+        body: JSON.stringify(pauseTimerDTO),
         credentials: "include",
       });
 
@@ -143,15 +154,20 @@ export const pauseTimer = createAppAsyncThunk<Timer, string>(
   },
 );
 
-export const playTimer = createAppAsyncThunk<Timer, string>(
+export const playTimer = createAppAsyncThunk<Timer, PausePlayTimerDTO>(
   "timers/playTimer",
-  async (timerId: string, thunkAPI) => {
+  async (pausePlayTimerDTO: PausePlayTimerDTO, thunkAPI) => {
+    const timerId: string = pausePlayTimerDTO.timerId;
+    const playTimerDTO: PlayTimerDTO = {
+      playTime: pausePlayTimerDTO.pausePlayTime,
+    };
     try {
       const response = await fetch(`/api/timers/play-timer/${timerId}`, {
         method: "PATCH",
         headers: {
           "Content-type": "application/json",
         },
+        body: JSON.stringify(playTimerDTO),
         credentials: "include",
       });
 

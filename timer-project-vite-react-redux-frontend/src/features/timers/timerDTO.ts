@@ -6,6 +6,19 @@ export interface CreateTimerDTO {
   breakDuration: number;
 }
 
+export interface PausePlayTimerDTO {
+  timerId: string;
+  pausePlayTime: Date;
+}
+
+export interface PauseTimerDTO {
+  pauseTime: Date;
+}
+
+export interface PlayTimerDTO {
+  playTime: Date;
+}
+
 export interface Timer {
   id: string;
   title: string;

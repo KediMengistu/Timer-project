@@ -5,22 +5,29 @@ export function extractRemainingTime(timer: Timer) {
     return { hours: 0, minutes: 0, seconds: 0 };
   }
 
-  // Get effective end time (original or delayed)
-  const effectiveEndTime = timer.delayedEndTime
+  const endTime = timer.delayedEndTime
     ? new Date(timer.delayedEndTime).getTime()
     : new Date(timer.endTime).getTime();
 
-  // If timer is paused, use pauseTime as reference
-  // Otherwise use current time
-  const referenceTime = timer.pauseTime
+  const now = timer.pauseTime
     ? new Date(timer.pauseTime).getTime()
     : new Date().getTime();
 
-  const difference = Math.max(0, effectiveEndTime - referenceTime);
+  const difference = Math.max(0, endTime - now);
 
   const hours = Math.floor(difference / (1000 * 60 * 60));
   const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
   const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+  console.log("Timer data:", {
+    now: new Date(now),
+    endTime: timer.endTime ? new Date(timer.endTime) : null,
+    delayedEndTime: timer.delayedEndTime
+      ? new Date(timer.delayedEndTime)
+      : null,
+    pauseTime: timer.pauseTime ? new Date(timer.pauseTime) : null,
+    pausedDurationInMs: timer.pausedDurationInMs,
+  });
 
   return { hours, minutes, seconds };
 }

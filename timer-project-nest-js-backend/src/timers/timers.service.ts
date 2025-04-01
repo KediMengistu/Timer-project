@@ -10,6 +10,8 @@ import { TimersUtility } from './timers.utility';
 import { NotFoundException } from '../exception/not-found.exception';
 import { GuestTimer } from './objects/guest-timer';
 import { GuestTimerDTO } from './dto/guest-timer.dto';
+import { PauseTimerDTO } from './dto/pause-timer.dto';
+import { PlayTimerDTO } from './dto/play-timer.dto';
 
 @Injectable()
 export class TimersService {
@@ -17,18 +19,31 @@ export class TimersService {
     @InjectRepository(Timer)
     private timersRepository: Repository<Timer>,
     private usersService: UsersService,
-    private timerUtility: TimersUtility
+    private timerUtility: TimersUtility,
   ) {}
 
-  async createTimer(userId: string, createTimerDTO: CreateTimerDTO): Promise<Timer> {
+  async createTimer(
+    userId: string,
+    createTimerDTO: CreateTimerDTO,
+  ): Promise<Timer> {
     const user: User = await this.usersService.retrieveUserViaId(userId);
-    if(user.numberOfTimers === 3) {
+    if (user.numberOfTimers === 3) {
       throw new BadRequestException('Cannot create more than 3 timers.');
     }
-    const timer: Timer = this.timersRepository.create({ ...createTimerDTO, user: user });
+    const timer: Timer = this.timersRepository.create({
+      ...createTimerDTO,
+      user: user,
+    });
     const savedTimer: Timer = await this.timersRepository.save(timer);
-    const completedTimerStats: { end: Date, numberOfBreaks: number } = await this.timerUtility.completeCreateTimer(savedTimer);
-    await this.timersRepository.update({ id: savedTimer.id }, { endTime: completedTimerStats.end, numberOfBreaks: completedTimerStats.numberOfBreaks });
+    const completedTimerStats: { end: Date; numberOfBreaks: number } =
+      await this.timerUtility.completeCreateTimer(savedTimer);
+    await this.timersRepository.update(
+      { id: savedTimer.id },
+      {
+        endTime: completedTimerStats.end,
+        numberOfBreaks: completedTimerStats.numberOfBreaks,
+      },
+    );
     const completeTimer: Timer = await this.retrieveTimer(savedTimer.id);
     this.usersService.updateUserTimerCount(userId, true, user.numberOfTimers);
     return completeTimer;
@@ -40,7 +55,7 @@ export class TimersService {
 
   async retrieveTimer(timerId: string): Promise<Timer> {
     const timer: Timer = await this.timersRepository.findOneBy({ id: timerId });
-    if(!timer) {
+    if (!timer) {
       throw new NotFoundException('Timer not found.');
     }
     return timer;
@@ -53,9 +68,14 @@ export class TimersService {
     return listOfTimers;
   }
 
-  async pauseTimer(timerId: string): Promise<Timer> {
-    const now: Date = new Date();
-    await this.timersRepository.update({ id: timerId }, { pauseTime: now });
+  async pauseTimer(
+    timerId: string,
+    pauseTimerDTO: PauseTimerDTO,
+  ): Promise<Timer> {
+    await this.timersRepository.update(
+      { id: timerId },
+      { pauseTime: pauseTimerDTO.pauseTime },
+    );
     const updatedTimer: Timer = await this.retrieveTimer(timerId);
     return updatedTimer;
   }
@@ -67,17 +87,25 @@ export class TimersService {
     return guestTimer;
   }
 
-  async playTimer(timerId: string): Promise<Timer> {
-    const now: Date = new Date();
-    await this.timersRepository.update({ id: timerId }, { unpausedTime: now });
+  async playTimer(timerId: string, playTimerDTO: PlayTimerDTO): Promise<Timer> {
+    await this.timersRepository.update(
+      { id: timerId },
+      { unpausedTime: playTimerDTO.playTime },
+    );
     const timer: Timer = await this.retrieveTimer(timerId);
-    const pausePlayTimerStats: { delayedEndTime: Date, pausedDurationInMs: number } = this.timerUtility.pausePlayTimerSettingsConfiguration(timer);
-    await this.timersRepository.update({ id: timerId }, {
-      pauseTime: null,
-      unpausedTime: null,
-      delayedEndTime: pausePlayTimerStats.delayedEndTime,
-      pausedDurationInMs: pausePlayTimerStats.pausedDurationInMs
-    });
+    const pausePlayTimerStats: {
+      delayedEndTime: Date;
+      pausedDurationInMs: number;
+    } = this.timerUtility.pausePlayTimerSettingsConfiguration(timer);
+    await this.timersRepository.update(
+      { id: timerId },
+      {
+        pauseTime: null,
+        unpausedTime: null,
+        delayedEndTime: pausePlayTimerStats.delayedEndTime,
+        pausedDurationInMs: pausePlayTimerStats.pausedDurationInMs,
+      },
+    );
     const updatedTimer: Timer = await this.retrieveTimer(timerId);
     return updatedTimer;
   }
@@ -86,17 +114,22 @@ export class TimersService {
     const now: Date = new Date();
     let guestTimer: GuestTimer = GuestTimer.fromGuestTimerDTO(guestTimerDTO);
     guestTimer.setUnpausedTime(now);
-    const guestPausePlayTimerStats: { delayedEndTime: Date, pausedDurationInMs: number } = this.timerUtility.guestPausePlayTimerSettingsConfiguration(guestTimer);
+    const guestPausePlayTimerStats: {
+      delayedEndTime: Date;
+      pausedDurationInMs: number;
+    } = this.timerUtility.guestPausePlayTimerSettingsConfiguration(guestTimer);
     guestTimer.setPauseTime(null);
     guestTimer.setUnpausedTime(null);
     guestTimer.setDelayedEndTime(guestPausePlayTimerStats.delayedEndTime);
-    guestTimer.setPausedDurationInMs(guestPausePlayTimerStats.pausedDurationInMs)
+    guestTimer.setPausedDurationInMs(
+      guestPausePlayTimerStats.pausedDurationInMs,
+    );
     return guestTimer;
   }
 
   async removeTimer(userId: string, timerId: string) {
     const user: User = await this.usersService.retrieveUserViaId(userId);
-    if(user.numberOfTimers === 0) {
+    if (user.numberOfTimers === 0) {
       throw new BadRequestException('No timers to delete.');
     }
     await this.timersRepository.delete({ id: timerId });
