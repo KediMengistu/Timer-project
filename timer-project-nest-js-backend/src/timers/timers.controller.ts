@@ -40,7 +40,7 @@ export class TimersController {
 
   @Patch('pause-timer/:id')
   async pauseTimer(@Param() params: any) {
-    await this.timerService.pauseTimer(params.id);
+    return this.timerService.pauseTimer(params.id);
   }
 
   @Public()
@@ -51,7 +51,7 @@ export class TimersController {
 
   @Patch('play-timer/:id')
   async playTimer(@Param() params: any) {
-    await this.timerService.playTimer(params.id);
+    return this.timerService.playTimer(params.id);
   }
 
   @Public()

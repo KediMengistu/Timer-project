@@ -82,9 +82,7 @@ function TimerSelectScrollListItemComponent({ item }: { item: Timer }) {
                   <h1 className="flex items-center justify-between text-xs text-black dark:text-white">
                     <span>Duration Hours: </span>
                     <span className="font-bold italic">
-                      {item.durationHours < 10
-                        ? `0${item.durationHours} hrs`
-                        : `${item.durationHours} hrs`}
+                      {String(item.durationHours).padStart(2, "0")} hrs
                     </span>
                   </h1>
                 </div>
@@ -92,9 +90,7 @@ function TimerSelectScrollListItemComponent({ item }: { item: Timer }) {
                   <h1 className="flex items-center justify-between text-xs text-black dark:text-white">
                     <span>Duration Minutes: </span>
                     <span className="font-bold italic">
-                      {item.durationMinutes < 10
-                        ? `0${item.durationMinutes} min`
-                        : `${item.durationMinutes} min`}
+                      {String(item.durationMinutes).padStart(2, "0")} min
                     </span>
                   </h1>
                 </div>
@@ -102,9 +98,7 @@ function TimerSelectScrollListItemComponent({ item }: { item: Timer }) {
                   <h1 className="flex items-center justify-between text-xs text-black dark:text-white">
                     <span>Duration Seconds: </span>
                     <span className="font-bold italic">
-                      {item.durationSeconds < 10
-                        ? `0${item.durationSeconds} s`
-                        : `${item.durationSeconds} s`}
+                      {String(item.durationSeconds).padStart(2, "0")} s
                     </span>
                   </h1>
                 </div>
@@ -172,9 +166,7 @@ function TimerSelectScrollListItemComponent({ item }: { item: Timer }) {
                   <h1 className="flex items-center justify-between text-xs text-black dark:text-white">
                     <span>Duration Hours: </span>
                     <span className="font-bold italic">
-                      {item.durationHours < 10
-                        ? `0${item.durationHours} hrs`
-                        : `${item.durationHours} hrs`}
+                      {String(item.durationHours).padStart(2, "0")} hrs
                     </span>
                   </h1>
                 </div>
@@ -182,9 +174,7 @@ function TimerSelectScrollListItemComponent({ item }: { item: Timer }) {
                   <h1 className="flex items-center justify-between text-xs text-black dark:text-white">
                     <span>Duration Minutes: </span>
                     <span className="font-bold italic">
-                      {item.durationMinutes < 10
-                        ? `0${item.durationMinutes} min`
-                        : `${item.durationMinutes} min`}
+                      {String(item.durationMinutes).padStart(2, "0")} min
                     </span>
                   </h1>
                 </div>
@@ -192,9 +182,7 @@ function TimerSelectScrollListItemComponent({ item }: { item: Timer }) {
                   <h1 className="flex items-center justify-between text-xs text-black dark:text-white">
                     <span>Duration Seconds: </span>
                     <span className="font-bold italic">
-                      {item.durationSeconds < 10
-                        ? `0${item.durationSeconds} s`
-                        : `${item.durationSeconds} s`}
+                      {String(item.durationSeconds).padStart(2, "0")} s
                     </span>
                   </h1>
                 </div>

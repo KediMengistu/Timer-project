@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAppSelector } from "../../app/hooks";
 import { AnimatePresence, motion } from "framer-motion";
+import { extractAmPm } from "../../utils/functions/extractAMPM";
 
 function DefaultMainContentTime() {
   const [time, setTime] = useState(new Date());
@@ -32,18 +33,10 @@ function DefaultMainContentTime() {
               UTC
             </span>{" "}
             Time: <br />
-            {time.getUTCHours() < 10
-              ? "0" + time.getUTCHours()
-              : time.getUTCHours()}
-            hrs{" "}
-            {time.getUTCMinutes() < 10
-              ? "0" + time.getUTCMinutes()
-              : time.getUTCMinutes()}
-            min{" "}
-            {time.getUTCSeconds() < 10
-              ? "0" + time.getUTCSeconds()
-              : time.getUTCSeconds()}
-            s{time.getUTCHours() < 12 ? " in the AM" : " in the PM"}.
+            {String(time.getUTCHours()).padStart(2, "0")}
+            hrs {String(time.getUTCMinutes()).padStart(2, "0")}
+            min {String(time.getUTCSeconds()).padStart(2, "0")}s
+            {` in the ${extractAmPm(String(time))}.`}
           </h1>
         </motion.div>
       ) : (
@@ -62,17 +55,10 @@ function DefaultMainContentTime() {
               Local
             </span>{" "}
             Time: <br />
-            {time.getHours() < 10
-              ? "0" + time.getHours()
-              : time.getHours()}hrs{" "}
-            {time.getMinutes() < 10
-              ? "0" + time.getMinutes()
-              : time.getMinutes()}
-            min{" "}
-            {time.getSeconds() < 10
-              ? "0" + time.getSeconds()
-              : time.getSeconds()}
-            s{time.getHours() < 12 ? " in the AM" : " in the PM"}.
+            {String(time.getHours()).padStart(2, "0")}
+            hrs {String(time.getMinutes()).padStart(2, "0")}
+            min {String(time.getSeconds()).padStart(2, "0")}s
+            {` in the ${extractAmPm(String(time))}.`}
           </h1>
         </motion.div>
       )}

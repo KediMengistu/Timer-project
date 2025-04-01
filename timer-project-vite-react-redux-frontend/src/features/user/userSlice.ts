@@ -10,7 +10,12 @@ import {
   VerifyDeleteAccountDTO,
   User,
 } from "./userDTO";
-import { createTimer, deleteTimer } from "../timers/timersSlice";
+import {
+  createTimer,
+  deleteTimer,
+  pauseTimer,
+  playTimer,
+} from "../timers/timersSlice";
 
 export interface UserState extends DefaultState {
   user: User | null;
@@ -361,6 +366,12 @@ export const userSlice = createSlice({
         state.updateUser = true;
       })
       .addCase(deleteTimer.fulfilled, (state) => {
+        state.updateUser = true;
+      })
+      .addCase(pauseTimer.fulfilled, (state) => {
+        state.updateUser = true;
+      })
+      .addCase(playTimer.fulfilled, (state) => {
         state.updateUser = true;
       });
   },

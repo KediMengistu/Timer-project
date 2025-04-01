@@ -112,6 +112,68 @@ export const deleteTimer = createAppAsyncThunk<string, string>(
   },
 );
 
+export const pauseTimer = createAppAsyncThunk<Timer, string>(
+  "timers/pauseTimer",
+  async (timerId: string, thunkAPI) => {
+    try {
+      const response = await fetch(`/api/timers/pause-timer/${timerId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-type": "application/json",
+        },
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return thunkAPI.rejectWithValue(errorData);
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue({
+        timestamp: new Date().toISOString(),
+        path: `/timers/pause-timer/${timerId}`,
+        message:
+          error instanceof Error ? error.message : "Network error occurred",
+        statusCode: 500,
+      });
+    }
+  },
+);
+
+export const playTimer = createAppAsyncThunk<Timer, string>(
+  "timers/playTimer",
+  async (timerId: string, thunkAPI) => {
+    try {
+      const response = await fetch(`/api/timers/play-timer/${timerId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-type": "application/json",
+        },
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return thunkAPI.rejectWithValue(errorData);
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue({
+        timestamp: new Date().toISOString(),
+        path: `/timers/play-timer/${timerId}`,
+        message:
+          error instanceof Error ? error.message : "Network error occurred",
+        statusCode: 500,
+      });
+    }
+  },
+);
+
 const timersAdapter = createEntityAdapter<Timer>();
 
 const initialState: TimerState = timersAdapter.getInitialState({
@@ -173,6 +235,32 @@ export const timersSlice = createSlice({
         state.error = null;
       })
       .addCase(deleteTimer.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload || null;
+      })
+      .addCase(pauseTimer.pending, (state) => {
+        state.status = "pending";
+        state.error = null;
+      })
+      .addCase(pauseTimer.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        timersAdapter.upsertOne(state, action.payload);
+        state.error = null;
+      })
+      .addCase(pauseTimer.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload || null;
+      })
+      .addCase(playTimer.pending, (state) => {
+        state.status = "pending";
+        state.error = null;
+      })
+      .addCase(playTimer.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        timersAdapter.upsertOne(state, action.payload);
+        state.error = null;
+      })
+      .addCase(playTimer.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload || null;
       });

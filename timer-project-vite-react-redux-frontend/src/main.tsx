@@ -22,7 +22,7 @@ import RequireAuthGuard from "./components/guard-components/RequireAuthGuard.tsx
 import RequireNoAuthGuard from "./components/guard-components/RequireNoAuthGuard.tsx";
 import TimerSelectScrollComponent from "./components/timer-components/timer-select-components/TimerSelectScrollComponent.tsx";
 import AddTimerForm from "./components/timer-components/timer-add-components/AddTimerForm.tsx";
-import TimerItemComponent from "./components/timer-components/timer-display-components/Timer.tsx";
+import TimerItemComponent from "./components/timer-components/timer-display-components/TimerItemComponent.tsx";
 import DeleteTimerForm from "./components/timer-components/timer-delete-components/DeleteTimerForm.tsx";
 
 const router = createBrowserRouter([
