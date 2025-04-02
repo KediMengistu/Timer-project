@@ -1,19 +1,21 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { FaPause, FaPlay } from "react-icons/fa6";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router";
-import { PausePlayTimerDTO, Timer } from "../../../features/timers/timerDTO";
+import { useNavigate, useParams } from "react-router";
+import { Timer } from "../../../features/timers/timerDTO";
 import { extractPauseStatus } from "../../../utils/functions/extractPauseStatus";
 import { useAppDispatch, useAppSelector } from "../../../app/hooks";
-import TimerItemCountdownContent from "./TimerItemCountdownContent";
 import {
   pauseTimer,
   playTimer,
   resetTimersError,
   resetTimersStatus,
 } from "../../../features/timers/timersSlice";
+import TimerItemCountdownContent from "./TimerItemCountdownContent";
+import TimerItemStatsContent from "./TimerItemStatsContent";
 
 function TimerItemComponent() {
+  const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const timerId = id as string;
   const dispatch = useAppDispatch();
@@ -24,6 +26,7 @@ function TimerItemComponent() {
   const [pauseStatus, setPauseStatus] = useState<boolean>(() =>
     extractPauseStatus(timer),
   );
+  const [countdownUpdate, setCountdownUpdate] = useState<boolean>(false);
 
   useEffect(() => {
     if (timersState.status === "succeeded") {
@@ -32,10 +35,18 @@ function TimerItemComponent() {
         setTimer(updatedTimer);
         setPauseStatus(extractPauseStatus(updatedTimer));
       }
-      dispatch(resetTimersStatus());
-      dispatch(resetTimersError());
     }
+    dispatch(resetTimersStatus());
+    dispatch(resetTimersError());
   }, [timersState]);
+
+  useEffect(() => {
+    if (countdownUpdate) {
+      const updatedTimer = timersState.entities[timerId];
+      setTimer(updatedTimer);
+      setCountdownUpdate(false);
+    }
+  }, [countdownUpdate]);
 
   useEffect(() => {
     return () => {
@@ -44,20 +55,18 @@ function TimerItemComponent() {
     };
   }, []);
 
+  const handleGoBack = () => {
+    dispatch(resetTimersStatus());
+    dispatch(resetTimersError());
+    navigate("/manage-timers");
+  };
+
   const handlePause = () => {
-    const pausePlayTimerDTO: PausePlayTimerDTO = {
-      timerId: timer.id,
-      pausePlayTime: new Date(),
-    };
-    dispatch(pauseTimer(pausePlayTimerDTO));
+    dispatch(pauseTimer(timer.id));
   };
 
   const handlePlay = () => {
-    const pausePlayTimerDTO: PausePlayTimerDTO = {
-      timerId: timer.id,
-      pausePlayTime: new Date(),
-    };
-    dispatch(playTimer(pausePlayTimerDTO));
+    dispatch(playTimer(timer.id));
   };
 
   return (
@@ -73,16 +82,31 @@ function TimerItemComponent() {
       >
         <div className="grid grid-cols-none grid-rows-[70%_30%] border-r-2 border-b-0 border-black md:grid-cols-[70%_30%] md:grid-rows-none md:border-r-0 md:border-b-2 dark:border-gray-700">
           <div className="border-r-0 border-b-2 border-black p-2! md:border-r-2 md:border-b-0 dark:border-gray-700">
-            <div className="grid h-full w-full grid-cols-[70%_30%] grid-rows-none rounded-xl border-1 border-black shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)] md:grid-cols-none md:grid-rows-[70%_30%] md:flex-row dark:border-gray-700">
+            <div className="relative grid h-full w-full grid-cols-[70%_30%] grid-rows-none rounded-xl border-1 border-black shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)] md:grid-cols-none md:grid-rows-[70%_30%] md:flex-row dark:border-gray-700">
+              <div className="absolute top-1 left-1 flex h-8 w-16 items-center justify-center rounded-xl hover:cursor-pointer">
+                <span
+                  onClick={() => {
+                    handleGoBack();
+                  }}
+                  className="group text-center text-xs text-black transition duration-300 ease-in-out hover:text-red-500 dark:text-white"
+                >
+                  &larr;
+                  <span className="text-center text-xs text-black italic underline underline-offset-2 transition duration-300 ease-in-out group-hover:text-red-500 dark:text-white">
+                    {" "}
+                    Go Back
+                  </span>
+                </span>
+              </div>
               <div className="flex flex-col items-center md:flex-row">
                 <div className="flex flex-1 flex-col items-start justify-center md:flex-row md:items-center md:gap-2">
                   <TimerItemCountdownContent
                     item={timer}
+                    updateItem={setCountdownUpdate}
                     pauseStatus={pauseStatus}
                   />
                 </div>
               </div>
-              <div className="xs:border-l-0 mt-3! mb-3! grid grid-cols-none grid-rows-1 border-t-0 border-l-1 border-black md:mt-0! md:mr-3! md:mb-0! md:ml-3! md:grid-cols-1 md:grid-rows-none md:border-t-1 md:border-l-0 dark:border-gray-700">
+              <div className="grid grid-cols-none grid-rows-1 border-t-0 border-black md:mr-3! md:ml-3! md:grid-cols-1 md:grid-rows-none md:border-t-1 dark:border-gray-700">
                 <AnimatePresence mode="wait" initial={false}>
                   {pauseStatus ? (
                     <motion.div
@@ -95,7 +119,7 @@ function TimerItemComponent() {
                         willChange: "transform",
                         backfaceVisibility: "hidden",
                       }}
-                      className="flex flex-col items-center justify-center md:flex-row"
+                      className="flex flex-col items-start justify-center md:flex-row md:items-center"
                     >
                       <FaPlay
                         onClick={() => {
@@ -115,7 +139,7 @@ function TimerItemComponent() {
                         willChange: "transform",
                         backfaceVisibility: "hidden",
                       }}
-                      className="flex flex-col items-center justify-center md:flex-row"
+                      className="flex flex-col items-start justify-center md:flex-row md:items-center"
                     >
                       <FaPause
                         onClick={() => {
@@ -129,10 +153,8 @@ function TimerItemComponent() {
               </div>
             </div>
           </div>
-          <div>
-            md: top-right
-            <br />
-            sm: bottom-left
+          <div className="p-2!">
+            <TimerItemStatsContent item={timer} />
           </div>
         </div>
         <div className="">

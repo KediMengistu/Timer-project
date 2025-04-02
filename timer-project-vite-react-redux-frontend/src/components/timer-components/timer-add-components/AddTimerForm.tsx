@@ -27,7 +27,10 @@ function AddTimerForm() {
     if (timersState.status === "succeeded") {
       dispatch(resetTimersStatus());
       dispatch(resetTimersError());
-      navigate("/manage-timers");
+      navigate(
+        `/manage-timers/${timersState.ids[timersState.ids.length - 1]}`,
+        { replace: true },
+      );
     }
   }, [timersState]);
 

@@ -1,6 +1,6 @@
-import { Timer } from "../../features/timers/timerDTO";
+import { TimeDuration, Timer } from "../../features/timers/timerDTO";
 
-export function extractRemainingTime(timer: Timer) {
+export function extractRemainingTime(timer: Timer): TimeDuration {
   if (!timer || !timer.endTime) {
     return { hours: 0, minutes: 0, seconds: 0 };
   }

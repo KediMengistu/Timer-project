@@ -2,15 +2,10 @@ import {
   createEntityAdapter,
   createSlice,
   EntityState,
+  PayloadAction,
 } from "@reduxjs/toolkit";
 import { createAppAsyncThunk, DefaultState } from "../../app/appTypes";
-import {
-  CreateTimerDTO,
-  PausePlayTimerDTO,
-  PauseTimerDTO,
-  PlayTimerDTO,
-  Timer,
-} from "./timerDTO";
+import { CreateTimerDTO, TimeDurationDTO, Timer } from "./timerDTO";
 
 export interface TimerState extends DefaultState, EntityState<Timer, string> {}
 
@@ -118,20 +113,15 @@ export const deleteTimer = createAppAsyncThunk<string, string>(
   },
 );
 
-export const pauseTimer = createAppAsyncThunk<Timer, PausePlayTimerDTO>(
+export const pauseTimer = createAppAsyncThunk<Timer, string>(
   "timers/pauseTimer",
-  async (pausePlayTimerDTO: PausePlayTimerDTO, thunkAPI) => {
-    const timerId: string = pausePlayTimerDTO.timerId;
-    const pauseTimerDTO: PauseTimerDTO = {
-      pauseTime: pausePlayTimerDTO.pausePlayTime,
-    };
+  async (timerId: string, thunkAPI) => {
     try {
       const response = await fetch(`/api/timers/pause-timer/${timerId}`, {
         method: "PATCH",
         headers: {
           "Content-type": "application/json",
         },
-        body: JSON.stringify(pauseTimerDTO),
         credentials: "include",
       });
 
@@ -154,20 +144,15 @@ export const pauseTimer = createAppAsyncThunk<Timer, PausePlayTimerDTO>(
   },
 );
 
-export const playTimer = createAppAsyncThunk<Timer, PausePlayTimerDTO>(
+export const playTimer = createAppAsyncThunk<Timer, string>(
   "timers/playTimer",
-  async (pausePlayTimerDTO: PausePlayTimerDTO, thunkAPI) => {
-    const timerId: string = pausePlayTimerDTO.timerId;
-    const playTimerDTO: PlayTimerDTO = {
-      playTime: pausePlayTimerDTO.pausePlayTime,
-    };
+  async (timerId: string, thunkAPI) => {
     try {
       const response = await fetch(`/api/timers/play-timer/${timerId}`, {
         method: "PATCH",
         headers: {
           "Content-type": "application/json",
         },
-        body: JSON.stringify(playTimerDTO),
         credentials: "include",
       });
 
@@ -201,6 +186,14 @@ export const timersSlice = createSlice({
   name: "timers",
   initialState,
   reducers: {
+    setReferenceTime: (state, action: PayloadAction<TimeDurationDTO>) => {
+      timersAdapter.updateOne(state, {
+        id: action.payload.id,
+        changes: {
+          referenceTime: action.payload.timeDuration,
+        },
+      });
+    },
     resetTimersStatus: (state) => {
       state.status = "idle";
     },
@@ -283,6 +276,10 @@ export const timersSlice = createSlice({
   },
 });
 
-export const { resetTimersStatus, resetTimersError, resetTimers } =
-  timersSlice.actions;
+export const {
+  setReferenceTime,
+  resetTimersStatus,
+  resetTimersError,
+  resetTimers,
+} = timersSlice.actions;
 export default timersSlice.reducer;

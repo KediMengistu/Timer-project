@@ -10,8 +10,6 @@ import { TimersUtility } from './timers.utility';
 import { NotFoundException } from '../exception/not-found.exception';
 import { GuestTimer } from './objects/guest-timer';
 import { GuestTimerDTO } from './dto/guest-timer.dto';
-import { PauseTimerDTO } from './dto/pause-timer.dto';
-import { PlayTimerDTO } from './dto/play-timer.dto';
 
 @Injectable()
 export class TimersService {
@@ -68,14 +66,9 @@ export class TimersService {
     return listOfTimers;
   }
 
-  async pauseTimer(
-    timerId: string,
-    pauseTimerDTO: PauseTimerDTO,
-  ): Promise<Timer> {
-    await this.timersRepository.update(
-      { id: timerId },
-      { pauseTime: pauseTimerDTO.pauseTime },
-    );
+  async pauseTimer(timerId: string): Promise<Timer> {
+    const now: Date = new Date();
+    await this.timersRepository.update({ id: timerId }, { pauseTime: now });
     const updatedTimer: Timer = await this.retrieveTimer(timerId);
     return updatedTimer;
   }
@@ -87,11 +80,9 @@ export class TimersService {
     return guestTimer;
   }
 
-  async playTimer(timerId: string, playTimerDTO: PlayTimerDTO): Promise<Timer> {
-    await this.timersRepository.update(
-      { id: timerId },
-      { unpausedTime: playTimerDTO.playTime },
-    );
+  async playTimer(timerId: string): Promise<Timer> {
+    const now: Date = new Date();
+    await this.timersRepository.update({ id: timerId }, { unpausedTime: now });
     const timer: Timer = await this.retrieveTimer(timerId);
     const pausePlayTimerStats: {
       delayedEndTime: Date;

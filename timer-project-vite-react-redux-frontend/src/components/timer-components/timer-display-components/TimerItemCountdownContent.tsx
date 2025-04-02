@@ -1,19 +1,38 @@
 import { useEffect, useState } from "react";
-import { Timer } from "../../../features/timers/timerDTO";
+import {
+  TimeDuration,
+  TimeDurationDTO,
+  Timer,
+} from "../../../features/timers/timerDTO";
 import { extractRemainingTime } from "../../../utils/functions/extractRemainingTime";
+import { useAppDispatch } from "../../../app/hooks";
+import { setReferenceTime } from "../../../features/timers/timersSlice";
 
 function TimerItemCountdownContent({
   item,
+  updateItem,
   pauseStatus,
 }: {
   item: Timer;
+  updateItem: React.Dispatch<React.SetStateAction<boolean>>;
   pauseStatus: boolean;
 }) {
-  const [timeLeft, setTimeLeft] = useState(() => extractRemainingTime(item));
+  const dispatch = useAppDispatch();
+  const [timeLeft, setTimeLeft] = useState<TimeDuration>(() =>
+    extractRemainingTime(item),
+  );
 
   useEffect(() => {
     let intervalId: number;
     if (!pauseStatus) {
+      if (item.referenceTime) {
+        const timeDurationDTO: TimeDurationDTO = {
+          id: item.id,
+          timeDuration: null,
+        };
+        dispatch(setReferenceTime(timeDurationDTO));
+        updateItem(true);
+      }
       setTimeLeft(extractRemainingTime(item));
       intervalId = setInterval(() => {
         const remaining = extractRemainingTime(item);
@@ -26,6 +45,17 @@ function TimerItemCountdownContent({
           clearInterval(intervalId);
         }
       }, 1000);
+    } else {
+      if (!item.referenceTime) {
+        const timeDurationDTO: TimeDurationDTO = {
+          id: item.id,
+          timeDuration: timeLeft,
+        };
+        dispatch(setReferenceTime(timeDurationDTO));
+        updateItem(true);
+      } else {
+        setTimeLeft(item.referenceTime);
+      }
     }
     return () => clearInterval(intervalId);
   }, [pauseStatus]);

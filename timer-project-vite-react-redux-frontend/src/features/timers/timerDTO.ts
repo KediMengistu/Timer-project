@@ -6,17 +6,15 @@ export interface CreateTimerDTO {
   breakDuration: number;
 }
 
-export interface PausePlayTimerDTO {
-  timerId: string;
-  pausePlayTime: Date;
+export interface TimeDuration {
+  hours: number;
+  minutes: number;
+  seconds: number;
 }
 
-export interface PauseTimerDTO {
-  pauseTime: Date;
-}
-
-export interface PlayTimerDTO {
-  playTime: Date;
+export interface TimeDurationDTO {
+  id: string;
+  timeDuration: TimeDuration | null;
 }
 
 export interface Timer {
@@ -35,4 +33,5 @@ export interface Timer {
   unpausedTime: string | null;
   createdAt: string;
   updatedAt: string;
+  referenceTime: TimeDuration | null;
 }
