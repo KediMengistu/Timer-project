@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 function TimerSelectScrollAddListItemComponent() {
   const navigate = useNavigate();
   return (
-    <div className="relative ml-2! inline h-[75%] w-full shrink-0 grow-0 snap-center snap-always rounded-sm bg-white align-middle whitespace-normal md:h-full dark:bg-transparent">
+    <div className="relative ml-2! inline h-[85%] w-full shrink-0 grow-0 snap-center snap-always rounded-sm bg-white align-middle whitespace-normal md:h-full dark:bg-transparent">
       <button
         onClick={() => {
           navigate("/manage-timers/add-timer");

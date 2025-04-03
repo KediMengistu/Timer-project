@@ -62,15 +62,15 @@ function TimerItemCountdownContent({
 
   return (
     <>
-      <span className="text-5xl text-black md:gap-2 md:text-7xl lg:text-9xl dark:text-white">
+      <span className="text-3xl text-black md:gap-2 md:text-5xl lg:text-7xl dark:text-white">
         {String(timeLeft.hours).padStart(2, "0")}
         <span className="text-xs text-black dark:text-white">hrs</span>
       </span>
-      <span className="text-5xl text-black md:gap-2 md:text-7xl lg:text-9xl dark:text-white">
+      <span className="text-3xl text-black md:gap-2 md:text-5xl lg:text-7xl dark:text-white">
         {String(timeLeft.minutes).padStart(2, "0")}
         <span className="text-xs text-black dark:text-white">min</span>
       </span>
-      <span className="text-5xl text-black md:gap-2 md:text-7xl lg:text-9xl dark:text-white">
+      <span className="text-3xl text-black md:gap-2 md:text-5xl lg:text-7xl dark:text-white">
         {String(timeLeft.seconds).padStart(2, "0")}
         <span className="text-xs text-black dark:text-white">s</span>
       </span>
