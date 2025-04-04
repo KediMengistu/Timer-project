@@ -1,10 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate } from "react-router";
 import { Timer } from "../../../features/timers/timerDTO";
-import { extractAmPm } from "../../../utils/functions/extractAMPM";
-import { extractDate } from "../../../utils/functions/extractDate";
-import { extractUTCTime } from "../../../utils/functions/extractUTCTime";
-import { extractLocalTime } from "../../../utils/functions/extractLocalTime";
 import { useEffect } from "react";
 import { useAppSelector, useAppDispatch } from "../../../app/hooks";
 import {
@@ -15,7 +11,6 @@ import {
 function TimerSelectScrollListItemComponent({ item }: { item: Timer }) {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const timezoneState = useAppSelector((state) => state.time.timezone);
   const deleteTimersState = useAppSelector((state) => state.timers);
 
   useEffect(() => {
