@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import {
   TimeDuration,
   TimeDurationDTO,
@@ -10,17 +10,18 @@ import { setReferenceTime } from "../../../features/timers/timersSlice";
 
 function TimerItemCountdownContent({
   item,
+  timeLeft,
+  setTimeLeft,
   updateItem,
   pauseStatus,
 }: {
   item: Timer;
+  timeLeft: TimeDuration;
+  setTimeLeft: React.Dispatch<React.SetStateAction<TimeDuration>>;
   updateItem: React.Dispatch<React.SetStateAction<boolean>>;
   pauseStatus: boolean;
 }) {
   const dispatch = useAppDispatch();
-  const [timeLeft, setTimeLeft] = useState<TimeDuration>(() =>
-    extractRemainingTime(item),
-  );
 
   useEffect(() => {
     let intervalId: number;

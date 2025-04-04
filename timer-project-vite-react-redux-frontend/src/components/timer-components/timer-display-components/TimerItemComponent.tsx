@@ -1,8 +1,10 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { FaPause, FaPlay } from "react-icons/fa6";
+import { IoInformationCircleSharp } from "react-icons/io5";
+import { IoIosCloseCircleOutline } from "react-icons/io";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
-import { Timer } from "../../../features/timers/timerDTO";
+import { TimeDuration, Timer } from "../../../features/timers/timerDTO";
 import { extractPauseStatus } from "../../../utils/functions/extractPauseStatus";
 import { useAppDispatch, useAppSelector } from "../../../app/hooks";
 import {
@@ -12,7 +14,8 @@ import {
   resetTimersStatus,
 } from "../../../features/timers/timersSlice";
 import TimerItemCountdownContent from "./TimerItemCountdownContent";
-import TimerItemStatsContent from "./TimerItemStatsContent";
+import { extractRemainingTime } from "../../../utils/functions/extractRemainingTime";
+import TimerItemInformationContent from "./TimerItemInformationContent";
 
 function TimerItemComponent() {
   const navigate = useNavigate();
@@ -23,10 +26,14 @@ function TimerItemComponent() {
   const [timer, setTimer] = useState<Timer>(
     () => timersState.entities[timerId],
   );
+  const [timeLeft, setTimeLeft] = useState<TimeDuration>(() =>
+    extractRemainingTime(timer),
+  );
   const [pauseStatus, setPauseStatus] = useState<boolean>(() =>
     extractPauseStatus(timer),
   );
   const [countdownUpdate, setCountdownUpdate] = useState<boolean>(false);
+  const [renderTimerInfo, setRenderTimerInfo] = useState<boolean>(false);
 
   useEffect(() => {
     if (timersState.status === "succeeded") {
@@ -69,6 +76,10 @@ function TimerItemComponent() {
     dispatch(playTimer(timer.id));
   };
 
+  const handleGoToTimerInfo = () => {
+    setRenderTimerInfo(!renderTimerInfo);
+  };
+
   return (
     <AnimatePresence mode="wait">
       <motion.div
@@ -78,11 +89,11 @@ function TimerItemComponent() {
         exit={{ opacity: 0 }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
         style={{ willChange: "transform", backfaceVisibility: "hidden" }}
-        className="grid grid-cols-none grid-rows-2 border-t-2 border-b-2 border-black bg-white md:grid-cols-2 md:grid-rows-none dark:border-gray-700 dark:bg-gray-800"
+        className="border-t-2 border-b-2 border-black bg-white dark:border-gray-700 dark:bg-gray-800"
       >
-        <div className="h-full w-full p-2! pr-2! pb-1! md:pr-1! md:pb-2!">
-          <div className="relative grid h-full w-full grid-cols-[60%_40%] grid-rows-none rounded-xl border-1 border-black bg-white shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)] md:grid-cols-none md:grid-rows-[70%_30%] md:flex-row dark:border-gray-700 dark:bg-gray-800">
-            <div className="absolute top-1 left-1 flex h-8 w-16 items-center justify-center rounded-xl hover:cursor-pointer">
+        <div className="relative h-full w-full p-2! pr-2! pb-1! md:pr-1! md:pb-2!">
+          <div className="relative grid h-full w-full grid-cols-[60%_40%] grid-rows-none rounded-xl border-1 border-black bg-white shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)] md:grid-cols-none md:grid-rows-[70%_30%] dark:border-gray-700 dark:bg-gray-800">
+            <div className="absolute top-1 left-4 flex h-8 w-fit items-center justify-center rounded-xl hover:cursor-pointer">
               <span
                 onClick={() => {
                   handleGoBack();
@@ -96,10 +107,28 @@ function TimerItemComponent() {
                 </span>
               </span>
             </div>
+            <div className="absolute top-3 right-4 z-20 flex h-fit w-fit items-center justify-center transition duration-300 ease-in-out hover:cursor-pointer">
+              <button
+                type="button"
+                onClick={() => {
+                  handleGoToTimerInfo();
+                }}
+                className="peer cursor-pointer border-0 bg-transparent p-0 transition ease-in-out hover:opacity-75 active:opacity-55"
+              >
+                <IoInformationCircleSharp className="h-5 w-5 fill-black dark:fill-gray-400" />
+              </button>
+              <div className="pointer-events-none absolute top-1/2 right-[110%] flex w-[100px] -translate-y-1/2 items-center justify-center rounded-tr-full rounded-br-full border-2 border-black bg-white p-1! opacity-0 shadow-[-2.25px_3px_0_2px_rgba(0,0,0,0.516)] transition duration-200 ease-in-out peer-hover:opacity-100 md:w-[110px] dark:border-gray-700 dark:bg-gray-800">
+                <h1 className="text-center text-[8px] text-black italic md:text-[9.5px] dark:text-white">
+                  Click for {timer.title} info
+                </h1>
+              </div>
+            </div>
             <div className="flex flex-col items-center md:flex-row">
               <div className="flex flex-1 flex-col items-start justify-center md:flex-row md:items-center md:gap-2">
                 <TimerItemCountdownContent
                   item={timer}
+                  timeLeft={timeLeft}
+                  setTimeLeft={setTimeLeft}
                   updateItem={setCountdownUpdate}
                   pauseStatus={pauseStatus}
                 />
@@ -150,13 +179,42 @@ function TimerItemComponent() {
                 )}
               </AnimatePresence>
             </div>
-          </div>
-        </div>
-        <div className="h-full w-full p-2! pt-1! pl-2! md:pt-2! md:pl-1!">
-          <div className="h-full w-full rounded-xl border-1 border-black bg-white pt-3! pb-3! shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)] dark:border-gray-700 dark:bg-gray-800">
-            <div className="scrollbar-none flex h-full w-full snap-x snap-mandatory scroll-p-1! items-center overflow-x-auto border-t-1 border-b-1 border-black bg-white p-1! pt-1! pr-1! pb-1! pl-1! whitespace-nowrap dark:border-gray-700 dark:bg-gray-800">
-              <TimerItemStatsContent item={timer} />
-            </div>
+            {
+              <AnimatePresence mode="wait">
+                {renderTimerInfo && (
+                  <motion.div
+                    key="TimerItemComponentInfo"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                    style={{
+                      willChange: "transform",
+                      backfaceVisibility: "hidden",
+                    }}
+                    className="absolute top-0 left-0 z-20 h-full w-full rounded-xl border-1 border-black bg-white dark:border-gray-700 dark:bg-gray-800"
+                  >
+                    <div className="relative h-full w-full">
+                      <div className="absolute top-3 right-4 z-20 flex h-fit w-fit items-center justify-center transition duration-300 ease-in-out hover:cursor-pointer">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            handleGoToTimerInfo();
+                          }}
+                          className="group cursor-pointer border-0 bg-transparent p-0 transition ease-in-out active:opacity-55"
+                        >
+                          <IoIosCloseCircleOutline className="h-5 w-5 fill-black transition duration-300 ease-in-out group-hover:fill-red-500 dark:fill-gray-400" />
+                        </button>
+                      </div>
+                      <TimerItemInformationContent
+                        item={timer}
+                        timeLeft={timeLeft}
+                      />
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            }
           </div>
         </div>
       </motion.div>
