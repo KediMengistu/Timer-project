@@ -16,6 +16,11 @@ import {
 import TimerItemCountdownContent from "./TimerItemCountdownContent";
 import { extractRemainingTime } from "../../../utils/functions/extractRemainingTime";
 import TimerItemInformationContent from "./TimerItemInformationContent";
+import {
+  resetBreaksError,
+  resetBreaksStatus,
+  retrieveAllBreaks,
+} from "../../../features/breaks/breaksSlice";
 
 function TimerItemComponent() {
   const navigate = useNavigate();
@@ -23,6 +28,7 @@ function TimerItemComponent() {
   const timerId = id as string;
   const dispatch = useAppDispatch();
   const timersState = useAppSelector((state) => state.timers);
+  const breaksState = useAppSelector((state) => state.breaks);
   const [timer, setTimer] = useState<Timer>(
     () => timersState.entities[timerId],
   );
@@ -34,6 +40,15 @@ function TimerItemComponent() {
   );
   const [countdownUpdate, setCountdownUpdate] = useState<boolean>(false);
   const [renderTimerInfo, setRenderTimerInfo] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (breaksState.ids.includes(timerId) === false) {
+      dispatch(retrieveAllBreaks(timerId)).then(() => {
+        dispatch(resetBreaksStatus());
+        dispatch(resetBreaksError());
+      });
+    }
+  }, []);
 
   useEffect(() => {
     if (timersState.status === "succeeded") {
@@ -59,12 +74,16 @@ function TimerItemComponent() {
     return () => {
       dispatch(resetTimersStatus());
       dispatch(resetTimersError());
+      dispatch(resetBreaksStatus());
+      dispatch(resetBreaksError());
     };
   }, []);
 
   const handleGoBack = () => {
     dispatch(resetTimersStatus());
     dispatch(resetTimersError());
+    dispatch(resetBreaksStatus());
+    dispatch(resetBreaksError());
     navigate("/manage-timers");
   };
 
@@ -192,7 +211,7 @@ function TimerItemComponent() {
                       willChange: "transform",
                       backfaceVisibility: "hidden",
                     }}
-                    className="absolute top-0 left-0 z-20 h-full w-full rounded-xl border-1 border-black bg-white dark:border-gray-700 dark:bg-gray-800"
+                    className="absolute top-0 left-0 z-20 h-full w-full rounded-xl border-1 border-transparent bg-white dark:bg-gray-800"
                   >
                     <div className="relative h-full w-full">
                       <div className="absolute top-3 right-4 z-20 flex h-fit w-fit items-center justify-center transition duration-300 ease-in-out hover:cursor-pointer">

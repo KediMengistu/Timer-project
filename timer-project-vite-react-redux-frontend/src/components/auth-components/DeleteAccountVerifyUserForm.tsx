@@ -20,6 +20,7 @@ import {
 } from "../../features/user/userSlice";
 import { VerifyDeleteAccountDTO } from "../../features/user/userDTO";
 import { resetTimers } from "../../features/timers/timersSlice";
+import { resetBreaks } from "../../features/breaks/breaksSlice";
 import {
   ApiErrorResponse,
   ReinitiateVerificationDTO,
@@ -54,6 +55,7 @@ function DeleteAccountVerifyUserForm() {
     ) {
       dispatch(resetUser());
       dispatch(resetTimers());
+      dispatch(resetBreaks());
       dispatch(setIsSignedIn(false));
       navigate("/", { replace: true });
     }
@@ -66,6 +68,7 @@ function DeleteAccountVerifyUserForm() {
     ) {
       dispatch(resetUser());
       dispatch(resetTimers());
+      dispatch(resetBreaks());
       dispatch(setIsSignedIn(false));
       navigate("/", { replace: true });
     }

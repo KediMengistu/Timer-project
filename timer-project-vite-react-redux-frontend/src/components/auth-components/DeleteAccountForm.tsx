@@ -12,6 +12,7 @@ import {
   submitDeleteAccount,
 } from "../../features/user/userSlice";
 import { resetTimers } from "../../features/timers/timersSlice";
+import { resetBreaks } from "../../features/breaks/breaksSlice";
 import {
   ApiErrorResponse,
   ReinitiateVerificationDTO,
@@ -51,6 +52,7 @@ function DeleteAccountForm() {
     ) {
       dispatch(resetUser());
       dispatch(resetTimers());
+      dispatch(resetBreaks());
       dispatch(setIsSignedIn(false));
       navigate("/");
     }

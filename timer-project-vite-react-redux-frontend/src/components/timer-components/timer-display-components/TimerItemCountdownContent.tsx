@@ -7,6 +7,7 @@ import {
 import { extractRemainingTime } from "../../../utils/functions/extractRemainingTime";
 import { useAppDispatch } from "../../../app/hooks";
 import { setReferenceTime } from "../../../features/timers/timersSlice";
+import { extractIsExpiring } from "../../../utils/functions/extractIsExpiring";
 
 function TimerItemCountdownContent({
   item,
@@ -63,15 +64,21 @@ function TimerItemCountdownContent({
 
   return (
     <>
-      <span className="text-3xl text-black md:gap-2 md:text-5xl lg:text-7xl dark:text-white">
+      <span
+        className={`text-3xl ${extractIsExpiring(timeLeft) ? "text-red" : "text-black dark:text-white"} md:gap-2 md:text-5xl lg:text-7xl`}
+      >
         {String(timeLeft.hours).padStart(2, "0")}
         <span className="text-xs text-black dark:text-white">hrs</span>
       </span>
-      <span className="text-3xl text-black md:gap-2 md:text-5xl lg:text-7xl dark:text-white">
+      <span
+        className={`text-3xl ${extractIsExpiring(timeLeft) ? "text-red" : "text-black dark:text-white"} md:gap-2 md:text-5xl lg:text-7xl`}
+      >
         {String(timeLeft.minutes).padStart(2, "0")}
         <span className="text-xs text-black dark:text-white">min</span>
       </span>
-      <span className="text-3xl text-black md:gap-2 md:text-5xl lg:text-7xl dark:text-white">
+      <span
+        className={`text-3xl ${extractIsExpiring(timeLeft) ? "text-red" : "text-black dark:text-white"} md:gap-2 md:text-5xl lg:text-7xl`}
+      >
         {String(timeLeft.seconds).padStart(2, "0")}
         <span className="text-xs text-black dark:text-white">s</span>
       </span>

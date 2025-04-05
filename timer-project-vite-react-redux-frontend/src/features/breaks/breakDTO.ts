@@ -1,10 +1,14 @@
 export interface Break {
   id: string;
-  timerId: string;
+  breakNumber: number;
   breakDuration: number;
   startTime: string;
   endTime: string;
   createdAt: string;
   updatedAt: string;
-  breakNumber: number;
+}
+
+export interface BreaksForTimer {
+  id: string;
+  breaks: Break[];
 }

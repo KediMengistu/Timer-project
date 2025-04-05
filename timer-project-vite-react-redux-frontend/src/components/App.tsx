@@ -13,6 +13,12 @@ import {
   resetTimersStatus,
   retrieveAllTimers,
 } from "../features/timers/timersSlice";
+import {
+  resetBreaksError,
+  resetBreaksStatus,
+  retrieveAllBreaks,
+  setFetchBreaks,
+} from "../features/breaks/breaksSlice";
 
 function App() {
   const darkModeState = useAppSelector((state) => state.theme.darkMode);
@@ -20,6 +26,8 @@ function App() {
   const userState = useAppSelector((state) => state.user.user);
   const updateUserState = useAppSelector((state) => state.user.updateUser);
   const timersState = useAppSelector((state) => state.timers);
+  const fetchBreaksState = useAppSelector((state) => state.breaks.fetchBreaks);
+  const breaksState = useAppSelector((state) => state.breaks);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -63,6 +71,20 @@ function App() {
       }
     }
   }, [updateUserState]);
+
+  useEffect(() => {
+    if (fetchBreaksState) {
+      if (JSON.stringify(breaksState.entities) === "{}") {
+        timersState.ids.forEach((id) => {
+          dispatch(retrieveAllBreaks(id)).then(() => {
+            dispatch(resetBreaksStatus());
+            dispatch(resetBreaksError());
+          });
+        });
+      }
+      dispatch(setFetchBreaks(false));
+    }
+  }, [fetchBreaksState]);
 
   return (
     <>
