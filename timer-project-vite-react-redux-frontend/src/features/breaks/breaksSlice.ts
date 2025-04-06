@@ -6,7 +6,11 @@ import {
 } from "@reduxjs/toolkit";
 import { createAppAsyncThunk, DefaultState } from "../../app/appTypes";
 import { BreaksForTimer } from "./breakDTO";
-import { deleteTimer, retrieveAllTimers } from "../timers/timersSlice";
+import {
+  deleteTimer,
+  restartTimer,
+  retrieveAllTimers,
+} from "../timers/timersSlice";
 
 export interface BreaksState
   extends DefaultState,
@@ -93,6 +97,9 @@ export const breaksSlice = createSlice({
       })
       .addCase(retrieveAllTimers.fulfilled, (state) => {
         state.fetchBreaks = true;
+      })
+      .addCase(restartTimer.fulfilled, (state, action) => {
+        breaksAdapter.removeOne(state, action.payload.id);
       })
       .addCase(deleteTimer.fulfilled, (state, action) => {
         breaksAdapter.removeOne(state, action.payload);

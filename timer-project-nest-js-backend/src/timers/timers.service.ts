@@ -10,6 +10,7 @@ import { TimersUtility } from './timers.utility';
 import { NotFoundException } from '../exception/not-found.exception';
 import { GuestTimer } from './objects/guest-timer';
 import { GuestTimerDTO } from './dto/guest-timer.dto';
+import { BreaksService } from 'src/breaks/breaks.service';
 
 @Injectable()
 export class TimersService {
@@ -18,6 +19,7 @@ export class TimersService {
     private timersRepository: Repository<Timer>,
     private usersService: UsersService,
     private timerUtility: TimersUtility,
+    private breaksService: BreaksService,
   ) {}
 
   async createTimer(
@@ -67,6 +69,10 @@ export class TimersService {
   }
 
   async pauseTimer(timerId: string): Promise<Timer> {
+    const timer: Timer = await this.retrieveTimer(timerId);
+    if (timer.pauseTime) {
+      throw new BadRequestException('Timer is currently paused.');
+    }
     const now: Date = new Date();
     await this.timersRepository.update({ id: timerId }, { pauseTime: now });
     const updatedTimer: Timer = await this.retrieveTimer(timerId);
@@ -81,9 +87,13 @@ export class TimersService {
   }
 
   async playTimer(timerId: string): Promise<Timer> {
+    let timer: Timer = await this.retrieveTimer(timerId);
+    if (timer.unpausedTime) {
+      throw new BadRequestException('Timer is currently played.');
+    }
     const now: Date = new Date();
     await this.timersRepository.update({ id: timerId }, { unpausedTime: now });
-    const timer: Timer = await this.retrieveTimer(timerId);
+    timer = await this.retrieveTimer(timerId);
     const pausePlayTimerStats: {
       delayedEndTime: Date;
       pausedDurationInMs: number;
@@ -116,6 +126,46 @@ export class TimersService {
       guestPausePlayTimerStats.pausedDurationInMs,
     );
     return guestTimer;
+  }
+
+  async restartTimer(timerId: string): Promise<Timer> {
+    let timer: Timer = await this.retrieveTimer(timerId);
+    const now: Date = new Date();
+    if (timer.pauseTime !== null) {
+      throw new BadRequestException('Cannot restart paused timer.');
+    }
+    if (
+      (timer.delayedEndTime !== null && timer.delayedEndTime > now) ||
+      (timer.endTime !== null && timer.endTime > now)
+    ) {
+      throw new BadRequestException('Cannot restart unexpired timer.');
+    }
+    await this.timersRepository.update(
+      { id: timerId },
+      {
+        startTime: now,
+        pauseTime: null,
+        unpausedTime: null,
+        numberOfBreaks: 0,
+        pausedDurationInMs: 0,
+        endTime: null,
+        delayedEndTime: null,
+      },
+    );
+    timer = await this.retrieveTimer(timerId);
+    await this.breaksService.removeAllBreaks(timer);
+    timer = await this.retrieveTimer(timerId);
+    const completedTimerStats: { end: Date; numberOfBreaks: number } =
+      await this.timerUtility.completeCreateTimer(timer);
+    await this.timersRepository.update(
+      { id: timer.id },
+      {
+        endTime: completedTimerStats.end,
+        numberOfBreaks: completedTimerStats.numberOfBreaks,
+      },
+    );
+    const completeTimer: Timer = await this.retrieveTimer(timer.id);
+    return completeTimer;
   }
 
   async removeTimer(userId: string, timerId: string) {

@@ -5,20 +5,24 @@ import {
   Timer,
 } from "../../../features/timers/timerDTO";
 import { extractRemainingTime } from "../../../utils/functions/extractRemainingTime";
+import { extractIsExpiring } from "../../../utils/functions/extractIsExpiring";
 import { useAppDispatch } from "../../../app/hooks";
 import { setReferenceTime } from "../../../features/timers/timersSlice";
-import { extractIsExpiring } from "../../../utils/functions/extractIsExpiring";
 
 function TimerItemCountdownContent({
   item,
   timeLeft,
   setTimeLeft,
+  expiredStatus,
+  setExpiredStatus,
   updateItem,
   pauseStatus,
 }: {
   item: Timer;
   timeLeft: TimeDuration;
   setTimeLeft: React.Dispatch<React.SetStateAction<TimeDuration>>;
+  expiredStatus: boolean;
+  setExpiredStatus: React.Dispatch<React.SetStateAction<boolean>>;
   updateItem: React.Dispatch<React.SetStateAction<boolean>>;
   pauseStatus: boolean;
 }) {
@@ -45,6 +49,9 @@ function TimerItemCountdownContent({
           remaining.seconds === 0
         ) {
           clearInterval(intervalId);
+          if (!expiredStatus) {
+            setExpiredStatus(true);
+          }
         }
       }, 1000);
     } else {
@@ -65,19 +72,19 @@ function TimerItemCountdownContent({
   return (
     <>
       <span
-        className={`text-3xl ${extractIsExpiring(timeLeft) ? "text-red" : "text-black dark:text-white"} md:gap-2 md:text-5xl lg:text-7xl`}
+        className={`text-3xl ${extractIsExpiring(timeLeft) ? "text-red-500" : "text-black dark:text-white"} transition duration-300 ease-in-out md:gap-2 md:text-5xl lg:text-7xl`}
       >
         {String(timeLeft.hours).padStart(2, "0")}
         <span className="text-xs text-black dark:text-white">hrs</span>
       </span>
       <span
-        className={`text-3xl ${extractIsExpiring(timeLeft) ? "text-red" : "text-black dark:text-white"} md:gap-2 md:text-5xl lg:text-7xl`}
+        className={`text-3xl ${extractIsExpiring(timeLeft) ? "text-red-500" : "text-black dark:text-white"} transition duration-300 ease-in-out md:gap-2 md:text-5xl lg:text-7xl`}
       >
         {String(timeLeft.minutes).padStart(2, "0")}
         <span className="text-xs text-black dark:text-white">min</span>
       </span>
       <span
-        className={`text-3xl ${extractIsExpiring(timeLeft) ? "text-red" : "text-black dark:text-white"} md:gap-2 md:text-5xl lg:text-7xl`}
+        className={`text-3xl ${extractIsExpiring(timeLeft) ? "text-red-500" : "text-black dark:text-white"} transition duration-300 ease-in-out md:gap-2 md:text-5xl lg:text-7xl`}
       >
         {String(timeLeft.seconds).padStart(2, "0")}
         <span className="text-xs text-black dark:text-white">s</span>

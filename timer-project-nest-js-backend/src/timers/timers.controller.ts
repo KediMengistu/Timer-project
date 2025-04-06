@@ -60,6 +60,11 @@ export class TimersController {
     return this.timerService.guestPlayTimer(guestTimerDTO);
   }
 
+  @Patch('restart-timer/:id')
+  async restartTimer(@Param() params: any) {
+    return this.timerService.restartTimer(params.id);
+  }
+
   @Delete('delete-timer/:id')
   async deleteTimer(@Req() request, @Param() params: any) {
     await this.timerService.removeTimer(request.user.userId, params.id);

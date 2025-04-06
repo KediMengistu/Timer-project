@@ -175,6 +175,37 @@ export const playTimer = createAppAsyncThunk<Timer, string>(
   },
 );
 
+export const restartTimer = createAppAsyncThunk<Timer, string>(
+  "timers/restartTimer",
+  async (timerId: string, thunkAPI) => {
+    try {
+      const response = await fetch(`/api/timers/restart-timer/${timerId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-type": "application/json",
+        },
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return thunkAPI.rejectWithValue(errorData);
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue({
+        timestamp: new Date().toISOString(),
+        path: `/timers/restart-timer/${timerId}`,
+        message:
+          error instanceof Error ? error.message : "Network error occurred",
+        statusCode: 500,
+      });
+    }
+  },
+);
+
 const timersAdapter = createEntityAdapter<Timer>();
 
 const initialState: TimerState = timersAdapter.getInitialState({
@@ -270,6 +301,19 @@ export const timersSlice = createSlice({
         state.error = null;
       })
       .addCase(playTimer.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload || null;
+      })
+      .addCase(restartTimer.pending, (state) => {
+        state.status = "pending";
+        state.error = null;
+      })
+      .addCase(restartTimer.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        timersAdapter.setOne(state, action.payload);
+        state.error = null;
+      })
+      .addCase(restartTimer.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload || null;
       });

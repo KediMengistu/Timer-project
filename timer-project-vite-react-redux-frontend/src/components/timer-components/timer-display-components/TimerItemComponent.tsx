@@ -2,19 +2,22 @@ import { AnimatePresence, motion } from "framer-motion";
 import { FaPause, FaPlay } from "react-icons/fa6";
 import { IoInformationCircleSharp } from "react-icons/io5";
 import { IoIosCloseCircleOutline } from "react-icons/io";
+import { GrPowerReset } from "react-icons/gr";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { TimeDuration, Timer } from "../../../features/timers/timerDTO";
 import { extractPauseStatus } from "../../../utils/functions/extractPauseStatus";
+import { extractRemainingTime } from "../../../utils/functions/extractRemainingTime";
+import { extractIsExpired } from "../../../utils/functions/extractIsExpired";
 import { useAppDispatch, useAppSelector } from "../../../app/hooks";
 import {
   pauseTimer,
   playTimer,
   resetTimersError,
   resetTimersStatus,
+  restartTimer,
 } from "../../../features/timers/timersSlice";
 import TimerItemCountdownContent from "./TimerItemCountdownContent";
-import { extractRemainingTime } from "../../../utils/functions/extractRemainingTime";
 import TimerItemInformationContent from "./TimerItemInformationContent";
 import {
   resetBreaksError,
@@ -38,6 +41,9 @@ function TimerItemComponent() {
   const [pauseStatus, setPauseStatus] = useState<boolean>(() =>
     extractPauseStatus(timer),
   );
+  const [expiredStatus, setExpiredStatus] = useState<boolean>(() =>
+    extractIsExpired(timeLeft),
+  );
   const [countdownUpdate, setCountdownUpdate] = useState<boolean>(false);
   const [renderTimerInfo, setRenderTimerInfo] = useState<boolean>(false);
 
@@ -52,9 +58,19 @@ function TimerItemComponent() {
 
   useEffect(() => {
     if (timersState.status === "succeeded") {
+      //update the breaks upon restart
+      if (breaksState.ids.includes(timerId) === false) {
+        dispatch(retrieveAllBreaks(timerId)).then(() => {
+          dispatch(resetBreaksStatus());
+          dispatch(resetBreaksError());
+        });
+      }
       const updatedTimer = timersState.entities[timerId];
       if (updatedTimer) {
         setTimer(updatedTimer);
+        if (setExpiredStatus) {
+          setExpiredStatus(false);
+        }
         setPauseStatus(extractPauseStatus(updatedTimer));
       }
     }
@@ -97,6 +113,10 @@ function TimerItemComponent() {
 
   const handleGoToTimerInfo = () => {
     setRenderTimerInfo(!renderTimerInfo);
+  };
+
+  const handleRestart = () => {
+    dispatch(restartTimer(timer.id));
   };
 
   return (
@@ -148,6 +168,8 @@ function TimerItemComponent() {
                   item={timer}
                   timeLeft={timeLeft}
                   setTimeLeft={setTimeLeft}
+                  expiredStatus={expiredStatus}
+                  setExpiredStatus={setExpiredStatus}
                   updateItem={setCountdownUpdate}
                   pauseStatus={pauseStatus}
                 />
@@ -155,46 +177,72 @@ function TimerItemComponent() {
             </div>
             <div className="grid grid-cols-none grid-rows-1 border-t-0 border-black md:mr-3! md:ml-3! md:grid-cols-1 md:grid-rows-none md:border-t-1 dark:border-gray-700">
               <AnimatePresence mode="wait" initial={false}>
-                {pauseStatus ? (
-                  <motion.div
-                    key="TimerItemComponentPlay"
-                    initial={{ opacity: 0, x: 10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -10 }}
-                    transition={{ duration: 0.3, ease: "easeInOut" }}
-                    style={{
-                      willChange: "transform",
-                      backfaceVisibility: "hidden",
-                    }}
-                    className="flex flex-col items-start justify-center md:flex-row md:items-center"
-                  >
-                    <FaPlay
-                      onClick={() => {
-                        handlePlay();
+                {expiredStatus ? (
+                  <>
+                    <motion.div
+                      key="TimerItemComponentReset"
+                      initial={{ opacity: 0, x: 10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -10 }}
+                      transition={{ duration: 0.3, ease: "easeInOut" }}
+                      style={{
+                        willChange: "transform",
+                        backfaceVisibility: "hidden",
                       }}
-                      className="h-12 w-12 fill-black transition duration-300 ease-in-out hover:cursor-pointer hover:fill-green-500 md:h-14 md:w-14 dark:fill-white"
-                    />
-                  </motion.div>
+                      className="flex flex-col items-start justify-center md:flex-row md:items-center"
+                    >
+                      <GrPowerReset
+                        onClick={() => {
+                          handleRestart();
+                        }}
+                        className="h-12 w-12 fill-black transition duration-300 ease-in-out hover:cursor-pointer hover:stroke-blue-500 md:h-14 md:w-14 dark:fill-white"
+                      />
+                    </motion.div>
+                  </>
                 ) : (
-                  <motion.div
-                    key="TimerItemComponentPause"
-                    initial={{ opacity: 0, x: 10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -10 }}
-                    transition={{ duration: 0.3, ease: "easeInOut" }}
-                    style={{
-                      willChange: "transform",
-                      backfaceVisibility: "hidden",
-                    }}
-                    className="flex flex-col items-start justify-center md:flex-row md:items-center"
-                  >
-                    <FaPause
-                      onClick={() => {
-                        handlePause();
-                      }}
-                      className="h-12 w-12 fill-black transition duration-300 ease-in-out hover:cursor-pointer hover:fill-red-500 md:h-14 md:w-14 dark:fill-white"
-                    />
-                  </motion.div>
+                  <>
+                    {pauseStatus ? (
+                      <motion.div
+                        key="TimerItemComponentPlay"
+                        initial={{ opacity: 0, x: 10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -10 }}
+                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                        style={{
+                          willChange: "transform",
+                          backfaceVisibility: "hidden",
+                        }}
+                        className="flex flex-col items-start justify-center md:flex-row md:items-center"
+                      >
+                        <FaPlay
+                          onClick={() => {
+                            handlePlay();
+                          }}
+                          className="h-12 w-12 fill-black transition duration-300 ease-in-out hover:cursor-pointer hover:fill-green-500 md:h-14 md:w-14 dark:fill-white"
+                        />
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        key="TimerItemComponentPause"
+                        initial={{ opacity: 0, x: 10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -10 }}
+                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                        style={{
+                          willChange: "transform",
+                          backfaceVisibility: "hidden",
+                        }}
+                        className="flex flex-col items-start justify-center md:flex-row md:items-center"
+                      >
+                        <FaPause
+                          onClick={() => {
+                            handlePause();
+                          }}
+                          className="h-12 w-12 fill-black transition duration-300 ease-in-out hover:cursor-pointer hover:fill-red-500 md:h-14 md:w-14 dark:fill-white"
+                        />
+                      </motion.div>
+                    )}
+                  </>
                 )}
               </AnimatePresence>
             </div>
