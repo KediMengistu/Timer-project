@@ -15,12 +15,26 @@ import {
   deleteTimer,
   pauseTimer,
   playTimer,
+  restartTimer,
 } from "../timers/timersSlice";
+import { extractLocalStorageStoreExists } from "../../utils/functions/extractLocalStorageStoreExists";
 
 export interface UserState extends DefaultState {
   user: User | null;
   updateUser: boolean;
 }
+
+// Helper function to create a standard error response
+const createErrorResponse = (
+  path: string,
+  message: string,
+  statusCode: number,
+) => ({
+  timestamp: new Date().toISOString(),
+  path,
+  message,
+  statusCode,
+});
 
 export const submitForgotPassword = createAppAsyncThunk<
   void,
@@ -28,6 +42,15 @@ export const submitForgotPassword = createAppAsyncThunk<
 >(
   "user/submitForgotPassword",
   async (forgotPasswordDTO: ForgotPasswordDTO, thunkAPI) => {
+    if (!extractLocalStorageStoreExists)
+      return thunkAPI.rejectWithValue(
+        createErrorResponse(
+          "/user/forgot-password-request",
+          "Required data not available.",
+          400,
+        ),
+      );
+
     try {
       const response = await fetch("/api/users/forgot-password-request", {
         method: "PATCH",
@@ -43,13 +66,13 @@ export const submitForgotPassword = createAppAsyncThunk<
       }
       return;
     } catch (error) {
-      return thunkAPI.rejectWithValue({
-        timestamp: new Date().toISOString(),
-        path: "/user/forgot-password-request",
-        message:
+      return thunkAPI.rejectWithValue(
+        createErrorResponse(
+          "/user/forgot-password-request",
           error instanceof Error ? error.message : "Network error occurred",
-        statusCode: 500,
-      });
+          500,
+        ),
+      );
     }
   },
 );
@@ -60,6 +83,15 @@ export const verifyForgotPassword = createAppAsyncThunk<
 >(
   "user/verifyForgotPassword",
   async (verifyForgotPasswordDTO: VerifyForgotPasswordDTO, thunkAPI) => {
+    if (!extractLocalStorageStoreExists)
+      return thunkAPI.rejectWithValue(
+        createErrorResponse(
+          "/user/forgot-password-confirm",
+          "Required data not available.",
+          400,
+        ),
+      );
+
     try {
       const response = await fetch("/api/users/forgot-password-confirm", {
         method: "PATCH",
@@ -75,13 +107,13 @@ export const verifyForgotPassword = createAppAsyncThunk<
       }
       return;
     } catch (error) {
-      return thunkAPI.rejectWithValue({
-        timestamp: new Date().toISOString(),
-        path: "/user/forgot-password-confirm",
-        message:
+      return thunkAPI.rejectWithValue(
+        createErrorResponse(
+          "/user/forgot-password-confirm",
           error instanceof Error ? error.message : "Network error occurred",
-        statusCode: 500,
-      });
+          500,
+        ),
+      );
     }
   },
 );
@@ -92,6 +124,15 @@ export const reinitiateForgotPasswordVerification = createAppAsyncThunk<
 >(
   "user/reinitiateVerification",
   async (reinitiateForgotPasswordDTO: ReinitiateVerificationDTO, thunkAPI) => {
+    if (!extractLocalStorageStoreExists)
+      return thunkAPI.rejectWithValue(
+        createErrorResponse(
+          "/verification/reinitiate-verification",
+          "Required data not available.",
+          400,
+        ),
+      );
+
     try {
       const response = await fetch(
         "/api/verification/reinitiate-verification",
@@ -110,13 +151,13 @@ export const reinitiateForgotPasswordVerification = createAppAsyncThunk<
       }
       return;
     } catch (error) {
-      return thunkAPI.rejectWithValue({
-        timestamp: new Date().toISOString(),
-        path: "/verification/reinitiate-verification",
-        message:
+      return thunkAPI.rejectWithValue(
+        createErrorResponse(
+          "/verification/reinitiate-verification",
           error instanceof Error ? error.message : "Network error occurred",
-        statusCode: 500,
-      });
+          500,
+        ),
+      );
     }
   },
 );
@@ -124,6 +165,15 @@ export const reinitiateForgotPasswordVerification = createAppAsyncThunk<
 export const retrieveUser = createAppAsyncThunk<User, void>(
   "user/retrieveUser",
   async (_, thunkAPI) => {
+    if (!extractLocalStorageStoreExists)
+      return thunkAPI.rejectWithValue(
+        createErrorResponse(
+          "/users/retrieve-user",
+          "Required data not available.",
+          400,
+        ),
+      );
+
     try {
       const response = await fetch("/api/users/retrieve-user", {
         method: "GET",
@@ -138,13 +188,13 @@ export const retrieveUser = createAppAsyncThunk<User, void>(
       const user = await response.json();
       return user;
     } catch (error) {
-      return thunkAPI.rejectWithValue({
-        timestamp: new Date().toISOString(),
-        path: "/users/retrieve-user-email",
-        message:
+      return thunkAPI.rejectWithValue(
+        createErrorResponse(
+          "/users/retrieve-user-email",
           error instanceof Error ? error.message : "Network error occurred",
-        statusCode: 500,
-      });
+          500,
+        ),
+      );
     }
   },
 );
@@ -152,6 +202,15 @@ export const retrieveUser = createAppAsyncThunk<User, void>(
 export const submitDeleteAccount = createAppAsyncThunk<void, void>(
   "deleteAccount/submitDeleteAccount",
   async (_, thunkAPI) => {
+    if (!extractLocalStorageStoreExists)
+      return thunkAPI.rejectWithValue(
+        createErrorResponse(
+          "/users/delete-user-request",
+          "Required data not available.",
+          400,
+        ),
+      );
+
     try {
       const response = await fetch("/api/users/delete-user-request", {
         method: "PATCH",
@@ -163,13 +222,13 @@ export const submitDeleteAccount = createAppAsyncThunk<void, void>(
       }
       return;
     } catch (error) {
-      return thunkAPI.rejectWithValue({
-        timestamp: new Date().toISOString(),
-        path: "/users/delete-user-request",
-        message:
+      return thunkAPI.rejectWithValue(
+        createErrorResponse(
+          "/users/delete-user-request",
           error instanceof Error ? error.message : "Network error occurred",
-        statusCode: 500,
-      });
+          500,
+        ),
+      );
     }
   },
 );
@@ -180,6 +239,15 @@ export const verifyDeleteAccount = createAppAsyncThunk<
 >(
   "deleteAccount/verifyDeleteAccount",
   async (verifyDeleteAccountDTO: VerifyDeleteAccountDTO, thunkAPI) => {
+    if (!extractLocalStorageStoreExists)
+      return thunkAPI.rejectWithValue(
+        createErrorResponse(
+          "/users/delete-user-confirm",
+          "Required data not available.",
+          400,
+        ),
+      );
+
     try {
       const response = await fetch("/api/users/delete-user-confirm", {
         method: "DELETE",
@@ -196,13 +264,13 @@ export const verifyDeleteAccount = createAppAsyncThunk<
       }
       return;
     } catch (error) {
-      return thunkAPI.rejectWithValue({
-        timestamp: new Date().toISOString(),
-        path: "/users/delete-user-confirm",
-        message:
+      return thunkAPI.rejectWithValue(
+        createErrorResponse(
+          "/users/delete-user-confirm",
           error instanceof Error ? error.message : "Network error occurred",
-        statusCode: 500,
-      });
+          500,
+        ),
+      );
     }
   },
 );
@@ -213,6 +281,15 @@ export const reinitiateDeleteAccountVerification = createAppAsyncThunk<
 >(
   "deleteAccount/reinitiateVerification",
   async (reinitiateDeleteAccountDTO: ReinitiateVerificationDTO, thunkAPI) => {
+    if (!extractLocalStorageStoreExists)
+      return thunkAPI.rejectWithValue(
+        createErrorResponse(
+          "/verification/reinitiate-verification",
+          "Required data not available.",
+          400,
+        ),
+      );
+
     try {
       const response = await fetch(
         "/api/verification/reinitiate-verification",
@@ -231,13 +308,13 @@ export const reinitiateDeleteAccountVerification = createAppAsyncThunk<
       }
       return;
     } catch (error) {
-      return thunkAPI.rejectWithValue({
-        timestamp: new Date().toISOString(),
-        path: "/verification/reinitiate-verification",
-        message:
+      return thunkAPI.rejectWithValue(
+        createErrorResponse(
+          "/verification/reinitiate-verification",
           error instanceof Error ? error.message : "Network error occurred",
-        statusCode: 500,
-      });
+          500,
+        ),
+      );
     }
   },
 );
@@ -372,6 +449,9 @@ export const userSlice = createSlice({
         state.updateUser = true;
       })
       .addCase(playTimer.fulfilled, (state) => {
+        state.updateUser = true;
+      })
+      .addCase(restartTimer.fulfilled, (state) => {
         state.updateUser = true;
       });
   },

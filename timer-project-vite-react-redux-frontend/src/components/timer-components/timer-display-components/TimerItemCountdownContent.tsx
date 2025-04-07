@@ -30,7 +30,7 @@ function TimerItemCountdownContent({
 
   useEffect(() => {
     let intervalId: number;
-    if (!pauseStatus) {
+    if (!pauseStatus && !expiredStatus) {
       if (item.referenceTime) {
         const timeDurationDTO: TimeDurationDTO = {
           id: item.id,
@@ -54,7 +54,7 @@ function TimerItemCountdownContent({
           }
         }
       }, 1000);
-    } else {
+    } else if (pauseStatus && !expiredStatus) {
       if (!item.referenceTime) {
         const timeDurationDTO: TimeDurationDTO = {
           id: item.id,
@@ -67,7 +67,7 @@ function TimerItemCountdownContent({
       }
     }
     return () => clearInterval(intervalId);
-  }, [pauseStatus]);
+  }, [pauseStatus, expiredStatus]);
 
   return (
     <>

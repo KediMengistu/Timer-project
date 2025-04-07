@@ -62,19 +62,6 @@ function DeleteAccountVerifyUserForm() {
   }, [verifyDeleteAccountState, sentReInitiateVerification]);
 
   useEffect(() => {
-    if (
-      verifyDeleteAccountErrorState !== null &&
-      verifyDeleteAccountErrorState.message === "Unauthorized"
-    ) {
-      dispatch(resetUser());
-      dispatch(resetTimers());
-      dispatch(resetBreaks());
-      dispatch(setIsSignedIn(false));
-      navigate("/", { replace: true });
-    }
-  }, [verifyDeleteAccountErrorState]);
-
-  useEffect(() => {
     return () => {
       dispatch(resetUserStatus());
       dispatch(resetUserError());

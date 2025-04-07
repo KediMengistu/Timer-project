@@ -285,15 +285,33 @@ function Navbar() {
                   }}
                   className="absolute top-[115%] left-1/2 z-20 flex h-auto w-[75px] -translate-x-1/2 flex-col gap-0.5 md:top-1/2 md:left-[125%] md:w-[108.067px] md:-translate-x-0 md:-translate-y-1/2"
                 >
-                  <div className="group relative flex flex-row items-center justify-center border-2 border-black bg-white p-2! shadow-[4px_4px_0_2px_rgba(0,0,0,0.516)] transition duration-300 ease-in-out hover:cursor-pointer hover:bg-black active:opacity-55 md:rounded-tr-3xl md:rounded-br-3xl md:shadow-[-4px_4px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-800">
-                    <h1 className="text-center text-[8px] text-black transition duration-300 ease-in-out group-hover:text-white md:text-[10px] dark:text-white">
+                  <NavLink
+                    to={
+                      !signedInState ? "/manage-guest-timer" : "/manage-timers"
+                    }
+                    end
+                    style={({ isActive }) => {
+                      return isActive
+                        ? {
+                            textDecoration: "none",
+                          }
+                        : {
+                            textDecoration: "none",
+                          };
+                    }}
+                    onClick={() => {
+                      closeAllMenus();
+                    }}
+                    className="group relative flex flex-row items-center justify-center border-2 border-black bg-white p-2! shadow-[4px_4px_0_2px_rgba(0,0,0,0.516)] transition duration-300 ease-in-out hover:cursor-pointer hover:bg-black active:opacity-55 md:rounded-tr-3xl md:rounded-br-3xl md:shadow-[-4px_4px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-800"
+                  >
+                    <h1 className="text-center text-[8px] text-black transition duration-300 ease-in-out group-hover:text-white md:text-[9px] dark:text-white">
                       {!signedInState ? (
-                        <>Create Guest Timer</>
+                        <>Manage Guest Timer</>
                       ) : (
                         <>Manage Timers</>
                       )}
                     </h1>
-                  </div>
+                  </NavLink>
                 </motion.div>
               )}
             </AnimatePresence>

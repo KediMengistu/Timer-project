@@ -24,6 +24,7 @@ import TimerSelectScrollComponent from "./components/timer-components/timer-sele
 import AddTimerForm from "./components/timer-components/timer-add-components/AddTimerForm.tsx";
 import TimerItemComponent from "./components/timer-components/timer-display-components/TimerItemComponent.tsx";
 import DeleteTimerForm from "./components/timer-components/timer-delete-components/DeleteTimerForm.tsx";
+import AccountInfoComponent from "./components/account-components/AccountInfoComponent.tsx";
 
 const router = createBrowserRouter([
   {
@@ -76,6 +77,10 @@ const router = createBrowserRouter([
               {
                 element: <RequireAuthGuard />,
                 children: [
+                  {
+                    path: "account-info",
+                    element: <AccountInfoComponent />,
+                  },
                   {
                     path: "signout",
                     element: <SignOutForm />,

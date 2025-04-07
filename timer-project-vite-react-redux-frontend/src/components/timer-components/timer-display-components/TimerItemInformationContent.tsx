@@ -87,14 +87,14 @@ function TimerItemInformationContent({
           exit={{ opacity: 0, x: -5 }}
           transition={{ duration: 0.3, ease: "easeInOut" }}
           style={{ willChange: "transform", backfaceVisibility: "hidden" }}
-          className="absolute top-[50%] left-[50%] h-80 w-64 -translate-x-1/2 -translate-y-1/2 rounded-2xl border-2 border-black bg-white pb-4! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-700 dark:bg-gray-800"
+          className="absolute top-[50%] left-[50%] h-80 w-58 -translate-x-1/2 -translate-y-1/2 rounded-2xl border-2 border-black bg-white pb-4! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-700 dark:bg-gray-800"
         >
           <div className="relative grid h-full w-full grid-rows-[auto_1fr]">
             <div className="flex items-center justify-between p-2! dark:border-b-gray-700">
               <h1 className="text-center text-xs text-black italic dark:text-white">
                 {item.title} Stats &#183;{" "}
                 <span className="font-bold text-red-500 underline underline-offset-2 dark:text-yellow-400">
-                  UTC TZ
+                  UTC
                 </span>
               </h1>
               <h1 className="text-center text-xs text-black italic dark:text-white">
@@ -239,14 +239,14 @@ function TimerItemInformationContent({
           exit={{ opacity: 0, x: -5 }}
           transition={{ duration: 0.3, ease: "easeInOut" }}
           style={{ willChange: "transform", backfaceVisibility: "hidden" }}
-          className="absolute top-[50%] left-[50%] h-80 w-64 -translate-x-1/2 -translate-y-1/2 rounded-2xl border-2 border-black bg-white pb-4! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-700 dark:bg-gray-800"
+          className="absolute top-[50%] left-[50%] h-80 w-58 -translate-x-1/2 -translate-y-1/2 rounded-2xl border-2 border-black bg-white pb-4! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-700 dark:bg-gray-800"
         >
           <div className="relative grid h-full w-full grid-rows-[auto_1fr]">
             <div className="flex items-center justify-between p-2! dark:border-b-gray-700">
               <h1 className="text-center text-xs text-black italic dark:text-white">
                 {item.title} Stats &#183;{" "}
                 <span className="font-bold text-red-500 underline underline-offset-2 dark:text-yellow-400">
-                  Local TZ
+                  Local
                 </span>
               </h1>
               <h1 className="text-center text-xs text-black italic dark:text-white">

@@ -5,14 +5,36 @@ import {
   ReinitiateVerificationDTO,
 } from "../../app/appTypes";
 import { SignInDTO, SignUpDTO, VerifyAccountDTO } from "./authDTO";
+import { extractLocalStorageStoreExists } from "../../utils/functions/extractLocalStorageStoreExists";
 
 export interface AuthState extends DefaultState {
   isSignedIn: boolean;
 }
 
+// Helper function to create a standard error response
+const createErrorResponse = (
+  path: string,
+  message: string,
+  statusCode: number,
+) => ({
+  timestamp: new Date().toISOString(),
+  path,
+  message,
+  statusCode,
+});
+
 export const submitSignUp = createAppAsyncThunk<void, SignUpDTO>(
   "auth/submitSignUp",
   async (signupDTO: SignUpDTO, thunkAPI) => {
+    if (!extractLocalStorageStoreExists)
+      return thunkAPI.rejectWithValue(
+        createErrorResponse(
+          "/auth/signup",
+          "Required data not available.",
+          400,
+        ),
+      );
+
     try {
       const response = await fetch("/api/auth/signup", {
         method: "POST",
@@ -28,13 +50,13 @@ export const submitSignUp = createAppAsyncThunk<void, SignUpDTO>(
       }
       return;
     } catch (error) {
-      return thunkAPI.rejectWithValue({
-        timestamp: new Date().toISOString(),
-        path: "/auth/signup",
-        message:
+      return thunkAPI.rejectWithValue(
+        createErrorResponse(
+          "/auth/signup",
           error instanceof Error ? error.message : "Network error occurred",
-        statusCode: 500,
-      });
+          500,
+        ),
+      );
     }
   },
 );
@@ -42,6 +64,15 @@ export const submitSignUp = createAppAsyncThunk<void, SignUpDTO>(
 export const submitSignIn = createAppAsyncThunk<void, SignInDTO>(
   "auth/submitSignIn",
   async (signinDTO: SignInDTO, thunkAPI) => {
+    if (!extractLocalStorageStoreExists)
+      return thunkAPI.rejectWithValue(
+        createErrorResponse(
+          "/auth/signin",
+          "Required data not available.",
+          400,
+        ),
+      );
+
     try {
       const response = await fetch("/api/auth/signin", {
         method: "POST",
@@ -57,13 +88,13 @@ export const submitSignIn = createAppAsyncThunk<void, SignInDTO>(
       }
       return;
     } catch (error) {
-      return thunkAPI.rejectWithValue({
-        timestamp: new Date().toISOString(),
-        path: "/auth/signin",
-        message:
+      return thunkAPI.rejectWithValue(
+        createErrorResponse(
+          "/auth/signin",
           error instanceof Error ? error.message : "Network error occurred",
-        statusCode: 500,
-      });
+          500,
+        ),
+      );
     }
   },
 );
@@ -71,6 +102,15 @@ export const submitSignIn = createAppAsyncThunk<void, SignInDTO>(
 export const verifySignUpOrIn = createAppAsyncThunk<void, VerifyAccountDTO>(
   "auth/verifySignUpOrIn",
   async (verifySignUpDTO: VerifyAccountDTO, thunkAPI) => {
+    if (!extractLocalStorageStoreExists)
+      return thunkAPI.rejectWithValue(
+        createErrorResponse(
+          "/auth/verify-signup",
+          "Required data not available.",
+          400,
+        ),
+      );
+
     try {
       const response = await fetch("/api/auth/verify-signup", {
         method: "PATCH",
@@ -86,13 +126,13 @@ export const verifySignUpOrIn = createAppAsyncThunk<void, VerifyAccountDTO>(
       }
       return;
     } catch (error) {
-      return thunkAPI.rejectWithValue({
-        timestamp: new Date().toISOString(),
-        path: "/auth/verifySignUpOrIn",
-        message:
+      return thunkAPI.rejectWithValue(
+        createErrorResponse(
+          "/auth/verify-signup",
           error instanceof Error ? error.message : "Network error occurred",
-        statusCode: 500,
-      });
+          500,
+        ),
+      );
     }
   },
 );
@@ -103,6 +143,15 @@ export const reinitiateSignUpVerification = createAppAsyncThunk<
 >(
   "auth/reinitiateVerification",
   async (reinitiateVerifySignUpDTO: ReinitiateVerificationDTO, thunkAPI) => {
+    if (!extractLocalStorageStoreExists)
+      return thunkAPI.rejectWithValue(
+        createErrorResponse(
+          "/auth/reinitiate-verification",
+          "Required data not available.",
+          400,
+        ),
+      );
+
     try {
       const response = await fetch(
         "/api/verification/reinitiate-verification",
@@ -121,13 +170,13 @@ export const reinitiateSignUpVerification = createAppAsyncThunk<
       }
       return;
     } catch (error) {
-      return thunkAPI.rejectWithValue({
-        timestamp: new Date().toISOString(),
-        path: "/verification/reinitiate-verification",
-        message:
+      return thunkAPI.rejectWithValue(
+        createErrorResponse(
+          "/verification/reinitiate-verification",
           error instanceof Error ? error.message : "Network error occurred",
-        statusCode: 500,
-      });
+          500,
+        ),
+      );
     }
   },
 );
@@ -135,6 +184,15 @@ export const reinitiateSignUpVerification = createAppAsyncThunk<
 export const submitSignOut = createAppAsyncThunk<void, void>(
   "auth/submitSignOut",
   async (_, thunkAPI) => {
+    if (!extractLocalStorageStoreExists)
+      return thunkAPI.rejectWithValue(
+        createErrorResponse(
+          "/auth/signout",
+          "Required data not available.",
+          400,
+        ),
+      );
+
     try {
       const response = await fetch("/api/auth/signout", {
         method: "POST",
@@ -150,13 +208,13 @@ export const submitSignOut = createAppAsyncThunk<void, void>(
       }
       return;
     } catch (error) {
-      return thunkAPI.rejectWithValue({
-        timestamp: new Date().toISOString(),
-        path: "/auth/signout",
-        message:
+      return thunkAPI.rejectWithValue(
+        createErrorResponse(
+          "/auth/signout",
           error instanceof Error ? error.message : "Network error occurred",
-        statusCode: 500,
-      });
+          500,
+        ),
+      );
     }
   },
 );

@@ -12,7 +12,12 @@ function BreakLocalListComponent({ item }: { item: Timer }) {
       >
         {breaksState.entities[item.id].breaks.map((breakObject: Break) => {
           return (
-            <BreakLocalItemComponent key={breakObject.id} item={breakObject} />
+            <BreakLocalItemComponent
+              key={breakObject.id}
+              item={breakObject}
+              addedTime={item.pausedDurationInMs}
+              numberOfBreaks={item.numberOfBreaks}
+            />
           );
         })}
       </div>

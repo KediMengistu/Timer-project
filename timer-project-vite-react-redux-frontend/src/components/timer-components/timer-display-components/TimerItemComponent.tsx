@@ -58,18 +58,17 @@ function TimerItemComponent() {
 
   useEffect(() => {
     if (timersState.status === "succeeded") {
-      //update the breaks upon restart
-      if (breaksState.ids.includes(timerId) === false) {
-        dispatch(retrieveAllBreaks(timerId)).then(() => {
-          dispatch(resetBreaksStatus());
-          dispatch(resetBreaksError());
-        });
-      }
       const updatedTimer = timersState.entities[timerId];
       if (updatedTimer) {
         setTimer(updatedTimer);
-        if (setExpiredStatus) {
+        if (expiredStatus) {
+          //update the breaks upon restart
+          dispatch(retrieveAllBreaks(timerId)).then(() => {
+            dispatch(resetBreaksStatus());
+            dispatch(resetBreaksError());
+          });
           setExpiredStatus(false);
+          setTimeLeft(extractRemainingTime(updatedTimer));
         }
         setPauseStatus(extractPauseStatus(updatedTimer));
       }

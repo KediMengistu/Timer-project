@@ -12,7 +12,12 @@ function BreakUTCListComponent({ item }: { item: Timer }) {
       >
         {breaksState.entities[item.id].breaks.map((breakObject: Break) => {
           return (
-            <BreakUTCItemComponent key={breakObject.id} item={breakObject} />
+            <BreakUTCItemComponent
+              key={breakObject.id}
+              item={breakObject}
+              addedTime={item.pausedDurationInMs}
+              numberOfBreaks={item.numberOfBreaks}
+            />
           );
         })}
       </div>

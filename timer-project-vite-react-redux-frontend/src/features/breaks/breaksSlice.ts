@@ -6,11 +6,8 @@ import {
 } from "@reduxjs/toolkit";
 import { createAppAsyncThunk, DefaultState } from "../../app/appTypes";
 import { BreaksForTimer } from "./breakDTO";
-import {
-  deleteTimer,
-  restartTimer,
-  retrieveAllTimers,
-} from "../timers/timersSlice";
+import { deleteTimer, retrieveAllTimers } from "../timers/timersSlice";
+import { extractLocalStorageStoreExists } from "../../utils/functions/extractLocalStorageStoreExists";
 
 export interface BreaksState
   extends DefaultState,
@@ -18,9 +15,30 @@ export interface BreaksState
   fetchBreaks: boolean;
 }
 
+// Helper function to create a standard error response
+const createErrorResponse = (
+  path: string,
+  message: string,
+  statusCode: number,
+) => ({
+  timestamp: new Date().toISOString(),
+  path,
+  message,
+  statusCode,
+});
+
 export const retrieveAllBreaks = createAppAsyncThunk<BreaksForTimer, string>(
   "breaks/retrieveAllBreaks",
   async (timerId: string, thunkAPI) => {
+    if (!extractLocalStorageStoreExists)
+      return thunkAPI.rejectWithValue(
+        createErrorResponse(
+          `/breaks/get-all-breaks/${timerId}`,
+          "Required data not available.",
+          400,
+        ),
+      );
+
     try {
       const response = await fetch(`/api/breaks/get-all-breaks/${timerId}`, {
         method: "GET",
@@ -41,13 +59,13 @@ export const retrieveAllBreaks = createAppAsyncThunk<BreaksForTimer, string>(
       };
       return result;
     } catch (error) {
-      return thunkAPI.rejectWithValue({
-        timestamp: new Date().toISOString(),
-        path: `/breaks/get-all-breaks/${timerId}`,
-        message:
+      return thunkAPI.rejectWithValue(
+        createErrorResponse(
+          `/breaks/get-all-breaks/${timerId}`,
           error instanceof Error ? error.message : "Network error occurred",
-        statusCode: 500,
-      });
+          500,
+        ),
+      );
     }
   },
 );
@@ -89,7 +107,7 @@ export const breaksSlice = createSlice({
       })
       .addCase(retrieveAllBreaks.fulfilled, (state, action) => {
         state.status = "succeeded";
-        breaksAdapter.addOne(state, action.payload);
+        breaksAdapter.upsertOne(state, action.payload);
       })
       .addCase(retrieveAllBreaks.rejected, (state, action) => {
         state.status = "failed";
@@ -97,9 +115,6 @@ export const breaksSlice = createSlice({
       })
       .addCase(retrieveAllTimers.fulfilled, (state) => {
         state.fetchBreaks = true;
-      })
-      .addCase(restartTimer.fulfilled, (state, action) => {
-        breaksAdapter.removeOne(state, action.payload.id);
       })
       .addCase(deleteTimer.fulfilled, (state, action) => {
         breaksAdapter.removeOne(state, action.payload);

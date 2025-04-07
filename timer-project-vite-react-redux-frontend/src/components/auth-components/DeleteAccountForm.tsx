@@ -3,16 +3,12 @@ import { useLocation, useNavigate } from "react-router";
 import { FaCircleArrowLeft } from "react-icons/fa6";
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { setIsSignedIn } from "../../features/auth/authSlice";
 import {
   reinitiateDeleteAccountVerification,
-  resetUser,
   resetUserError,
   resetUserStatus,
   submitDeleteAccount,
 } from "../../features/user/userSlice";
-import { resetTimers } from "../../features/timers/timersSlice";
-import { resetBreaks } from "../../features/breaks/breaksSlice";
 import {
   ApiErrorResponse,
   ReinitiateVerificationDTO,
@@ -44,19 +40,6 @@ function DeleteAccountForm() {
       navigate("/verify-delete-account", { replace: true });
     }
   }, [deleteAccountState, deleteAccountErrorState]);
-
-  useEffect(() => {
-    if (
-      deleteAccountErrorState !== null &&
-      deleteAccountErrorState.message === "Unauthorized"
-    ) {
-      dispatch(resetUser());
-      dispatch(resetTimers());
-      dispatch(resetBreaks());
-      dispatch(setIsSignedIn(false));
-      navigate("/");
-    }
-  }, [deleteAccountErrorState]);
 
   useEffect(() => {
     return () => {
