@@ -59,7 +59,7 @@ function AccountInfoComponent() {
             </div>
             <div className="border-b-1 border-black dark:border-gray-700">
               <h1 className="flex items-center justify-between text-xs text-black dark:text-white">
-                <span>Full name</span>
+                <span>Name</span>
                 <span className="font-bold italic">
                   {userState!.firstName} {userState!.lastName}
                 </span>

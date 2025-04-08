@@ -17,7 +17,6 @@ import authReducer from "../features/auth/authSlice";
 import userReducer from "../features/user/userSlice";
 import timersReducer from "../features/timers/timersSlice";
 import breaksReducer from "../features/breaks/breaksSlice";
-
 const rootReducer = combineReducers({
   theme: themeReducer,
   time: timeReducer,

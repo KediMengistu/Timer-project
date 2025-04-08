@@ -65,6 +65,12 @@ export class TimersController {
     return this.timerService.restartTimer(params.id);
   }
 
+  @Public()
+  @Patch('restart-guest-timer')
+  async restartGuestTimer(@Body() guestTimerDTO: GuestTimerDTO) {
+    return this.timerService.restartGuestTimer(guestTimerDTO);
+  }
+
   @Delete('delete-timer/:id')
   async deleteTimer(@Req() request, @Param() params: any) {
     await this.timerService.removeTimer(request.user.userId, params.id);

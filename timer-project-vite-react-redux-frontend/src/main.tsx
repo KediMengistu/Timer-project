@@ -25,6 +25,8 @@ import AddTimerForm from "./components/timer-components/timer-add-components/Add
 import TimerItemComponent from "./components/timer-components/timer-display-components/TimerItemComponent.tsx";
 import DeleteTimerForm from "./components/timer-components/timer-delete-components/DeleteTimerForm.tsx";
 import AccountInfoComponent from "./components/account-components/AccountInfoComponent.tsx";
+import StackComponent from "./components/about-components/StackComponent.tsx";
+import BackgroundComponent from "./components/about-components/BackgroundComponent.tsx";
 
 const router = createBrowserRouter([
   {
@@ -116,6 +118,14 @@ const router = createBrowserRouter([
                     element: <DeleteAccountVerifyUserForm />,
                   },
                 ],
+              },
+              {
+                path: "stack",
+                element: <StackComponent />,
+              },
+              {
+                path: "background",
+                element: <BackgroundComponent />,
               },
             ],
           },

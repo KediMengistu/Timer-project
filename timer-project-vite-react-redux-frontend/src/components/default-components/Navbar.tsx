@@ -1,18 +1,15 @@
 import { RiUserShared2Fill } from "react-icons/ri";
-import { BsIncognito } from "react-icons/bs";
 import { IoIosInformationCircle } from "react-icons/io";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { toggleTheme } from "../../features/theme/themeSlice";
 import { IoSunnyOutline, IoMoonOutline } from "react-icons/io5";
-import { CiClock2 } from "react-icons/ci";
 import { useEffect, useState } from "react";
 import { NavLink, useLocation } from "react-router";
 import { toggleTimezone } from "../../features/time/timeSlice";
 
 function Navbar() {
   const [userActionsState, setUserActionsState] = useState(false);
-  const [guestTimerState, setGuestTimerState] = useState(false);
   const [aboutOptionState, setAboutOptionsState] = useState(false);
   const darkModeState = useAppSelector((state) => state.theme.darkMode);
   const timezoneState = useAppSelector((state) => state.time.timezone);
@@ -26,7 +23,6 @@ function Navbar() {
 
   const closeAllMenus = () => {
     setUserActionsState(false);
-    setGuestTimerState(false);
     setAboutOptionsState(false);
   };
 
@@ -66,7 +62,6 @@ function Navbar() {
               }`}
               onClick={() => {
                 setUserActionsState(!userActionsState);
-                setGuestTimerState(false);
                 setAboutOptionsState(false);
               }}
             >
@@ -140,6 +135,27 @@ function Navbar() {
                     </h1>
                   </NavLink>
                   <NavLink
+                    to={!signedInState ? "/signin" : "/manage-timers"}
+                    end
+                    style={({ isActive }) => {
+                      return isActive
+                        ? {
+                            textDecoration: "none",
+                          }
+                        : {
+                            textDecoration: "none",
+                          };
+                    }}
+                    onClick={() => {
+                      closeAllMenus();
+                    }}
+                    className="group relative flex flex-row items-center justify-center border-2 border-black bg-white p-2! shadow-[4px_4px_0_2px_rgba(0,0,0,0.516)] transition duration-300 ease-in-out hover:cursor-pointer hover:bg-black active:opacity-55 md:rounded-tr-3xl md:rounded-br-3xl md:shadow-[-4px_4px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-800"
+                  >
+                    <h1 className="text-center text-[8px] text-black transition duration-300 ease-in-out group-hover:text-white md:text-[9px] dark:text-white">
+                      <>Manage Timers</>
+                    </h1>
+                  </NavLink>
+                  <NavLink
                     to={!signedInState ? "/forgotpassword" : "/delete-account"}
                     end
                     style={({ isActive }) => {
@@ -171,161 +187,12 @@ function Navbar() {
           <div className="relative">
             <div
               className={`group flex flex-col items-center justify-center rounded-xl border-2 p-2! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] transition ease-in-out hover:cursor-pointer hover:bg-black active:opacity-55 md:p-1! dark:border-gray-600 dark:hover:bg-gray-800 ${
-                guestTimerState
-                  ? "bg-black dark:bg-gray-800"
-                  : "bg-white dark:bg-gray-700"
-              }`}
-              onClick={() => {
-                setUserActionsState(false);
-                setGuestTimerState(!guestTimerState);
-                setAboutOptionsState(false);
-              }}
-            >
-              <AnimatePresence mode="wait">
-                {!signedInState ? (
-                  <>
-                    <motion.span
-                      key="guestUserIconSpan"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.3, ease: "easeInOut" }}
-                      style={{
-                        willChange: "transform",
-                        backfaceVisibility: "hidden",
-                      }}
-                    >
-                      <BsIncognito
-                        className={`h-4 w-4 transition ease-in-out group-hover:fill-white md:h-8 md:w-8 ${
-                          guestTimerState
-                            ? "fill-white"
-                            : "fill-black dark:fill-white"
-                        }`}
-                      />
-                    </motion.span>
-                    <motion.span
-                      key="guestUserTextSpan"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.3, ease: "easeInOut" }}
-                      style={{
-                        willChange: "transform",
-                        backfaceVisibility: "hidden",
-                      }}
-                    >
-                      <h1
-                        className={`text-center text-xs group-hover:text-white ${
-                          guestTimerState
-                            ? "text-white"
-                            : "text-black dark:text-white"
-                        }`}
-                      >
-                        Guest Actions
-                      </h1>
-                    </motion.span>
-                  </>
-                ) : (
-                  <>
-                    <motion.span
-                      key="manageTimerIconSpan"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.3, ease: "easeInOut" }}
-                      style={{
-                        willChange: "transform",
-                        backfaceVisibility: "hidden",
-                      }}
-                    >
-                      <CiClock2
-                        className={`h-4 w-4 transition ease-in-out group-hover:fill-white md:h-8 md:w-8 ${
-                          guestTimerState
-                            ? "fill-white"
-                            : "fill-black dark:fill-white"
-                        }`}
-                      />
-                    </motion.span>
-                    <motion.span
-                      key="manageTimerTextSpan"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.3, ease: "easeInOut" }}
-                      style={{
-                        willChange: "transform",
-                        backfaceVisibility: "hidden",
-                      }}
-                    >
-                      <h1
-                        className={`text-center text-xs group-hover:text-white ${
-                          guestTimerState
-                            ? "text-white"
-                            : "text-black dark:text-white"
-                        }`}
-                      >
-                        Timer Actions
-                      </h1>
-                    </motion.span>
-                  </>
-                )}
-              </AnimatePresence>
-            </div>
-            <AnimatePresence>
-              {guestTimerState && (
-                <motion.div
-                  key="guestTimerMenuDiv"
-                  initial={{ opacity: 0, scale: 0 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0 }}
-                  transition={{ duration: 0.3, ease: "easeInOut" }}
-                  style={{
-                    willChange: "transform",
-                    backfaceVisibility: "hidden",
-                  }}
-                  className="absolute top-[115%] left-1/2 z-20 flex h-auto w-[75px] -translate-x-1/2 flex-col gap-0.5 md:top-1/2 md:left-[125%] md:w-[108.067px] md:-translate-x-0 md:-translate-y-1/2"
-                >
-                  <NavLink
-                    to={
-                      !signedInState ? "/manage-guest-timer" : "/manage-timers"
-                    }
-                    end
-                    style={({ isActive }) => {
-                      return isActive
-                        ? {
-                            textDecoration: "none",
-                          }
-                        : {
-                            textDecoration: "none",
-                          };
-                    }}
-                    onClick={() => {
-                      closeAllMenus();
-                    }}
-                    className="group relative flex flex-row items-center justify-center border-2 border-black bg-white p-2! shadow-[4px_4px_0_2px_rgba(0,0,0,0.516)] transition duration-300 ease-in-out hover:cursor-pointer hover:bg-black active:opacity-55 md:rounded-tr-3xl md:rounded-br-3xl md:shadow-[-4px_4px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-800"
-                  >
-                    <h1 className="text-center text-[8px] text-black transition duration-300 ease-in-out group-hover:text-white md:text-[9px] dark:text-white">
-                      {!signedInState ? (
-                        <>Manage Guest Timer</>
-                      ) : (
-                        <>Manage Timers</>
-                      )}
-                    </h1>
-                  </NavLink>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-          <div className="relative">
-            <div
-              className={`group flex flex-col items-center justify-center rounded-xl border-2 p-2! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] transition ease-in-out hover:cursor-pointer hover:bg-black active:opacity-55 md:p-1! dark:border-gray-600 dark:hover:bg-gray-800 ${
                 aboutOptionState
                   ? "bg-black dark:bg-gray-800"
                   : "bg-white dark:bg-gray-700"
               }`}
               onClick={() => {
                 setUserActionsState(false);
-                setGuestTimerState(false);
                 setAboutOptionsState(!aboutOptionState);
               }}
             >
@@ -356,16 +223,48 @@ function Navbar() {
                   }}
                   className="absolute top-[115%] left-1/2 z-20 flex h-auto w-[75px] -translate-x-1/2 flex-col gap-0.5 md:top-1/2 md:left-[125%] md:w-[108.067px] md:-translate-x-0 md:-translate-y-1/2"
                 >
-                  <div className="group relative flex flex-row items-center justify-center border-2 border-black bg-white p-2! shadow-[4px_4px_0_2px_rgba(0,0,0,0.516)] transition duration-300 ease-in-out hover:cursor-pointer hover:bg-black active:opacity-55 md:rounded-tr-3xl md:rounded-br-3xl md:shadow-[-4px_4px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-800">
+                  <NavLink
+                    to="/stack"
+                    end
+                    style={({ isActive }) => {
+                      return isActive
+                        ? {
+                            textDecoration: "none",
+                          }
+                        : {
+                            textDecoration: "none",
+                          };
+                    }}
+                    onClick={() => {
+                      closeAllMenus();
+                    }}
+                    className="group relative flex flex-row items-center justify-center border-2 border-black bg-white p-2! shadow-[4px_4px_0_2px_rgba(0,0,0,0.516)] transition duration-300 ease-in-out hover:cursor-pointer hover:bg-black active:opacity-55 md:rounded-tr-3xl md:rounded-br-3xl md:shadow-[-4px_4px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-800"
+                  >
                     <h1 className="text-center text-[8px] text-black transition duration-300 ease-in-out group-hover:text-white md:text-[10px] dark:text-white">
                       Stack
                     </h1>
-                  </div>
-                  <div className="group relative flex flex-row items-center justify-center border-2 border-black bg-white p-2! shadow-[4px_4px_0_2px_rgba(0,0,0,0.516)] transition duration-300 ease-in-out hover:cursor-pointer hover:bg-black active:opacity-55 md:rounded-tr-3xl md:rounded-br-3xl md:shadow-[-4px_4px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-800">
+                  </NavLink>
+                  <NavLink
+                    to="/background"
+                    end
+                    style={({ isActive }) => {
+                      return isActive
+                        ? {
+                            textDecoration: "none",
+                          }
+                        : {
+                            textDecoration: "none",
+                          };
+                    }}
+                    onClick={() => {
+                      closeAllMenus();
+                    }}
+                    className="group relative flex flex-row items-center justify-center border-2 border-black bg-white p-2! shadow-[4px_4px_0_2px_rgba(0,0,0,0.516)] transition duration-300 ease-in-out hover:cursor-pointer hover:bg-black active:opacity-55 md:rounded-tr-3xl md:rounded-br-3xl md:shadow-[-4px_4px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-800"
+                  >
                     <h1 className="text-center text-[8px] text-black transition duration-300 ease-in-out group-hover:text-white md:text-[10px] dark:text-white">
                       Background
                     </h1>
-                  </div>
+                  </NavLink>
                 </motion.div>
               )}
             </AnimatePresence>

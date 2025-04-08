@@ -80,6 +80,9 @@ export class TimersService {
   }
 
   guestPauseTimer(guestTimerDTO: GuestTimerDTO): GuestTimer {
+    if (guestTimerDTO.pauseTime) {
+      throw new BadRequestException('Timer is currently paused.');
+    }
     const now: Date = new Date();
     let guestTimer: GuestTimer = GuestTimer.fromGuestTimerDTO(guestTimerDTO);
     guestTimer.setPauseTime(now);
@@ -112,6 +115,9 @@ export class TimersService {
   }
 
   guestPlayTimer(guestTimerDTO: GuestTimerDTO): GuestTimer {
+    if (guestTimerDTO.unpausedTime) {
+      throw new BadRequestException('Timer is currently played.');
+    }
     const now: Date = new Date();
     let guestTimer: GuestTimer = GuestTimer.fromGuestTimerDTO(guestTimerDTO);
     guestTimer.setUnpausedTime(now);
@@ -166,6 +172,29 @@ export class TimersService {
     );
     const completeTimer: Timer = await this.retrieveTimer(timer.id);
     return completeTimer;
+  }
+
+  restartGuestTimer(guestTimerDTO: GuestTimerDTO): GuestTimer {
+    const now: Date = new Date();
+    if (guestTimerDTO.pauseTime !== null) {
+      throw new BadRequestException('Cannot restart paused timer.');
+    }
+    if (
+      (guestTimerDTO.delayedEndTime !== null &&
+        guestTimerDTO.delayedEndTime > now) ||
+      (guestTimerDTO.endTime !== null && guestTimerDTO.endTime > now)
+    ) {
+      throw new BadRequestException('Cannot restart unexpired timer.');
+    }
+    const createTimerDTO: CreateTimerDTO = {
+      title: guestTimerDTO.title,
+      durationHours: guestTimerDTO.durationHours,
+      durationMinutes: guestTimerDTO.durationMinutes,
+      durationSeconds: guestTimerDTO.durationSeconds,
+      breakDuration: guestTimerDTO.breakDuration,
+    };
+    const newTimer: GuestTimer = this.createGuestTimer(createTimerDTO);
+    return newTimer;
   }
 
   async removeTimer(userId: string, timerId: string) {
