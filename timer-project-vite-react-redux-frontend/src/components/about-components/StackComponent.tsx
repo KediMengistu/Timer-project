@@ -39,18 +39,6 @@ function StackComponent() {
                 <br />
               </span>
             </span>
-            <span className="text-left text-xs md:text-sm">
-              <span className="font-bold">&#183; Contaitnerization:</span>
-              <br />
-              <span className="italic">&rarr; Docker</span>
-            </span>
-            <span className="text-left text-xs md:text-sm">
-              <span className="font-bold">&#183; Hosting:</span>
-              <br />
-              <span className="italic">
-                &rarr; Digitial Ocean &rarr; Vercel
-              </span>
-            </span>
           </div>
         </div>
       </motion.div>
