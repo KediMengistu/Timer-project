@@ -20,7 +20,10 @@ import { CatchEverythingFilter } from './exception/catch-everything-exception.fi
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
-        url: configService.get('DATABASE_URL'),
+        database: configService.get('PGDATABASE'),
+        host: configService.get('PGHOST'),
+        username: configService.get('PGUSER'),
+        password: configService.get('PGPASSWORD'),
         autoLoadEntities: true,
         ssl: { rejectUnauthorized: false },
       }),
