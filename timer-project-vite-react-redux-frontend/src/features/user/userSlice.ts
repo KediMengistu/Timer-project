@@ -18,6 +18,7 @@ import {
   restartTimer,
 } from "../timers/timersSlice";
 import { extractLocalStorageStoreExists } from "../../utils/functions/extractLocalStorageStoreExists";
+import APP_URL from "../../utils/server/server-info";
 
 export interface UserState extends DefaultState {
   user: User | null;
@@ -52,7 +53,7 @@ export const submitForgotPassword = createAppAsyncThunk<
       );
 
     try {
-      const response = await fetch("/api/users/forgot-password-request", {
+      const response = await fetch(`${APP_URL}/users/forgot-password-request`, {
         method: "PATCH",
         headers: {
           "Content-type": "application/json",
@@ -93,7 +94,7 @@ export const verifyForgotPassword = createAppAsyncThunk<
       );
 
     try {
-      const response = await fetch("/api/users/forgot-password-confirm", {
+      const response = await fetch(`${APP_URL}/users/forgot-password-confirm`, {
         method: "PATCH",
         headers: {
           "Content-type": "application/json",
@@ -135,7 +136,7 @@ export const reinitiateForgotPasswordVerification = createAppAsyncThunk<
 
     try {
       const response = await fetch(
-        "/api/verification/reinitiate-verification",
+        `${APP_URL}/verification/reinitiate-verification`,
         {
           method: "PATCH",
           headers: {
@@ -175,7 +176,7 @@ export const retrieveUser = createAppAsyncThunk<User, void>(
       );
 
     try {
-      const response = await fetch("/api/users/retrieve-user", {
+      const response = await fetch(`${APP_URL}/users/retrieve-user`, {
         method: "GET",
         credentials: "include",
       });
@@ -212,7 +213,7 @@ export const submitDeleteAccount = createAppAsyncThunk<void, void>(
       );
 
     try {
-      const response = await fetch("/api/users/delete-user-request", {
+      const response = await fetch(`${APP_URL}/users/delete-user-request`, {
         method: "PATCH",
         credentials: "include",
       });
@@ -249,7 +250,7 @@ export const verifyDeleteAccount = createAppAsyncThunk<
       );
 
     try {
-      const response = await fetch("/api/users/delete-user-confirm", {
+      const response = await fetch(`${APP_URL}/users/delete-user-confirm`, {
         method: "DELETE",
         headers: {
           "Content-type": "application/json",
@@ -292,7 +293,7 @@ export const reinitiateDeleteAccountVerification = createAppAsyncThunk<
 
     try {
       const response = await fetch(
-        "/api/verification/reinitiate-verification",
+        `${APP_URL}/verification/reinitiate-verification`,
         {
           method: "PATCH",
           headers: {

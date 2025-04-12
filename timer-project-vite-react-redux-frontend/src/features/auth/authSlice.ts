@@ -6,6 +6,7 @@ import {
 } from "../../app/appTypes";
 import { SignInDTO, SignUpDTO, VerifyAccountDTO } from "./authDTO";
 import { extractLocalStorageStoreExists } from "../../utils/functions/extractLocalStorageStoreExists";
+import APP_URL from "../../utils/server/server-info";
 
 export interface AuthState extends DefaultState {
   isSignedIn: boolean;
@@ -36,7 +37,7 @@ export const submitSignUp = createAppAsyncThunk<void, SignUpDTO>(
       );
 
     try {
-      const response = await fetch("/api/auth/signup", {
+      const response = await fetch(`${APP_URL}/auth/signup`, {
         method: "POST",
         headers: {
           "Content-type": "application/json",
@@ -74,7 +75,7 @@ export const submitSignIn = createAppAsyncThunk<void, SignInDTO>(
       );
 
     try {
-      const response = await fetch("/api/auth/signin", {
+      const response = await fetch(`${APP_URL}/auth/signin`, {
         method: "POST",
         headers: {
           "Content-type": "application/json",
@@ -112,7 +113,7 @@ export const verifySignUpOrIn = createAppAsyncThunk<void, VerifyAccountDTO>(
       );
 
     try {
-      const response = await fetch("/api/auth/verify-signup", {
+      const response = await fetch(`${APP_URL}/auth/verify-signup`, {
         method: "PATCH",
         headers: {
           "Content-type": "application/json",
@@ -154,7 +155,7 @@ export const reinitiateSignUpVerification = createAppAsyncThunk<
 
     try {
       const response = await fetch(
-        "/api/verification/reinitiate-verification",
+        `${APP_URL}/verification/reinitiate-verification`,
         {
           method: "PATCH",
           headers: {
@@ -194,7 +195,7 @@ export const submitSignOut = createAppAsyncThunk<void, void>(
       );
 
     try {
-      const response = await fetch("/api/auth/signout", {
+      const response = await fetch(`${APP_URL}/auth/signout`, {
         method: "POST",
         headers: {
           "Content-type": "application/json",

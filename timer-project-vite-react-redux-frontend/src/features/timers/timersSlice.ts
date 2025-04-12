@@ -7,6 +7,7 @@ import {
 import { createAppAsyncThunk, DefaultState } from "../../app/appTypes";
 import { CreateTimerDTO, TimeDurationDTO, Timer } from "./timerDTO";
 import { extractLocalStorageStoreExists } from "../../utils/functions/extractLocalStorageStoreExists";
+import APP_URL from "../../utils/server/server-info";
 
 export interface TimerState extends DefaultState, EntityState<Timer, string> {}
 
@@ -48,7 +49,7 @@ export const retrieveAllTimers = createAppAsyncThunk<Timer[], void>(
       );
 
     try {
-      const response = await fetch("/api/timers/get-all-timers", {
+      const response = await fetch(`${APP_URL}/timers/get-all-timers`, {
         method: "GET",
         headers: {
           "Content-type": "application/json",
@@ -87,7 +88,7 @@ export const createTimer = createAppAsyncThunk<Timer, CreateTimerDTO>(
       );
 
     try {
-      const response = await fetch("/api/timers/create-timer", {
+      const response = await fetch(`${APP_URL}/timers/create-timer`, {
         method: "POST",
         headers: {
           "Content-type": "application/json",
@@ -127,13 +128,16 @@ export const deleteTimer = createAppAsyncThunk<string, string>(
       );
 
     try {
-      const response = await fetch(`/api/timers/delete-timer/${timerId}`, {
-        method: "DELETE",
-        headers: {
-          "Content-type": "application/json",
+      const response = await fetch(
+        `${APP_URL}/timers/delete-timer/${timerId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-type": "application/json",
+          },
+          credentials: "include",
         },
-        credentials: "include",
-      });
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -166,7 +170,7 @@ export const pauseTimer = createAppAsyncThunk<Timer, string>(
       );
 
     try {
-      const response = await fetch(`/api/timers/pause-timer/${timerId}`, {
+      const response = await fetch(`${APP_URL}/timers/pause-timer/${timerId}`, {
         method: "PATCH",
         headers: {
           "Content-type": "application/json",
@@ -206,7 +210,7 @@ export const playTimer = createAppAsyncThunk<Timer, string>(
       );
 
     try {
-      const response = await fetch(`/api/timers/play-timer/${timerId}`, {
+      const response = await fetch(`${APP_URL}/timers/play-timer/${timerId}`, {
         method: "PATCH",
         headers: {
           "Content-type": "application/json",
@@ -246,13 +250,16 @@ export const restartTimer = createAppAsyncThunk<Timer, string>(
       );
 
     try {
-      const response = await fetch(`/api/timers/restart-timer/${timerId}`, {
-        method: "PATCH",
-        headers: {
-          "Content-type": "application/json",
+      const response = await fetch(
+        `${APP_URL}/timers/restart-timer/${timerId}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-type": "application/json",
+          },
+          credentials: "include",
         },
-        credentials: "include",
-      });
+      );
 
       if (!response.ok) {
         const errorData = await response.json();

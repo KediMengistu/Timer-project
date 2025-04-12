@@ -8,6 +8,7 @@ import { createAppAsyncThunk, DefaultState } from "../../app/appTypes";
 import { BreaksForTimer } from "./breakDTO";
 import { deleteTimer, retrieveAllTimers } from "../timers/timersSlice";
 import { extractLocalStorageStoreExists } from "../../utils/functions/extractLocalStorageStoreExists";
+import APP_URL from "../../utils/server/server-info";
 
 export interface BreaksState
   extends DefaultState,
@@ -40,13 +41,16 @@ export const retrieveAllBreaks = createAppAsyncThunk<BreaksForTimer, string>(
       );
 
     try {
-      const response = await fetch(`/api/breaks/get-all-breaks/${timerId}`, {
-        method: "GET",
-        headers: {
-          "Content-type": "application/json",
+      const response = await fetch(
+        `${APP_URL}/breaks/get-all-breaks/${timerId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-type": "application/json",
+          },
+          credentials: "include",
         },
-        credentials: "include",
-      });
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
