@@ -1,3 +1,17 @@
+// src/main.ts  (or the very first file that runs)
+import { webcrypto } from 'crypto';
+
+if (typeof globalThis.crypto === 'undefined') {
+  // Define once, as a non‑writable property
+  Object.defineProperty(globalThis, 'crypto', {
+    value: webcrypto,
+    configurable: false,
+    enumerable: false,
+    writable: false,
+  });
+}
+// ───────────────────────────────────────────────
+
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as cookieParser from 'cookie-parser';
