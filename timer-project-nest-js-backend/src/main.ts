@@ -18,13 +18,13 @@ import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.use(cookieParser());
   app.enableCors({
-    origin: ['https://timer4u.vercel.app/'],
+    origin: ['https://timer4u.vercel.app'],
     credentials: true,
-    methods: ['GET', 'PUT', 'PATCH', 'POST', 'DELETE'],
+    methods: ['GET', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   });
-  app.use(cookieParser());
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
