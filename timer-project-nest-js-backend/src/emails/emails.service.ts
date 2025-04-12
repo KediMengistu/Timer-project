@@ -30,7 +30,11 @@ export class EmailsService {
     };
 
     SendGrid.send(msg)
-      .then((response) => {})
-      .catch((error) => {});
+      .then(() => {
+        console.log('Email sent');
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   }
 }

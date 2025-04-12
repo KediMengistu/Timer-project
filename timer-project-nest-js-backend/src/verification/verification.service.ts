@@ -3,6 +3,7 @@ import { User } from '../users/entities/user.entity';
 import { EmailsService } from '../emails/emails.service';
 import { UsersService } from '../users/users.service';
 import { VerificationUtitliy } from './verification.utility';
+import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import { BadRequestException } from '../exception/bad-request.exception';
 import { UnauthorizedException } from '../exception/unauthorized.exception';
@@ -17,6 +18,7 @@ export class VerificationService {
     @Inject(forwardRef(() => UsersService))
     private usersService: UsersService,
     private verificationUtility: VerificationUtitliy,
+    private configService: ConfigService,
   ) {}
 
   async initiateVerification(user: User, verificationAction: string) {
@@ -55,7 +57,7 @@ export class VerificationService {
       this.verificationUtility.generateVerificationCode();
     await this.emailsService.createAndSendEmail(
       user.email,
-      user.email,
+      this.configService.get('VERIFIED_SENDER_EMAIL'),
       `Timer Application: ${this.verificationUtility.capitalizeVerificationAction(verificationAction)}`,
       `The copy & paste code for ${verificationAction} is as follows: ${verificationCode}.`,
       `
