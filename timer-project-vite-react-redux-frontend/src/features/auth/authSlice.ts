@@ -81,6 +81,7 @@ export const submitSignIn = createAppAsyncThunk<void, SignInDTO>(
           "Content-type": "application/json",
         },
         body: JSON.stringify(signinDTO),
+        credentials: "include",
       });
 
       if (!response.ok) {
@@ -119,6 +120,7 @@ export const verifySignUpOrIn = createAppAsyncThunk<void, VerifyAccountDTO>(
           "Content-type": "application/json",
         },
         body: JSON.stringify(verifySignUpDTO),
+        credentials: "include",
       });
 
       if (!response.ok) {
