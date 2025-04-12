@@ -15,7 +15,7 @@ function BreakLocalItemComponent({
 }) {
   return (
     <>
-      <div className="grid h-fit w-full grid-rows-2">
+      <div className="h-fit w-full">
         <div className="sticky top-0 z-10 flex flex-row items-center justify-between bg-black p-1! dark:bg-gray-700">
           <span className="text-xs text-white">Break Number</span>
           <span className="text-xs text-white">{item.breakNumber}</span>
