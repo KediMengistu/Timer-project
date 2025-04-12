@@ -19,63 +19,63 @@ function TimerItemInformationContent({
 }) {
   const timezoneState = useAppSelector((state) => state.time.timezone);
 
-  // Add refs for scroll containers
-  const utcScrollContainerRef = useRef<HTMLDivElement | null>(null);
-  const localScrollContainerRef = useRef<HTMLDivElement | null>(null);
+  // // Add refs for scroll containers
+  // const utcScrollContainerRef = useRef<HTMLDivElement | null>(null);
+  // const localScrollContainerRef = useRef<HTMLDivElement | null>(null);
 
-  // Functions to handle left and right scrolling for UTC view
-  const scrollUtcLeft = () => {
-    if (!utcScrollContainerRef.current) return;
+  // // Functions to handle left and right scrolling for UTC view
+  // const scrollUtcLeft = () => {
+  //   if (!utcScrollContainerRef.current) return;
 
-    const container = utcScrollContainerRef.current;
-    const firstChild = container.children[0] as HTMLElement;
-    const scrollWidth = firstChild.offsetWidth;
+  //   const container = utcScrollContainerRef.current;
+  //   const firstChild = container.children[0] as HTMLElement;
+  //   const scrollWidth = firstChild.offsetWidth;
 
-    container.scrollBy({
-      left: -scrollWidth,
-      behavior: "smooth",
-    });
-  };
+  //   container.scrollBy({
+  //     left: -scrollWidth,
+  //     behavior: "smooth",
+  //   });
+  // };
 
-  const scrollUtcRight = () => {
-    if (!utcScrollContainerRef.current) return;
+  // const scrollUtcRight = () => {
+  //   if (!utcScrollContainerRef.current) return;
 
-    const container = utcScrollContainerRef.current;
-    const firstChild = container.children[0] as HTMLElement;
-    const scrollWidth = firstChild.offsetWidth;
+  //   const container = utcScrollContainerRef.current;
+  //   const firstChild = container.children[0] as HTMLElement;
+  //   const scrollWidth = firstChild.offsetWidth;
 
-    container.scrollBy({
-      left: scrollWidth,
-      behavior: "smooth",
-    });
-  };
+  //   container.scrollBy({
+  //     left: scrollWidth,
+  //     behavior: "smooth",
+  //   });
+  // };
 
-  // Functions to handle left and right scrolling for Local view
-  const scrollLocalLeft = () => {
-    if (!localScrollContainerRef.current) return;
+  // // Functions to handle left and right scrolling for Local view
+  // const scrollLocalLeft = () => {
+  //   if (!localScrollContainerRef.current) return;
 
-    const container = localScrollContainerRef.current;
-    const firstChild = container.children[0] as HTMLElement;
-    const scrollWidth = firstChild.offsetWidth;
+  //   const container = localScrollContainerRef.current;
+  //   const firstChild = container.children[0] as HTMLElement;
+  //   const scrollWidth = firstChild.offsetWidth;
 
-    container.scrollBy({
-      left: -scrollWidth,
-      behavior: "smooth",
-    });
-  };
+  //   container.scrollBy({
+  //     left: -scrollWidth,
+  //     behavior: "smooth",
+  //   });
+  // };
 
-  const scrollLocalRight = () => {
-    if (!localScrollContainerRef.current) return;
+  // const scrollLocalRight = () => {
+  //   if (!localScrollContainerRef.current) return;
 
-    const container = localScrollContainerRef.current;
-    const firstChild = container.children[0] as HTMLElement;
-    const scrollWidth = firstChild.offsetWidth;
+  //   const container = localScrollContainerRef.current;
+  //   const firstChild = container.children[0] as HTMLElement;
+  //   const scrollWidth = firstChild.offsetWidth;
 
-    container.scrollBy({
-      left: scrollWidth,
-      behavior: "smooth",
-    });
-  };
+  //   container.scrollBy({
+  //     left: scrollWidth,
+  //     behavior: "smooth",
+  //   });
+  // };
 
   return (
     <AnimatePresence mode="wait">
@@ -92,7 +92,7 @@ function TimerItemInformationContent({
           <div className="relative grid h-full w-full grid-rows-[auto_1fr]">
             <div className="flex items-center justify-between p-2! dark:border-b-gray-700">
               <h1 className="text-center text-xs text-black italic dark:text-white">
-                {item.title} Stats &#183;{" "}
+                Stats &#183;{" "}
                 <span className="font-bold text-red-500 underline underline-offset-2 dark:text-yellow-400">
                   UTC
                 </span>
@@ -106,8 +106,8 @@ function TimerItemInformationContent({
               </h1>
             </div>
             <div
-              ref={utcScrollContainerRef}
-              className="scrollbar-none relative flex h-full w-full snap-x snap-mandatory scroll-p-1! items-center overflow-x-auto border-t-2 border-black pt-1! pr-1! pb-1! pl-1! whitespace-nowrap md:pb-4! dark:border-gray-700 dark:bg-gray-800"
+              // ref={utcScrollContainerRef}
+              className="scrollbar-thin relative flex h-full w-full snap-x snap-mandatory scroll-p-1! items-center overflow-x-auto border-t-2 border-black pt-1! pr-1! pb-1! pl-1! whitespace-nowrap md:pb-4! dark:border-gray-700 dark:bg-gray-800"
             >
               <div className="ml-2! inline h-full w-full shrink-0 grow-0 snap-center snap-always rounded-sm border-1 border-black bg-white align-middle whitespace-normal shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)] dark:border-gray-700 dark:bg-gray-800">
                 <div className="grid h-full w-full grid-rows-10 gap-1 p-1!">
@@ -213,7 +213,7 @@ function TimerItemInformationContent({
               </div>
               <BreakUTCListComponent item={item} />
             </div>
-            <button
+            {/* <button
               onClick={scrollUtcLeft}
               className="absolute bottom-[-7%] left-[45.5%] flex h-4 w-8 -translate-x-1/2 -translate-y-1/2 items-center justify-evenly hover:cursor-pointer active:opacity-55 md:bottom-[-5%]"
             >
@@ -228,7 +228,7 @@ function TimerItemInformationContent({
               <span className="text-xl text-black dark:text-gray-500">
                 &rarr;
               </span>
-            </button>
+            </button> */}
           </div>
         </motion.div>
       ) : (
@@ -244,7 +244,7 @@ function TimerItemInformationContent({
           <div className="relative grid h-full w-full grid-rows-[auto_1fr]">
             <div className="flex items-center justify-between p-2! dark:border-b-gray-700">
               <h1 className="text-center text-xs text-black italic dark:text-white">
-                {item.title} Stats &#183;{" "}
+                Stats &#183;{" "}
                 <span className="font-bold text-red-500 underline underline-offset-2 dark:text-yellow-400">
                   Local
                 </span>
@@ -258,8 +258,8 @@ function TimerItemInformationContent({
               </h1>
             </div>
             <div
-              ref={localScrollContainerRef}
-              className="scrollbar-none relative flex h-full w-full snap-x snap-mandatory scroll-p-1! items-center overflow-x-auto border-t-2 border-black pt-1! pr-1! pb-1! pl-1! whitespace-nowrap md:pb-4! dark:border-gray-700 dark:bg-gray-800"
+              // ref={localScrollContainerRef}
+              className="scrollbar-thin relative flex h-full w-full snap-x snap-mandatory scroll-p-1! items-center overflow-x-auto border-t-2 border-black pt-1! pr-1! pb-1! pl-1! whitespace-nowrap md:pb-4! dark:border-gray-700 dark:bg-gray-800"
             >
               <div className="ml-2! inline h-full w-full shrink-0 grow-0 snap-center snap-always rounded-sm border-1 border-black bg-white align-middle whitespace-normal shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)] dark:border-gray-700 dark:bg-gray-800">
                 <div className="grid h-full w-full grid-rows-10 gap-1 p-1!">
@@ -365,7 +365,7 @@ function TimerItemInformationContent({
               </div>
               <BreakLocalListComponent item={item} />
             </div>
-            <button
+            {/* <button
               onClick={scrollLocalLeft}
               className="absolute bottom-[-7%] left-[45.5%] flex h-4 w-8 -translate-x-1/2 -translate-y-1/2 items-center justify-evenly hover:cursor-pointer active:opacity-55 md:bottom-[-5%]"
             >
@@ -380,7 +380,7 @@ function TimerItemInformationContent({
               <span className="text-xl text-black dark:text-gray-500">
                 &rarr;
               </span>
-            </button>
+            </button> */}
           </div>
         </motion.div>
       )}
