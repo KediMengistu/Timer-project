@@ -25,6 +25,7 @@ import { CatchEverythingFilter } from './exception/catch-everything-exception.fi
         username: configService.get('PGUSER'),
         password: configService.get('PGPASSWORD'),
         autoLoadEntities: true,
+        synchronize: true,
         ssl: { rejectUnauthorized: false },
       }),
     }),
