@@ -34,7 +34,7 @@ export class AuthController {
     response.cookie('jwt', userDetails.access_token, {
       httpOnly: true,
       secure: true,
-      sameSite: 'none',
+      sameSite: 'None',
       maxAge: 3600000,
       path: '/',
     });
@@ -50,7 +50,7 @@ export class AuthController {
     response.cookie('jwt', userDetails.access_token, {
       httpOnly: true,
       secure: true,
-      sameSite: 'none',
+      sameSite: 'None',
       maxAge: 3600000,
       path: '/',
     });
@@ -62,7 +62,7 @@ export class AuthController {
     response.clearCookie('jwt', {
       httpOnly: true,
       secure: true,
-      sameSite: 'none',
+      sameSite: 'None',
       path: '/',
     });
   }
