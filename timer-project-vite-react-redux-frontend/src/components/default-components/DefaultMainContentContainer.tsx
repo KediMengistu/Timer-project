@@ -19,7 +19,7 @@ function DefaultMainContentContainer() {
       >
         <div className="pointer-events-none relative grid w-64 grid-rows-[auto_1fr] rounded-sm border-2 border-black bg-white p-2! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-700 dark:bg-gray-800">
           <div className="flex items-center justify-center border-b-2 border-b-black p-2! dark:border-b-gray-600">
-            <h1 className="text-xs italic">
+            <h1 className="text-center text-xs italic">
               <span className="font-bold">Home</span> &#183; Navigate
               Application Via Navbar
             </h1>
