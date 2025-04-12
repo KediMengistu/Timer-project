@@ -35,7 +35,7 @@ function DeleteAccountVerifyUserForm() {
     (state) => state.user.error,
   );
   const userState = useAppSelector((state) => state.user.user);
-  const [refsInitialized, setRefsInitialized] = useState<boolean>(false);
+  const [_refsInitialized, setRefsInitialized] = useState<boolean>(false);
   const [sentReInitiateVerification, setSentReinitiateVerification] =
     useState<boolean>(false);
   const [noEmailAPIError, setNoEmailAPIError] =

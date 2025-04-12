@@ -36,7 +36,7 @@ function SignUpVerifyUserForm() {
   const [password, setPassword] = useState<string>("");
   const [sentReinitiateVerification, setSentReinitiateVerification] =
     useState<boolean>(false);
-  const [refsInitialized, setRefsInitialized] = useState<boolean>(false);
+  const [_refsInitialized, setRefsInitialized] = useState<boolean>(false);
   const [nonAPIError, setNonAPIError] = useState<ApiErrorResponse | null>(null);
 
   const handleContinueAsGuestClick = () => {
