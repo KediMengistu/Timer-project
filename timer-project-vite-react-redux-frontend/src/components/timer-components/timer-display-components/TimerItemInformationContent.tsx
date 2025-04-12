@@ -87,7 +87,7 @@ function TimerItemInformationContent({
           exit={{ opacity: 0, x: -5 }}
           transition={{ duration: 0.3, ease: "easeInOut" }}
           style={{ willChange: "transform", backfaceVisibility: "hidden" }}
-          className="absolute top-[50%] left-[50%] h-80 w-58 -translate-x-1/2 -translate-y-1/2 rounded-2xl border-2 border-black bg-white pb-1! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-700 dark:bg-gray-800"
+          className="absolute top-[50%] left-[50%] h-80 w-58 -translate-x-1/2 -translate-y-1/2 rounded-tl-2xl rounded-tr-2xl border-2 border-black bg-white pb-1! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-700 dark:bg-gray-800"
         >
           <div className="relative grid h-full w-full grid-rows-[auto_1fr]">
             <div className="flex items-center justify-between p-2! dark:border-b-gray-700">
@@ -107,7 +107,7 @@ function TimerItemInformationContent({
             </div>
             <div
               // ref={utcScrollContainerRef}
-              className="relative m-1! flex h-full w-full snap-x snap-mandatory scroll-p-1! items-center overflow-x-auto border-t-2 border-black pt-1! pr-1! pb-2! pl-1! whitespace-nowrap dark:border-gray-700 dark:bg-transparent [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-400 dark:[&::-webkit-scrollbar-thumb]:bg-gray-400 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent dark:[&::-webkit-scrollbar-track]:bg-transparent"
+              className="relative flex h-full w-full snap-x snap-mandatory scroll-p-1! items-center overflow-x-auto border-t-2 border-black pt-1! pr-1! pb-2! pl-1! whitespace-nowrap dark:border-gray-700 dark:bg-transparent [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-400 dark:[&::-webkit-scrollbar-thumb]:bg-gray-400 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent dark:[&::-webkit-scrollbar-track]:bg-transparent"
             >
               <div className="ml-2! inline h-full w-full shrink-0 grow-0 snap-center snap-always rounded-sm border-1 border-black bg-white align-middle whitespace-normal shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)] dark:border-gray-700 dark:bg-gray-800">
                 <div className="grid h-full w-full grid-rows-10 gap-1 p-1!">
@@ -239,7 +239,7 @@ function TimerItemInformationContent({
           exit={{ opacity: 0, x: -5 }}
           transition={{ duration: 0.3, ease: "easeInOut" }}
           style={{ willChange: "transform", backfaceVisibility: "hidden" }}
-          className="absolute top-[50%] left-[50%] h-80 w-58 -translate-x-1/2 -translate-y-1/2 rounded-2xl border-2 border-black bg-white pb-1! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-700 dark:bg-gray-800"
+          className="absolute top-[50%] left-[50%] h-80 w-58 -translate-x-1/2 -translate-y-1/2 rounded-tl-2xl rounded-tr-2xl border-2 border-black bg-white pb-1! shadow-[2.25px_3px_0_2px_rgba(0,0,0,0.516)] dark:border-gray-700 dark:bg-gray-800"
         >
           <div className="relative grid h-full w-full grid-rows-[auto_1fr]">
             <div className="flex items-center justify-between p-2! dark:border-b-gray-700">
@@ -259,7 +259,7 @@ function TimerItemInformationContent({
             </div>
             <div
               // ref={localScrollContainerRef}
-              className="relative m-1! flex h-full w-full snap-x snap-mandatory scroll-p-1! items-center overflow-x-auto border-t-2 border-black pt-1! pr-1! pb-2! pl-1! whitespace-nowrap dark:border-gray-700 dark:bg-transparent [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-400 dark:[&::-webkit-scrollbar-thumb]:bg-gray-400 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent dark:[&::-webkit-scrollbar-track]:bg-transparent"
+              className="relative flex h-full w-full snap-x snap-mandatory scroll-p-1! items-center overflow-x-auto border-t-2 border-black pt-1! pr-1! pb-2! pl-1! whitespace-nowrap dark:border-gray-700 dark:bg-transparent [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-400 dark:[&::-webkit-scrollbar-thumb]:bg-gray-400 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent dark:[&::-webkit-scrollbar-track]:bg-transparent"
             >
               <div className="ml-2! inline h-full w-full shrink-0 grow-0 snap-center snap-always rounded-sm border-1 border-black bg-white align-middle whitespace-normal shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)] dark:border-gray-700 dark:bg-gray-800">
                 <div className="grid h-full w-full grid-rows-10 gap-1 p-1!">
