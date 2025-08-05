@@ -51,7 +51,7 @@ function TimerSelectScrollListItemComponent({ item }: { item: Timer }) {
               }}
               className="group flex flex-row items-center justify-center rounded-full border-2 border-white bg-white p-2! shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)] transition ease-in-out hover:cursor-pointer hover:border-red-500 hover:bg-red-500 active:opacity-55 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-red-500 dark:hover:bg-red-500"
             >
-              <span className="text-center text-[10px] text-black group-hover:text-white dark:text-white">
+              <span className="text-center text-[8px] text-black group-hover:text-white md:text-[10px] dark:text-white">
                 Delete Timer
               </span>
             </button>
@@ -61,7 +61,7 @@ function TimerSelectScrollListItemComponent({ item }: { item: Timer }) {
               }}
               className="group flex items-center justify-center rounded-full border-2 border-black bg-black p-2! shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)] transition duration-300 ease-in-out hover:cursor-pointer hover:bg-white active:opacity-55 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-800"
             >
-              <span className="text-left text-[10px] text-white group-hover:text-black dark:group-hover:text-white">
+              <span className="text-left text-[8px] text-white group-hover:text-black md:text-[10px] dark:group-hover:text-white">
                 Open Timer &rarr;
               </span>
             </button>
